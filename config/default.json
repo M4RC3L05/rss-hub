@@ -1,0 +1,27 @@
+{
+  "apps": {
+    "api": {
+      "host": "127.0.0.1",
+      "port": 4321,
+      "basicAuth": {
+        "name": "foo",
+        "pass": "bar"
+      }
+    },
+    "web": {
+      "host": "127.0.0.1",
+      "port": 4322,
+      "basicAuth": {
+        "name": "foo",
+        "pass": "bar"
+      }
+    },
+    "feeds-synchronizer": {
+      "timezone": "Etc/GMT",
+      "cron": "0 */10 * * * * *"
+    }
+  },
+  "database": {
+    "path": "./data/app.db"
+  }
+}

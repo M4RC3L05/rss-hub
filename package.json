@@ -64,7 +64,6 @@
     "kysely-codegen": "^0.10.0",
     "lint-staged": "^13.2.2",
     "offline-github-changelog": "^3.0.1",
-    "patch-package": "^7.0.0",
     "pino-pretty": "^10.0.0",
     "prettier": "^2.8.8",
     "react": "^18.2.0",
@@ -99,6 +98,7 @@
     "lodash-es": "^4.17.21",
     "node-fetch": "^3.3.1",
     "node-html-parser": "^6.1.5",
+    "patch-package": "^7.0.0",
     "pino": "^8.14.1",
     "ts-node": "^10.9.1"
   }

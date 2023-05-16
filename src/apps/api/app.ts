@@ -21,9 +21,9 @@ const makeApp = (deps: MakeAppDeps) => {
 
   app.use(deps.middlewares.requestLifeCycle);
   app.use(deps.middlewares.errorMapper);
+  app.use(deps.middlewares.cors);
   app.use(deps.middlewares.basicAuth);
   app.use(deps.middlewares.bodyParser);
-  app.use(deps.middlewares.cors);
   app.use(deps.router.routes());
   app.use(deps.router.allowedMethods());
 

@@ -18,7 +18,9 @@
     "db:seed": "sqlite3 ./data/app.db \".read ./src/database/seed.sql\"",
     "db:migrate": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations -s ./src/database/schema.sql migrate",
     "postdb:migrate": "npm run db:gen-types",
-    "db:gen-types": "kysely-codegen --dialect sqlite --url ./data/app.db --camel-case"
+    "db:gen-types": "kysely-codegen --dialect sqlite --url ./data/app.db --camel-case",
+    "version": "offline-github-changelog --next=${npm_new_version} | sed -e '/Release v.*/d;s/ (\\[.*\\]\\(.*\\))//gm' > CHANGELOG.md && git add CHANGELOG.md",
+    "postinstall": "patch-package"
   },
   "engines": {
     "node": "18.x.x"
@@ -61,6 +63,8 @@
     "husky": "^8.0.3",
     "kysely-codegen": "^0.10.0",
     "lint-staged": "^13.2.2",
+    "offline-github-changelog": "^3.0.1",
+    "patch-package": "^7.0.0",
     "pino-pretty": "^10.0.0",
     "prettier": "^2.8.8",
     "react": "^18.2.0",

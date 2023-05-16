@@ -8,6 +8,9 @@
   "author": "",
   "license": "MIT",
   "scripts": {
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
+    "lint": "xo && tsc -p tsconfig.json --noEmit --skipLibCheck",
+    "lint-staged": "lint-staged",
     "dev:api": "node --watch --no-warnings --loader ts-node/esm src/apps/api/main.ts | pino-pretty",
     "dev:web": "node --watch --no-warnings --loader ts-node/esm src/apps/web/main.ts | pino-pretty",
     "dev:feeds-synchronizer": "node --watch --no-warnings --loader ts-node/esm src/apps/feeds-synchronizer/main.ts | pino-pretty",
@@ -15,8 +18,7 @@
     "db:seed": "sqlite3 ./data/app.db \".read ./src/database/seed.sql\"",
     "db:migrate": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations -s ./src/database/schema.sql migrate",
     "postdb:migrate": "npm run db:gen-types",
-    "db:gen-types": "kysely-codegen --dialect sqlite --url ./data/app.db --camel-case",
-    "lint": "xo"
+    "db:gen-types": "kysely-codegen --dialect sqlite --url ./data/app.db --camel-case"
   },
   "engines": {
     "node": "18.x.x"
@@ -56,7 +58,9 @@
     "@types/react-dom": "^18.2.4",
     "bootstrap": "^5.2.3",
     "htm": "^3.1.1",
+    "husky": "^8.0.3",
     "kysely-codegen": "^0.10.0",
+    "lint-staged": "^13.2.2",
     "pino-pretty": "^10.0.0",
     "prettier": "^2.8.8",
     "react": "^18.2.0",

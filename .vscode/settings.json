@@ -1,0 +1,13 @@
+{
+  "editor.formatOnSave": true,
+  "xo.enable": true,
+  "xo.format.enable": true,
+  "javascript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "[typescript]": {
+    "editor.defaultFormatter": "samverschueren.linter-xo",
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "samverschueren.linter-xo"
+  }
+}

@@ -1,3 +1,10 @@
+### v0.1.1 (2023-05-16)
+
+- [Switch middleware order](https://github.com/M4RC3L05/rss-hub/commit/f2adb8e1f475d240e7ffa2ddf836687f1ac15772)
+- [Add \`interpreter\` to pm2 config files](https://github.com/M4RC3L05/rss-hub/commit/26b4960ba974b792045d219d762056b000b73402)
+- [Add front config in gitignore](https://github.com/M4RC3L05/rss-hub/commit/35a29f1fb65a729fd669b1e9f1be5d064ba23140)
+- [Move \`patch-package\` to dependencies](https://github.com/M4RC3L05/rss-hub/commit/aef3453c2fe5cc2c089e7b65d5370de055c2cc62)
+
 ### v0.1.0 (2023-05-16)
 
 - [Add npm version command](https://github.com/M4RC3L05/rss-hub/commit/ca5da72e02c939cfc36d9ae311d83a318574aadd)

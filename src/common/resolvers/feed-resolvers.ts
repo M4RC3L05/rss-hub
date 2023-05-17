@@ -7,7 +7,7 @@ export const resolveGuid = (feed: Record<string, unknown>) => {
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))
-    .find((v) => typeof v === "string" && v.trim().length > 0)
+    .find((v) => (typeof v === "string" && v.trim().length > 0) || typeof v === "number")
     .value() as string | undefined;
 };
 

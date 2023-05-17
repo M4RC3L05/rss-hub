@@ -5,10 +5,14 @@ import { type XMLBuilder } from "fast-xml-parser";
 export const resolveGuid = (feed: Record<string, unknown>) => {
   const searchKeys = ["guid", "guid.#text", "id", "id.#text", "newsid"];
 
-  return _.chain(searchKeys)
+  const value = _.chain(searchKeys)
     .map((k) => _.get(feed, k))
     .find((v) => (typeof v === "string" && v.trim().length > 0) || typeof v === "number")
     .value() as string | undefined;
+
+  if (!value) return;
+
+  return String(value);
 };
 
 export const resolveLink = (feed: Record<string, unknown>) => {

@@ -3,6 +3,8 @@
     "module": "NodeNext",
     "target": "ESNext",
     "moduleResolution": "nodenext",
+    "skipLibCheck": true,
+    "noEmit": true,
 
     "strict": true,
     "noImplicitOverride": true,

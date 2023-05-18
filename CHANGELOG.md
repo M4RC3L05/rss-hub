@@ -1,3 +1,7 @@
+### v0.2.1 (2023-05-18)
+
+- [Fix app process hook name](https://github.com/M4RC3L05/rss-hub/commit/50a3ed22edb8a06f7e0458dc0b5a1781801f9ef8)
+
 ### v0.2.0 (2023-05-18)
 
 - [Improve get feed title resolver](https://github.com/M4RC3L05/rss-hub/commit/d26851b832d31d76c92ee77dbf8ba1c0e990b6d6)

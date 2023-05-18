@@ -1,5 +1,6 @@
 import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
+import createHttpError from "http-errors";
 import type FeedService from "../../../../common/services/feed-service.js";
 
 type ValidateFeedUrlDeps = {
@@ -32,8 +33,8 @@ export const handler = (deps: ValidateFeedUrlDeps): Router.Middleware => {
       const title = deps.feedService.getFeedTitle(extracted);
 
       ctx.body = { data: { title } };
-    } catch {
-      ctx.throw(422, "Invalid feed url");
+    } catch (error) {
+      throw createHttpError(422, { cause: error, message: "Invalid feed url" });
     }
   };
 };

@@ -77,15 +77,17 @@ class FeedService {
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
-    return this.#extractRawFeed(url, options);
+    const rawFeed = await this.#extractRawFeed(url, options);
+    const parsed = this.toObject(rawFeed);
+
+    if (!this.#resolvers.resolveFeed(parsed)) {
+      throw new Error(`No feed found in url ${url}`);
+    }
+
+    return parsed;
   }
 
-  getFeedTitle(data: string) {
-    const parsed = this.toObject(data);
-    const feed = this.#resolvers.resolveFeed(parsed);
-
-    if (!feed) return undefined;
-
+  getFeedTitle(feed: Record<string, unknown>) {
     return this.#resolvers.resolveFeedTitle(feed);
   }
 

@@ -1,3 +1,16 @@
+### v0.2.0 (2023-05-18)
+
+- [Improve get feed title resolver](https://github.com/M4RC3L05/rss-hub/commit/d26851b832d31d76c92ee77dbf8ba1c0e990b6d6)
+- [Improve feed url verification check](https://github.com/M4RC3L05/rss-hub/commit/16bae2756f254bdeb25b6b770f1375dfaa7ecf06)
+- [Tweak margin bottom of feed item card](https://github.com/M4RC3L05/rss-hub/commit/89cf52921f21408f7fd8f881cb5756459e99cb91)
+- [Add word wrap to feed title modal](https://github.com/M4RC3L05/rss-hub/commit/9676038c6ec49524613b44b22e2d723aaad3a872)
+- [Fix indentation](https://github.com/M4RC3L05/rss-hub/commit/f6598907015cb27689e39e4c2452573ac17c1cd0)
+- [Move feed action buttons to the card footer](https://github.com/M4RC3L05/rss-hub/commit/e107a75f93e5e4ddf714e6474c1f1d0fb64b2e34)
+- [Update web config exmaple file](https://github.com/M4RC3L05/rss-hub/commit/b9a07cd9872d5dff129f68435d1357e950ef08e9)
+- [Update ts and lint staged config](https://github.com/M4RC3L05/rss-hub/commit/6cb1c22d360342fb515b3fb479ce1aa5160cf3c5)
+- [Parse ids as strings](https://github.com/M4RC3L05/rss-hub/commit/829470e443aea3ef1aceace364f44c822ccfc407)
+- [Allow number guids](https://github.com/M4RC3L05/rss-hub/commit/afa5349d7a2dad281306f533155939c11610d7a0)
+
 ### v0.1.1 (2023-05-16)
 
 - [Switch middleware order](https://github.com/M4RC3L05/rss-hub/commit/f2adb8e1f475d240e7ffa2ddf836687f1ac15772)

@@ -673,14 +673,14 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
         <//>
         <span class="mx-1"></span>
         <${Button}
-        variant="secundary"
-        size="sm"
-        onClick=${() => setShowAll((previous) => !previous)}>
-          ${
-            showAll
-              ? html`<i class="bi bi-eye-fill"></i>`
-              : html`<i class="bi bi-eye-slash-fill"></i>`
-          }
+          variant="secundary"
+          size="sm"
+          onClick=${() => setShowAll((previous) => !previous)}>
+            ${
+              showAll
+                ? html`<i class="bi bi-eye-fill"></i>`
+                : html`<i class="bi bi-eye-slash-fill"></i>`
+            }
         <//>
       <//>
     </${Modal}>

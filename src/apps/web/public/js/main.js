@@ -629,7 +629,7 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
             roundedCircle
           />
           <span class="mx-1"></span>
-          ${feed.name}
+          <span class="w-100" style=${{ wordWrap: "anywhere" }}>${feed.name}</span>
         <//>
       <//>
       <${Modal.Body}>

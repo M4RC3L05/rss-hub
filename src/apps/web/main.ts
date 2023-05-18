@@ -39,7 +39,7 @@ server.addListener("close", () => {
 });
 
 processUtils.addHook({
-  name: "api",
+  name: "web",
   async handler() {
     await pClose().catch((error) => {
       log.error(error, "Could not close server");

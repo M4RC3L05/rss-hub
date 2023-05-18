@@ -87,7 +87,8 @@ class FeedService {
     return parsed;
   }
 
-  getFeedTitle(feed: Record<string, unknown>) {
+  getFeedTitle(raw: Record<string, unknown>) {
+    const feed = this.#resolvers.resolveFeed(raw)!;
     return this.#resolvers.resolveFeedTitle(feed);
   }
 

@@ -630,38 +630,6 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
           />
           <span class="mx-1"></span>
           ${feed.name}
-          <span class="mx-2"></span>
-          <${Button} variant="primary" size="sm" onClick=${() => setShowUpdateModal(true)}>
-            <i class="bi bi-pencil-square"></i>
-          <//>
-          <span class="mx-2"></span>
-          <${Button} variant="danger" size="sm" onClick=${() => setShowDeleteModal(true)}>
-            <i class="bi bi-trash-fill"></i>
-          <//>
-          <span class="mx-2"></span>
-          <${Button}
-            variant="success"
-            size="sm"
-            onClick=${() => {
-              requests.feedItems.markFeedItemsAsRead({ body: { feedId: feed.id } }).then(() => {
-                feedItemsMutate();
-                mutate(`${paths.feeds.getFeeds}?categoryId=${feed.categoryId}`);
-              });
-            }}
-          >
-            <i class="bi bi-check2-all"></i>
-          <//>
-          <span class="mx-2"></span>
-          <${Button}
-          variant="secundary"
-          size="sm"
-          onClick=${() => setShowAll((previous) => !previous)}>
-            ${
-              showAll
-                ? html`<i class="bi bi-eye-fill"></i>`
-                : html`<i class="bi bi-eye-slash-fill"></i>`
-            }
-          <//>
         <//>
       <//>
       <${Modal.Body}>
@@ -680,6 +648,39 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
                 <//>
               `,
           )}
+        <//>
+      <//>
+      <${Modal.Footer} className="justify-content-start">
+        <${Button} variant="primary" size="sm" onClick=${() => setShowUpdateModal(true)}>
+          <i class="bi bi-pencil-square"></i>
+        <//>
+        <span class="mx-1"></span>
+        <${Button} variant="danger" size="sm" onClick=${() => setShowDeleteModal(true)}>
+          <i class="bi bi-trash-fill"></i>
+        <//>
+        <span class="mx-1"></span>
+        <${Button}
+          variant="success"
+          size="sm"
+          onClick=${() => {
+            requests.feedItems.markFeedItemsAsRead({ body: { feedId: feed.id } }).then(() => {
+              feedItemsMutate();
+              mutate(`${paths.feeds.getFeeds}?categoryId=${feed.categoryId}`);
+            });
+          }}
+        >
+          <i class="bi bi-check2-all"></i>
+        <//>
+        <span class="mx-1"></span>
+        <${Button}
+        variant="secundary"
+        size="sm"
+        onClick=${() => setShowAll((previous) => !previous)}>
+          ${
+            showAll
+              ? html`<i class="bi bi-eye-fill"></i>`
+              : html`<i class="bi bi-eye-slash-fill"></i>`
+          }
         <//>
       <//>
     </${Modal}>

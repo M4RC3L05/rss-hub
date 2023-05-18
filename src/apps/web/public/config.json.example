@@ -2,8 +2,8 @@
   "api": {
     "url": "http://127.0.0.1:4321",
     "auth": {
-      "username": "foo",
-      "pasword": "bar"
+      "name": "foo",
+      "pass": "bar"
     }
   }
 }

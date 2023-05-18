@@ -554,7 +554,7 @@ const FeedItem = ({ feedItem, mutate }) => {
       mutate=${mutate}
       handleClose=${() => setShowDetailModal(false)}
     />
-    <${Card} className="mx-2 mb-4" onClick=${() => setShowDetailModal(true)}>
+    <${Card} className="mx-2 mb-2" onClick=${() => setShowDetailModal(true)}>
       <${Card.Img} variant="top" src=${feedItem.img} />
       <${Card.Body}>
         <${Card.Title}>${feedItem.title}<//>

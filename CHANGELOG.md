@@ -1,3 +1,7 @@
+### v1.0.1 (2023-05-19)
+
+- [Improve regex to get feed item image](https://github.com/M4RC3L05/rss-hub/commit/b5430236ba5f05c06aab2275170ca28f095d4804)
+
 ### v1.0.0 (2023-05-19)
 
 - [Add self host esm front deps note](https://github.com/M4RC3L05/rss-hub/commit/73c44b59804c59ff9af43d953637c2cad466df2c)

@@ -76,7 +76,7 @@ export const resolveFeedItemImage = (
   const content = resolveContent(feed);
 
   if (content) {
-    const r = /src\s*=\s*"(.+?)"/;
+    const r = /<img.*?src=["']([^"']+)["']/im;
     const match = r.exec(content);
 
     return match?.[1];

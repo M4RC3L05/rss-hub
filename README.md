@@ -48,3 +48,9 @@ npm version [major | minor | patch] -m "Release v%s"
 
 git push origin main --tags
 ```
+
+## Extra
+
+### Frontend dependencies
+
+This project uses a self hosted instance of esm.sh, please update the importmaps html file from the web app to a valid instance of esm.sh

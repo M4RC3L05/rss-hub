@@ -1,3 +1,9 @@
+### v1.0.0 (2023-05-19)
+
+- [Add self host esm front deps note](https://github.com/M4RC3L05/rss-hub/commit/73c44b59804c59ff9af43d953637c2cad466df2c)
+- [Use self hosted esm instance](https://github.com/M4RC3L05/rss-hub/commit/2d5c5c46d82c869e1e26be1a86d849d05f48d4df)
+- [Remove unused file](https://github.com/M4RC3L05/rss-hub/commit/9d0d6eb551cd2aa274ee2f18664beffb8d32f346)
+
 ### v0.2.1 (2023-05-18)
 
 - [Fix app process hook name](https://github.com/M4RC3L05/rss-hub/commit/50a3ed22edb8a06f7e0458dc0b5a1781801f9ef8)

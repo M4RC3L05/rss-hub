@@ -1,3 +1,8 @@
+### v1.1.0 (2023-05-20)
+
+- [Change read\/unread badge colors for feed item card](https://github.com/M4RC3L05/rss-hub/commit/b1c153418994e3092c4e08515178ecf0298f354c)
+- [Move feed item content actions to modal footer](https://github.com/M4RC3L05/rss-hub/commit/bd8dcc341b6264fdc1b451a309e787cbe86528eb)
+
 ### v1.0.1 (2023-05-19)
 
 - [Improve regex to get feed item image](https://github.com/M4RC3L05/rss-hub/commit/b5430236ba5f05c06aab2275170ca28f095d4804)

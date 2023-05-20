@@ -563,7 +563,9 @@ const FeedItem = ({ feedItem, mutate }) => {
           ${new Date(feedItem.createdAt).toLocaleString()}
           <br />
           <br />
-          <${Badge} bg="primary">${feedItem.readedAt ? "Read" : "Unread"}<//>
+          <${Badge} bg=${feedItem.readedAt ? "success" : "info"}>
+            ${feedItem.readedAt ? "Read" : "Unread"}
+          <//>
         <//>
       <//>
     <//>

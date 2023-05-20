@@ -503,11 +503,6 @@ const FeedItemContentModal = ({ feedItem, show, handleClose, mutate }) => {
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>${feedItem.title}<//>
-        <span class="mx-2"></span>
-        <${Button} variant="primary" size="sm" href=${feedItem.link} target="__blank">
-          <i class="bi bi-box-arrow-up-right"></i>
-        <//>
-        ${uncheckRead}
       <//>
       <${Modal.Body}>
         <div class="w-100 h-100 overflow-x-hidden overflow-y-auto render-feed-item-container">
@@ -539,6 +534,12 @@ const FeedItemContentModal = ({ feedItem, show, handleClose, mutate }) => {
             <//>
           <//>
         </div>
+      <//>
+      <${Modal.Footer} className="justify-content-start">
+        <${Button} variant="primary" size="sm" href=${feedItem.link} target="__blank">
+          <i class="bi bi-box-arrow-up-right"></i>
+        <//>
+        ${uncheckRead}
       <//>
     <//>
   `;

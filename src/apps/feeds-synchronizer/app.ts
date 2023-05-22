@@ -2,20 +2,19 @@
 import * as _ from "lodash-es";
 import { type Kysely } from "kysely";
 import { type DB } from "kysely-codegen";
+import { type Logger } from "pino";
 import type FeedService from "../../common/services/feed-service.js";
-import type makeLogger from "../../common/logger/mod.js";
 
 type FeedSynchronizerDeps = {
   db: Kysely<DB>;
-  logger: typeof makeLogger;
+  log: Logger;
   feedService: FeedService;
 };
 
 const run = async (
-  { db, logger, feedService }: FeedSynchronizerDeps,
+  { db, log, feedService }: FeedSynchronizerDeps,
   { signal }: { signal: AbortSignal },
 ) => {
-  const log = logger("feed-synchronizer-runner");
   const feeds = await db.selectFrom("feeds").selectAll().execute();
 
   log.info("Synching begin");

@@ -26,6 +26,7 @@ const db = makeDbClient({ path: config.get<string>("database.path"), randomUuid:
 const feedService = new FeedService({ db, parser, builder, resolvers: feedResolvers });
 const job = new Cron(cron, timezone);
 const log = makeLogger("feeds-synchronizer");
+const runnerLog = makeLogger("feed-synchronizer-runner");
 
 processUtils.addHook({
   name: "feeds-synchronizer",
@@ -41,7 +42,7 @@ for await (const signal of job.start()) {
   try {
     log.info(`Running feeds-synchronizer`);
 
-    await run({ db, feedService, logger: makeLogger }, { signal });
+    await run({ db, feedService, log: runnerLog }, { signal });
   } catch (error) {
     log.error(error, `Error running feeds-synchronizer task`);
   } finally {

@@ -1,6 +1,5 @@
 import { type Context, type Next } from "koa";
 import pick from "json-pick-keys";
-import createHttpError from "http-errors";
 import type makeLogger from "../logger/mod.js";
 
 type RequestLifeCycleDeps = {

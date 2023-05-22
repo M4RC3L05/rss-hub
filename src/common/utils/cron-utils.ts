@@ -8,7 +8,7 @@ export class Cron {
   #abortController: AbortController;
   #working: boolean;
   #worker!: AsyncGenerator<AbortSignal, void>;
-  #lastProcessAt?: Date;
+  #lastProcessAt?: number;
   #timezone?: string;
 
   constructor(when: Date | string, timezone?: string) {
@@ -38,62 +38,36 @@ export class Cron {
 
   nextTime() {
     return this.#when instanceof Date
-      ? new Date(this.#when)
+      ? this.#when
       : new Date(
           cronMatch
             .getFutureMatches(this.#when, {
               hasSeconds: true,
               timezone: this.#timezone,
-              matchValidator: (x) => {
-                const now = new Date();
-                const xx = new Date(x);
-
-                now.setMilliseconds(0);
-                xx.setMilliseconds(0);
-
-                return (this.#lastProcessAt ?? now).getTime() !== xx.getTime();
-              },
+              matchValidator: (date) =>
+                Math.floor(this.#lastProcessAt ?? Date.now() / 1000) !==
+                Math.floor(new Date(date).getTime() / 1000),
             })
             .at(0)!,
         );
   }
 
-  #checkTime() {
+  #checkTime(at: number | string) {
     if (this.#when instanceof Date) {
-      return Math.round(Date.now() / 1000) === Math.round(this.#when.getTime() / 1000);
+      return Math.floor(Date.now() / 1000) === Math.floor(this.#when.getTime() / 1000);
     }
 
-    return cronMatch.isTimeMatches(this.#when, new Date().toISOString(), this.#timezone);
+    return cronMatch.isTimeMatches(this.#when, new Date(at).toISOString(), this.#timezone);
   }
 
   async *#ticker() {
-    let previous = new Date();
-
     while (true) {
-      const now = new Date();
-      const next = this.nextTime();
-      // Ignore miliseconds as we use seconds as max resolution.
-      now.setMilliseconds(0);
-      next.setMilliseconds(0);
-
-      // How mutch time until the next execution time.
-      const delay = Math.max(next.getTime() - now.getTime(), 0);
-      // How mutch the code take
-      const drift = Math.max(now.getTime() - previous.getTime(), 0) % 2000;
-      const driftFinal = Math.max(0, drift > 1000 ? 1000 - (drift % 1000) : 0);
-      // From the delay we take the amount spent on code execution if any
-      previous = new Date();
-      const final = Math.max(
-        delay - driftFinal - Math.max(previous.getTime() - now.getTime(), 0),
-        0,
-      );
-
       try {
-        await setTimeout(final === 0 ? 5 : final, undefined, {
+        await setTimeout(16, undefined, {
           signal: this.#abortController.signal,
         });
 
-        yield final;
+        yield Date.now();
       } catch {
         return;
       }
@@ -101,10 +75,12 @@ export class Cron {
   }
 
   async *#work() {
-    for await (const _ of this.#ticker()) {
-      if (this.#checkTime()) {
-        this.#lastProcessAt = new Date();
-        this.#lastProcessAt.setMilliseconds(0);
+    for await (const at of this.#ticker()) {
+      if (
+        this.#checkTime(at) &&
+        (!this.#lastProcessAt || Math.floor(at / 1000) !== Math.floor(this.#lastProcessAt / 1000))
+      ) {
+        this.#lastProcessAt = at;
 
         yield this.#abortController.signal;
       }

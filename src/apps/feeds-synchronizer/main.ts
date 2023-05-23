@@ -7,7 +7,7 @@ import { Cron } from "../../common/utils/cron-utils.js";
 import { processUtils } from "../../common/utils/mod.js";
 import makeDbClient from "../../database/mod.js";
 import { feedResolvers } from "../../common/resolvers/mod.js";
-import run from "./app.js";
+import runner from "./app.js";
 
 const parser = new XMLParser({
   attributeNamePrefix: "@_",
@@ -26,7 +26,7 @@ const db = makeDbClient({ path: config.get<string>("database.path"), randomUuid:
 const feedService = new FeedService({ db, parser, builder, resolvers: feedResolvers });
 const job = new Cron(cron, timezone);
 const log = makeLogger("feeds-synchronizer");
-const runnerLog = makeLogger("feed-synchronizer-runner");
+const run = runner({ db, feedService, logger: makeLogger });
 
 processUtils.addHook({
   name: "feeds-synchronizer",
@@ -36,17 +36,17 @@ processUtils.addHook({
   },
 });
 
-log.info({ nextDate: job.nextTime().toISOString() }, "Registered feeds-synchronizer");
+log.info({ nextDate: job.nextTime() }, "Registered feeds-synchronizer");
 
 for await (const signal of job.start()) {
   try {
     log.info(`Running feeds-synchronizer`);
 
-    await run({ db, feedService, log: runnerLog }, { signal });
+    await run(signal);
   } catch (error) {
     log.error(error, `Error running feeds-synchronizer task`);
   } finally {
     log.info(`feeds-synchronizer completed`);
-    log.info(`Next at ${job.nextTime()?.toISOString()}`);
+    log.info(`Next at ${job.nextTime() ?? "unknown"}`);
   }
 }

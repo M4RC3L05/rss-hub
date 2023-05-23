@@ -72,7 +72,7 @@ export class Cron {
 
   async *#work() {
     for await (const at of this.#ticker()) {
-      if (this.#checkTime(at) && (!this.#lastProcessAt || at !== this.#lastProcessAt)) {
+      if (this.#checkTime(at * 1000) && (!this.#lastProcessAt || at !== this.#lastProcessAt)) {
         this.#lastProcessAt = at;
 
         yield this.#abortController.signal;

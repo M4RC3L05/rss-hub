@@ -1,4 +1,3 @@
-import { setTimeout } from "node:timers/promises";
 import { type RouterContext } from "@koa/router";
 import { type Next } from "koa";
 import type Ajv from "ajv";

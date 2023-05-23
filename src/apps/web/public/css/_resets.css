@@ -1,8 +1,10 @@
-html, body, #app {
+html, body{
   width: 100vw;
-  min-height: 100vh;
+}
+
+body, #app {
   overflow-x: hidden;
-  overflow-y: auto;
+  min-height: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {

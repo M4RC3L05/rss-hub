@@ -4,15 +4,16 @@ import * as cronMatch from "@datasert/cronjs-matcher";
 import { type CronExprs, parse } from "@datasert/cronjs-parser";
 
 export class Cron {
-  #when: Date | CronExprs;
+  #when: CronExprs;
   #abortController: AbortController;
   #working: boolean;
   #worker!: AsyncGenerator<AbortSignal, void>;
   #lastProcessAt?: number;
   #timezone?: string;
+  #dateContainer = new Date();
 
-  constructor(when: Date | string, timezone?: string) {
-    this.#when = typeof when === "string" ? parse(when, { hasSeconds: true }) : when;
+  constructor(when: string, timezone?: string) {
+    this.#when = parse(when, { hasSeconds: true });
     this.#working = false;
 
     this.#abortController = new AbortController();
@@ -37,27 +38,22 @@ export class Cron {
   }
 
   nextTime() {
-    return this.#when instanceof Date
-      ? this.#when
-      : new Date(
-          cronMatch
-            .getFutureMatches(this.#when, {
-              hasSeconds: true,
-              timezone: this.#timezone,
-              matchValidator: (date) =>
-                Math.floor(this.#lastProcessAt ?? Date.now() / 1000) !==
-                Math.floor(new Date(date).getTime() / 1000),
-            })
-            .at(0)!,
-        );
+    return cronMatch
+      .getFutureMatches(this.#when, {
+        hasSeconds: true,
+        timezone: this.#timezone,
+        formatInTimezone: true,
+        maxLoopCount: 2,
+        matchValidator: (date) =>
+          (this.#lastProcessAt ?? Math.floor(Date.now() / 1000)) !==
+          Math.floor(Date.parse(date) / 1000),
+      })
+      .at(0);
   }
 
-  #checkTime(at: number | string) {
-    if (this.#when instanceof Date) {
-      return Math.floor(Date.now() / 1000) === Math.floor(this.#when.getTime() / 1000);
-    }
-
-    return cronMatch.isTimeMatches(this.#when, new Date(at).toISOString(), this.#timezone);
+  #checkTime(at: number) {
+    this.#dateContainer.setTime(at);
+    return cronMatch.isTimeMatches(this.#when, this.#dateContainer.toISOString(), this.#timezone);
   }
 
   async *#ticker() {
@@ -67,7 +63,7 @@ export class Cron {
           signal: this.#abortController.signal,
         });
 
-        yield Date.now();
+        yield Math.floor(Date.now() / 1000);
       } catch {
         return;
       }
@@ -76,10 +72,7 @@ export class Cron {
 
   async *#work() {
     for await (const at of this.#ticker()) {
-      if (
-        this.#checkTime(at) &&
-        (!this.#lastProcessAt || Math.floor(at / 1000) !== Math.floor(this.#lastProcessAt / 1000))
-      ) {
+      if (this.#checkTime(at) && (!this.#lastProcessAt || at !== this.#lastProcessAt)) {
         this.#lastProcessAt = at;
 
         yield this.#abortController.signal;

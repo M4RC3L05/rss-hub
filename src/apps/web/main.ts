@@ -14,7 +14,7 @@ const log = makeLogger("web");
 const app = makeApp({
   middlewares: {
     requestLifeCycle: requestLifeCycle({ loggerFactory: makeLogger }),
-    static: [koaStatic("./src/apps/web/public"), koaStatic("./node_modules")],
+    static: [koaStatic("./src/apps/web/public")],
     basicAuth: basicAuth({ ...config.get<{ name: string; pass: string }>("apps.web.basicAuth") }),
   },
 });

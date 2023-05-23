@@ -113,6 +113,7 @@ export const resolveFeedItems = (feed: Record<string, unknown>) => {
 export const resolveContent = (builder: XMLBuilder, feed: Record<string, any>) => {
   const searchKeys = [
     "content",
+    "content.#text",
     "content:encoded",
     "description",
     "description.#text",

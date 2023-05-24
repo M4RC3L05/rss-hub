@@ -11,13 +11,15 @@ export class Cron {
   #lastProcessAt?: number;
   #timezone?: string;
   #dateContainer = new Date();
+  #tickerTimeout = 500;
 
-  constructor(when: string, timezone?: string) {
+  constructor(when: string, timezone?: string, tickerTimeout?: number) {
     this.#when = parse(when, { hasSeconds: true });
     this.#working = false;
 
     this.#abortController = new AbortController();
     this.#timezone = timezone;
+    this.#tickerTimeout = tickerTimeout ?? this.#tickerTimeout;
   }
 
   start() {
@@ -59,7 +61,7 @@ export class Cron {
   async *#ticker() {
     while (true) {
       try {
-        await setTimeout(16, undefined, {
+        await setTimeout(this.#tickerTimeout, undefined, {
           signal: this.#abortController.signal,
         });
 

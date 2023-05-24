@@ -19,12 +19,12 @@ const builder = new XMLBuilder({
   ignoreAttributes: false,
 });
 
-const { timezone, cron } = config.get<{ timezone: string; cron: string }>(
-  "apps.feeds-synchronizer",
-);
+const { cron } = config.get<{
+  cron: { pattern: string; tickerTimeout?: number; timezone: string };
+}>("apps.feeds-synchronizer");
 const db = makeDbClient({ path: config.get<string>("database.path"), randomUuid: randomUUID });
 const feedService = new FeedService({ db, parser, builder, resolvers: feedResolvers });
-const job = new Cron(cron, timezone);
+const job = new Cron(cron.pattern, cron.timezone, cron.tickerTimeout);
 const log = makeLogger("feeds-synchronizer");
 const run = runner({ db, feedService, logger: makeLogger });
 

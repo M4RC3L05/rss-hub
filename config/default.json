@@ -17,8 +17,11 @@
       }
     },
     "feeds-synchronizer": {
-      "timezone": "Etc/GMT",
-      "cron": "0 */10 * * * * *"
+      "cron": {
+        "timezone": "Etc/GMT",
+        "pattern": "0 */10 * * * * *",
+        "tickerTimeout": 1000
+      }
     }
   },
   "database": {

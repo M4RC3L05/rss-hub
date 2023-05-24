@@ -46,6 +46,7 @@ const DeleteCategoryModal = ({ show, handleClose, toDelete }) => {
       onHide=${handleClose}
       onEntered=${() => setCanInteract(true)}
       onExit=${() => setCanInteract(false)}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>Delete category "${toDelete?.name}"<//>
@@ -90,6 +91,7 @@ const CreateCategoryModel = ({ show, handleClose }) => {
       onEntered=${() => setCanInteract(true)}
       onExit=${() => setCanInteract(false)}
       onExited=${() => setName("")}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>Create category<//>
@@ -146,6 +148,7 @@ const UpdateCategoryModel = ({ show, handleClose, toUpdate }) => {
       onEntered=${() => setCanInteract(true)}
       onExit=${() => setCanInteract(false)}
       onExited=${() => setName("")}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>Edit category "${toUpdate?.name}"<//>
@@ -239,6 +242,7 @@ const CreateFeedModel = ({ show, handleClose, category }) => {
         setName("");
         setUrl("");
       }}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>Create feed<//>
@@ -305,6 +309,7 @@ const DeleteFeedModal = ({ show, handleClose, toDelete }) => {
       onHide=${() => handleClose({ deleted: false })}
       onEntered=${() => setCanInteract(true)}
       onExit=${() => setCanInteract(false)}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>Delete feed "${toDelete?.name}"<//>
@@ -391,6 +396,7 @@ const UpdateFeedModal = ({ show, handleClose, toUpdate }) => {
       onEntered=${() => setCanInteract(true)}
       onExit=${() => setCanInteract(false)}
       onExited=${() => setName("")}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>Edit category "${toUpdate?.name}"<//>
@@ -500,6 +506,7 @@ const FeedItemContentModal = ({ feedItem, show, handleClose, mutate }) => {
 
         requests.feedItems.markFeedItemsAsRead({ body: { id: feedItem.id } }).then(() => mutate());
       }}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title}>${feedItem.title}<//>
@@ -621,6 +628,7 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
           mutate(`${paths.feeds.getFeeds}?categoryId=${feed.categoryId}`);
         }
       }}
+      centered
     >
       <${Modal.Header} closeButton>
         <${Modal.Title} className="d-flex align-items-center">
@@ -678,15 +686,14 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
         <${Button}
           variant="secundary"
           size="sm"
-          onClick=${() => setShowAll((previous) => !previous)}>
-            ${
-              showAll
-                ? html`<i class="bi bi-eye-fill"></i>`
-                : html`<i class="bi bi-eye-slash-fill"></i>`
-            }
+          onClick=${() => setShowAll((previous) => !previous)}
+        >
+          ${showAll
+            ? html`<i class="bi bi-eye-fill"></i>`
+            : html`<i class="bi bi-eye-slash-fill"></i>`}
         <//>
       <//>
-    </${Modal}>
+    <//>
   `;
 };
 

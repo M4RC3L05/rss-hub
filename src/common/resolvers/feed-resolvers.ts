@@ -2,13 +2,48 @@ import * as _ from "lodash-es";
 import { parse } from "node-html-parser";
 import { type XMLBuilder } from "fast-xml-parser";
 
+/**
+ * Feed resolvers.
+ */
+
+export const resolveFeed = (feed: Record<string, unknown>) => {
+  const searchKeys = ["rss", "rdf:RDF", "feed"];
+
+  return _.chain(searchKeys)
+    .map((k) => _.get(feed, k))
+    .find((v) => _.isPlainObject(v))
+    .value() as Record<string, unknown> | undefined;
+};
+
+export const resolveFeedTitle = (feed: Record<string, unknown>) => {
+  const searchKeys = ["channel.title", "title"];
+
+  return _.chain(searchKeys)
+    .map((k) => _.get(feed, k))
+    .find((v) => typeof v === "string" && v.trim().length > 0)
+    .value() as string;
+};
+
+export const resolveFeedItems = (feed: Record<string, unknown>) => {
+  const searchKeys = ["channel.item", "channel.items", "item", "items", "entry"];
+
+  return _.chain(searchKeys)
+    .map((k) => _.get(feed, k))
+    .find((v) => Array.isArray(v))
+    .value() as Array<Record<string, unknown>> | undefined;
+};
+
+/**
+ * Feed item resolvers.
+ */
+
 export const resolveGuid = (feed: Record<string, unknown>) => {
   const searchKeys = ["guid", "guid.#text", "id", "id.#text", "newsid"];
 
   const value = _.chain(searchKeys)
     .map((k) => _.get(feed, k))
     .find((v) => (typeof v === "string" && v.trim().length > 0) || typeof v === "number")
-    .value() as string | undefined;
+    .value() as string | number | undefined;
 
   if (!value) return;
 
@@ -81,33 +116,6 @@ export const resolveFeedItemImage = (
 
     return match?.[1];
   }
-};
-
-export const resolveFeed = (feed: Record<string, unknown>) => {
-  const searchKeys = ["rss", "rdf:RDF", "feed"];
-
-  return _.chain(searchKeys)
-    .map((k) => _.get(feed, k))
-    .find((v) => _.isPlainObject(v))
-    .value() as Record<string, unknown> | undefined;
-};
-
-export const resolveFeedTitle = (feed: Record<string, unknown>) => {
-  const searchKeys = ["channel.title", "title"];
-
-  return _.chain(searchKeys)
-    .map((k) => _.get(feed, k))
-    .find((v) => typeof v === "string" && v.trim().length > 0)
-    .value() as string;
-};
-
-export const resolveFeedItems = (feed: Record<string, unknown>) => {
-  const searchKeys = ["channel.item", "channel.items", "item", "items", "entry"];
-
-  return _.chain(searchKeys)
-    .map((k) => _.get(feed, k))
-    .find((v) => Array.isArray(v))
-    .value() as Array<Record<string, unknown>> | undefined;
 };
 
 export const resolveContent = (builder: XMLBuilder, feed: Record<string, any>) => {

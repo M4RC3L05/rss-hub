@@ -136,18 +136,18 @@ class FeedService {
   }
 
   async #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
-    const id = this.#resolvers.resolveGuid(feedItem);
-    const enclosures = this.#resolvers.resolveEnclosures(feedItem);
+    const id = this.#resolvers.resolveFeedItemGuid(feedItem);
+    const enclosures = this.#resolvers.resolveFeedItemEnclosures(feedItem);
     const feedImage = this.#resolvers.resolveFeedItemImage(
-      (feed) => this.#resolvers.resolveContent(this.#builder, feed),
+      (feed) => this.#resolvers.resolveFeedItemContent(this.#builder, feed),
       feedItem,
     );
-    const content = this.#resolvers.formatContent(
-      this.#resolvers.resolveContent(this.#builder, feedItem),
+    const content = this.#resolvers.formatFeedItemContent(
+      this.#resolvers.resolveFeedItemContent(this.#builder, feedItem),
     );
-    const pubDate = this.#resolvers.resolvePubDate(feedItem);
-    const link = this.#resolvers.resolveLink(feedItem);
-    const title = this.#resolvers.resolveTitle(feedItem);
+    const pubDate = this.#resolvers.resolveFeedItemPubDate(feedItem);
+    const link = this.#resolvers.resolveFeedItemLink(feedItem);
+    const title = this.#resolvers.resolveFeedTitle(feedItem);
 
     await this.#db
       .insertInto("feedItems")

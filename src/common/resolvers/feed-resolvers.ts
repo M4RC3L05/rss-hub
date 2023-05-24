@@ -37,7 +37,7 @@ export const resolveFeedItems = (feed: Record<string, unknown>) => {
  * Feed item resolvers.
  */
 
-export const resolveGuid = (feed: Record<string, unknown>) => {
+export const resolveFeedItemGuid = (feed: Record<string, unknown>) => {
   const searchKeys = ["guid", "guid.#text", "id", "id.#text", "newsid"];
 
   const value = _.chain(searchKeys)
@@ -50,7 +50,7 @@ export const resolveGuid = (feed: Record<string, unknown>) => {
   return String(value);
 };
 
-export const resolveLink = (feed: Record<string, unknown>) => {
+export const resolveFeedItemLink = (feed: Record<string, unknown>) => {
   const searchKeys = ["link", "link.@_href"];
 
   return _.chain(searchKeys)
@@ -59,7 +59,7 @@ export const resolveLink = (feed: Record<string, unknown>) => {
     .value() as string | undefined;
 };
 
-export const resolveTitle = (feed: Record<string, unknown>) => {
+export const resolveFeedItemTitle = (feed: Record<string, unknown>) => {
   const searchKeys = ["title", "title.#text"];
 
   return _.chain(searchKeys)
@@ -68,7 +68,7 @@ export const resolveTitle = (feed: Record<string, unknown>) => {
     .value() as string | undefined;
 };
 
-export const resolveEnclosures = (feed: Record<string, any>) => {
+export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {
   const searchKeys = ["enclosure", "media:content"];
 
   return _.chain(searchKeys)
@@ -80,7 +80,7 @@ export const resolveEnclosures = (feed: Record<string, any>) => {
 };
 
 export const resolveFeedItemImage = (
-  resolveContent: (arg: Record<string, unknown>) => string | undefined,
+  resolveFeedItemContent: (arg: Record<string, unknown>) => string | undefined,
   feed: Record<string, any>,
 ) => {
   const searchKeys = ["description.img.@_src"];
@@ -92,7 +92,7 @@ export const resolveFeedItemImage = (
 
   if (result) return result;
 
-  const enclosures = resolveEnclosures(feed);
+  const enclosures = resolveFeedItemEnclosures(feed);
 
   const found = enclosures.find(({ type, url }) => {
     const isTypeImg = _.includes(type, "image") || _.includes(type, "img");
@@ -108,7 +108,7 @@ export const resolveFeedItemImage = (
 
   if (found) return found.url;
 
-  const content = resolveContent(feed);
+  const content = resolveFeedItemContent(feed);
 
   if (content) {
     const r = /<img.*?src=["']([^"']+)["']/im;
@@ -118,7 +118,7 @@ export const resolveFeedItemImage = (
   }
 };
 
-export const resolveContent = (builder: XMLBuilder, feed: Record<string, any>) => {
+export const resolveFeedItemContent = (builder: XMLBuilder, feed: Record<string, any>) => {
   const searchKeys = [
     "content",
     "content.#text",
@@ -141,7 +141,7 @@ export const resolveContent = (builder: XMLBuilder, feed: Record<string, any>) =
     .value() as string | undefined;
 };
 
-export const formatContent = (content?: string) => {
+export const formatFeedItemContent = (content?: string) => {
   if (!content) return content;
 
   const dom = parse(content);
@@ -165,7 +165,7 @@ export const formatContent = (content?: string) => {
   return dom.toString();
 };
 
-export const resolvePubDate = (feed: Record<string, unknown>) => {
+export const resolveFeedItemPubDate = (feed: Record<string, unknown>) => {
   const searchKeys = ["pubDate", "published"];
 
   return _.chain(searchKeys)

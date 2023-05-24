@@ -107,7 +107,7 @@ const app = makeApp({
       validateFeedUrl: {
         schemas: feedsHandlers.validateFeedUrl.schemas,
         handler: feedsHandlers.validateFeedUrl.handler({
-          resolveTile: feedResolvers.resolveTitle,
+          resolveTile: feedResolvers.resolveFeedItemTitle,
           feedService,
         }),
       },

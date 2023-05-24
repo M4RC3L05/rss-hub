@@ -1,3 +1,20 @@
+### v1.2.0 (2023-05-24)
+
+- [Make cron ticker timeout customizable](https://github.com/M4RC3L05/rss-hub/commit/a8dde39597e9745b70138c62f1b524a903ff9893)
+- [Rename feed resolvers](https://github.com/M4RC3L05/rss-hub/commit/92349623ff153808ba89387b5db5b9f58ed21399)
+- [Seperate feed resolvers](https://github.com/M4RC3L05/rss-hub/commit/c18b41041bc662ea52601e3223338809a2ba5f6d)
+- [Center vertically modals](https://github.com/M4RC3L05/rss-hub/commit/e2840830db5f46d88896d19d92ef0b4bfd72f4a0)
+- [Fix scrollable background while modal is open](https://github.com/M4RC3L05/rss-hub/commit/3c54653e4a9a41374ce6c352baac2a97c3994af9)
+- [Remove usused static middleware](https://github.com/M4RC3L05/rss-hub/commit/c9b8ff9f56a6ea7dfc4664e60e92462ece693d94)
+- [Remove unused import](https://github.com/M4RC3L05/rss-hub/commit/5bc41a85b5f51b453c9a63a5c111e6487ef99aec)
+- [Add \`content.\#text\` search path for content feed item resolver](https://github.com/M4RC3L05/rss-hub/commit/f8fb0bbbb9ca1ed9f4195098620230e56ed0700b)
+- [Compensate the \/1000 from the at of the ticker when checking time](https://github.com/M4RC3L05/rss-hub/commit/8baffdd8eb0f8d1919359aa265c351fdbd095213)
+- [Deal with curried runner function](https://github.com/M4RC3L05/rss-hub/commit/29a4437d01b56f086c8ca4e6c640274c4212af85)
+- [Make feeds synchronizer a curried function](https://github.com/M4RC3L05/rss-hub/commit/82b67eea3a567e53938d1e2c2c1136ccf65268b0)
+- [Simplify cron utils](https://github.com/M4RC3L05/rss-hub/commit/bc699d1e46eda452abf040ecaedec8696ae8d171)
+- [Code cleanup and improvements](https://github.com/M4RC3L05/rss-hub/commit/138eb5a6d40314f5a4f31511a480d393a3cd5500)
+- [Cleanup cron utils](https://github.com/M4RC3L05/rss-hub/commit/3803301b4754055f712a9fcb6b1cceefea94ad3a)
+
 ### v1.1.0 (2023-05-20)
 
 - [Change read\/unread badge colors for feed item card](https://github.com/M4RC3L05/rss-hub/commit/b1c153418994e3092c4e08515178ecf0298f354c)

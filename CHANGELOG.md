@@ -1,3 +1,7 @@
+### v1.2.1 (2023-05-25)
+
+- [Use \`resolveFeedItemTitle\` to resolve feed item title](https://github.com/M4RC3L05/rss-hub/commit/b09a9d4350c5a54b7438b860978d85685e2474ed)
+
 ### v1.2.0 (2023-05-24)
 
 - [Make cron ticker timeout customizable](https://github.com/M4RC3L05/rss-hub/commit/a8dde39597e9745b70138c62f1b524a903ff9893)

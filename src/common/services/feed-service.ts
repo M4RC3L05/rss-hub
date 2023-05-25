@@ -147,7 +147,7 @@ class FeedService {
     );
     const pubDate = this.#resolvers.resolveFeedItemPubDate(feedItem);
     const link = this.#resolvers.resolveFeedItemLink(feedItem);
-    const title = this.#resolvers.resolveFeedTitle(feedItem);
+    const title = this.#resolvers.resolveFeedItemTitle(feedItem);
 
     await this.#db
       .insertInto("feedItems")

@@ -1,3 +1,7 @@
+### v2.0.0 (2023-05-26)
+
+- [Make feed\_items strict, without rowid](https://github.com/M4RC3L05/rss-hub/commit/58743008740198cfba314b50b7291028b6542179)
+
 ### v1.2.1 (2023-05-25)
 
 - [Use \`resolveFeedItemTitle\` to resolve feed item title](https://github.com/M4RC3L05/rss-hub/commit/b09a9d4350c5a54b7438b860978d85685e2474ed)

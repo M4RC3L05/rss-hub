@@ -29,7 +29,7 @@ when NEW.updated_at = OLD.updated_at
 begin
   update feeds set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ' , 'now') where id = OLD.id;
 end;
-CREATE TABLE feed_items (
+CREATE TABLE IF NOT EXISTS "feed_items" (
   id text not null default (uuid_v4()),
   title text not null,
   enclosure text,
@@ -44,16 +44,17 @@ CREATE TABLE feed_items (
 
   foreign key(feed_id) references feeds(id) on delete cascade,
   primary key(id, feed_id)
-);
+) strict, without rowid;
 CREATE TRIGGER "feed_items_update_updated_at"
 after update on feed_items
 for each row
 when NEW.updated_at = OLD.updated_at
 begin
-  update feeds set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ' , 'now') where id = OLD.id;
+  update feed_items set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ' , 'now') where id = OLD.id;
 end;
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
   ('20230503122557'),
   ('20230503122558'),
-  ('20230509221423');
+  ('20230509221423'),
+  ('20230526124802');

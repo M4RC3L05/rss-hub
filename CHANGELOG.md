@@ -1,3 +1,8 @@
+### v2.1.0 (2023-05-29)
+
+- [Replace \`kysely\` with \`@leafac\/sqlite\`](https://github.com/M4RC3L05/rss-hub/commit/13f6f21578b4c9bf72d7da225dfa28f5c7c597da)
+- [Improve cron utils](https://github.com/M4RC3L05/rss-hub/commit/8edaaa23956b66dd8be0479dcc24184e04655f1c)
+
 ### v2.0.0 (2023-05-26)
 
 - [Make feed\_items strict, without rowid](https://github.com/M4RC3L05/rss-hub/commit/58743008740198cfba314b50b7291028b6542179)

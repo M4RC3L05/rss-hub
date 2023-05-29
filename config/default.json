@@ -19,7 +19,7 @@
     "feeds-synchronizer": {
       "cron": {
         "timezone": "Etc/GMT",
-        "pattern": "0 */10 * * * * *",
+        "pattern": "0 */10 * * * *",
         "tickerTimeout": 1000
       }
     }

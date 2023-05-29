@@ -1,10 +1,10 @@
 import type Router from "@koa/router";
+import sql, { type Database } from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
+import { type FeedItemsTable } from "../../../../database/types/mod.js";
 
 type GetFeedItemsDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -14,6 +14,7 @@ export const schemas = {
       type: "object",
       properties: { feedId: { type: "string", format: "uuid" }, unread: { type: "string" } },
       additionalProperties: false,
+      required: ["feedId"],
     },
   },
 } as const;
@@ -21,19 +22,17 @@ export const schemas = {
 type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
 
 export const handler = (deps: GetFeedItemsDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
+  return (ctx: Router.RouterContext) => {
     const query = ctx.query as RequestQuery;
-    let q = deps.db.selectFrom("feedItems").selectAll().orderBy("createdAt", "desc");
-
-    if (query.feedId) {
-      q = q.where("feedId", "=", query.feedId);
-    }
-
-    if (query.unread) {
-      q = q.where("readedAt", "is", null);
-    }
-
-    const feedItems = await q.execute();
+    const feedItems = deps.db.all<FeedItemsTable>(
+      sql`
+        select * from feed_items
+        where
+          feed_id = ${query.feedId}
+          $${"unread" in query ? sql`and readed_at is null` : sql``}
+        order by created_at desc
+      `,
+    );
 
     ctx.body = { data: feedItems };
   };

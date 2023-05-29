@@ -1,21 +1,20 @@
 import type Router from "@koa/router";
-import { sql, type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
+import sql, { type Database } from "@leafac/sqlite";
+import { type CategoriesTable } from "../../../../database/types/mod.js";
 
 type GetCategoriesDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const handler = (deps: GetCategoriesDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
-    const categories = await deps.db
-      .selectFrom("categories")
-      .leftJoin("feeds", "categories.id", "feeds.categoryId")
-      .selectAll("categories")
-      .select(deps.db.fn.count<number>("feeds.id").as("feedCount"))
-      .orderBy(sql`name collate nocase`, "asc")
-      .groupBy("categories.id")
-      .execute();
+  return (ctx: Router.RouterContext) => {
+    const categories = deps.db.all<CategoriesTable & { feedCount: number }>(sql`
+      select c.*, count(f.id) as "feedCount"
+      from categories c
+      left join feeds f on c.id = f.category_id
+      group by c.id
+      order by name collate nocase asc
+    `);
 
     ctx.body = { data: categories };
   };

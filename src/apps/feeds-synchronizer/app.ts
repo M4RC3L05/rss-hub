@@ -1,12 +1,12 @@
 /* eslint-disable no-await-in-loop */
 import * as _ from "lodash-es";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
+import sql, { type Database } from "@leafac/sqlite";
 import type FeedService from "../../common/services/feed-service.js";
 import type makeLogger from "../../common/logger/mod.js";
+import { type FeedsTable } from "../../database/types/mod.js";
 
 type FeedSynchronizerDeps = {
-  db: Kysely<DB>;
+  db: Database;
   logger: typeof makeLogger;
   feedService: FeedService;
 };
@@ -15,7 +15,7 @@ const runner = ({ db, logger, feedService }: FeedSynchronizerDeps) => {
   const log = logger("feed-synchronizer-runner");
 
   return async (signal: AbortSignal) => {
-    const feeds = await db.selectFrom("feeds").selectAll().execute();
+    const feeds = db.all<FeedsTable>(sql`select * from feeds`);
 
     log.info("Synching begin");
 

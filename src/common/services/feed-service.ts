@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
-import { type Kysely, type Selectable } from "kysely";
-import { type DB, type Feeds } from "kysely-codegen";
 import * as _ from "lodash-es";
 import { type XMLBuilder, type XMLParser } from "fast-xml-parser";
+import sql, { type Database } from "@leafac/sqlite";
 import { type feedResolvers } from "../resolvers/mod.js";
+import { type FeedsTable } from "../../database/types/mod.js";
 
 type FeedServiceDeps = {
-  db: Kysely<DB>;
+  db: Database;
   parser: XMLParser;
   builder: XMLBuilder;
   resolvers: typeof feedResolvers;
@@ -25,7 +25,7 @@ class FeedService {
     this.#resolvers = resolvers;
   }
 
-  async syncFeed(feed: Selectable<Feeds>, options?: { signal: AbortSignal }) {
+  async syncFeed(feed: FeedsTable, options?: { signal: AbortSignal }) {
     let data;
 
     try {
@@ -149,32 +149,40 @@ class FeedService {
     const link = this.#resolvers.resolveFeedItemLink(feedItem);
     const title = this.#resolvers.resolveFeedItemTitle(feedItem);
 
-    await this.#db
-      .insertInto("feedItems")
-      .values({
-        id: id ?? createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),
-        feedId,
-        raw: JSON.stringify(feedItem),
-        content: content ?? "",
-        img: feedImage ?? null,
-        createdAt: new Date(pubDate ?? new Date()).toISOString(),
-        title: title ?? "",
-        enclosure: JSON.stringify(enclosures),
-        link: link ?? null,
-        updatedAt: new Date(pubDate ?? new Date()).toISOString(),
+    const toInsert = {
+      id: id ?? createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),
+      feedId,
+      raw: JSON.stringify(feedItem),
+      content: content ?? "",
+      img: feedImage ?? null,
+      createdAt: new Date(pubDate ?? new Date()).toISOString(),
+      title: title ?? "",
+      enclosure: JSON.stringify(enclosures),
+      link: link ?? null,
+      updatedAt: new Date(pubDate ?? new Date()).toISOString(),
+    };
+
+    this.#db.run(
+      sql`
+        insert into
+          feed_items(id, feed_id, raw, content, img, created_at, title, enclosure, link, updated_at)
+        values
+          (${toInsert.id}, ${toInsert.feedId}, ${toInsert.raw}, ${toInsert.content}, ${
+        toInsert.img
+      }, ${toInsert.createdAt}, ${toInsert.title}, ${toInsert.enclosure}, ${toInsert.link}, ${
+        toInsert.updatedAt
       })
-      .onConflict((c) =>
-        c.columns(["id", "feedId"]).doUpdateSet((eb) => ({
-          raw: JSON.stringify(feedItem),
-          content: content ?? eb.ref("content"),
-          img: feedImage ?? eb.ref("img"),
-          title: title ?? eb.ref("title"),
-          enclosure: enclosures.length > 0 ? JSON.stringify(enclosures) : eb.ref("enclosure"),
-          link: link ?? eb.ref("link"),
-          updatedAt: new Date(pubDate ?? new Date()).toISOString(),
-        })),
-      )
-      .execute();
+        on conflict
+          (id, feed_id)
+        do update set
+          content = $${content ? sql`${toInsert.content}` : sql`content`},
+          img = $${feedImage ? sql`${toInsert.img}` : sql`img`},
+          title = $${title ? sql`${toInsert.title}` : sql`title`},
+          enclosure = $${enclosures.length > 0 ? sql`${toInsert.enclosure}` : sql`enclosure`},
+          link = $${link ? sql`${toInsert.link}` : sql`link`},
+          updated_at = ${toInsert.updatedAt}
+      `,
+    );
   }
 }
 

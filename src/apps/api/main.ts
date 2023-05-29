@@ -154,9 +154,7 @@ server.addListener("close", () => {
 processUtils.addHook({
   name: "api",
   async handler() {
-    await db.destroy().catch((error) => {
-      log.error(error, "Could not close database connection");
-    });
+    db.close();
 
     await pClose().catch((error) => {
       log.error(error, "Could not close server");

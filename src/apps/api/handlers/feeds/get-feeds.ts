@@ -1,10 +1,10 @@
 import type Router from "@koa/router";
+import sql, { type Database } from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
-import { sql, type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
+import { type FeedsTable } from "../../../../database/types/mod.js";
 
 type GetFeedsDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -23,21 +23,14 @@ type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
 export const handler = (deps: GetFeedsDeps): Router.Middleware => {
   return async (ctx: Router.RouterContext) => {
     const query = ctx.query as RequestQuery;
-    let q = deps.db
-      .selectFrom("feeds")
-      .leftJoin("feedItems", (join) =>
-        join.onRef("feeds.id", "=", "feedItems.feedId").on("feedItems.readedAt", "is", null),
-      )
-      .selectAll("feeds")
-      .select(deps.db.fn.count<number>("feedItems.id").as("unreadCount"))
-      .orderBy(sql`feeds.name collate nocase`, "asc")
-      .groupBy("feeds.id");
-
-    if (query.categoryId) {
-      q = q.where("feeds.categoryId", "=", query.categoryId);
-    }
-
-    const feeds = await q.execute();
+    const feeds = deps.db.all<FeedsTable>(sql`
+      select f.*, count(fi.id) as "unreadCount"
+      from feeds f
+      left join feed_items fi on f.id = fi.feed_id and fi.readed_at is null
+      $${query.categoryId ? sql`where f.category_id = ${query.categoryId}` : sql``}
+      group by f.id
+      order by f.name collate nocase asc
+    `);
 
     ctx.body = { data: feeds };
   };

@@ -1,10 +1,9 @@
 import type Router from "@koa/router";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
 import { type FromSchema } from "json-schema-to-ts";
+import sql, { type Database } from "@leafac/sqlite";
 
 type UpdateCategoryNameDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -34,12 +33,11 @@ export const handler = (deps: UpdateCategoryNameDeps): Router.Middleware => {
     const parameters = ctx.params as RequestParameters;
     const body = ctx.request.body as RequestBody;
 
-    const updated = await deps.db
-      .updateTable("categories")
-      .set(body)
-      .where("id", "=", parameters.id)
-      .returningAll()
-      .executeTakeFirst();
+    const updated = deps.db.get(sql`
+      update categories set name = ${body.name}
+      where id = ${parameters.id}
+      returning *
+    `);
 
     if (!updated) {
       ctx.throw(404, "Entity not found");

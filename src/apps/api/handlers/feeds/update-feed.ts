@@ -1,10 +1,10 @@
 import type Router from "@koa/router";
+import sql, { type Database } from "@leafac/sqlite";
+import createHttpError from "http-errors";
 import { type FromSchema } from "json-schema-to-ts";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
 
 type UpdateFeedDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -33,16 +33,20 @@ type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 
 export const handler = (deps: UpdateFeedDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
+  return (ctx: Router.RouterContext) => {
     const body = ctx.request.body as RequestBody;
     const parameters = ctx.params as RequestParameters;
 
-    const feed = await deps.db
-      .updateTable("feeds")
-      .set(body)
-      .where("id", "=", parameters.id)
-      .returningAll()
-      .executeTakeFirst();
+    const feed = deps.db.get(sql`
+      update feeds set
+        category_id = $${body.categoryId ? sql`${body.categoryId}` : sql`category_id`}
+        name = $${body.name ? sql`${body.name}` : sql`name`}
+        url = $${body.url ? sql`${body.url}` : sql`url`}
+      where id = ${parameters.id}
+      returning *
+    `);
+
+    if (!feed) throw createHttpError(404, "Feed not found");
 
     ctx.status = 200;
     ctx.body = { data: feed };

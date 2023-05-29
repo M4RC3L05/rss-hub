@@ -1,10 +1,9 @@
 import type Router from "@koa/router";
+import sql, { type Database } from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
 
 type CreateFeedDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -25,11 +24,11 @@ export const handler = (deps: CreateFeedDeps): Router.Middleware => {
   return async (ctx: Router.RouterContext) => {
     const parameters = ctx.params as RequestParameters;
 
-    const deleted = await deps.db
-      .deleteFrom("feeds")
-      .where("id", "=", parameters.id)
-      .returningAll()
-      .executeTakeFirst();
+    const deleted = deps.db.get(sql`
+      delete from feeds
+      where id = ${parameters.id}
+      returning *
+    `);
 
     if (!deleted) {
       ctx.throw(404, "Entity not found");

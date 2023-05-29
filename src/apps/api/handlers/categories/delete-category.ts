@@ -1,10 +1,10 @@
 import type Router from "@koa/router";
+import sql, { type Database } from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
+import { type CategoriesTable } from "../../../../database/types/mod.js";
 
 type DeleteCategoryDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -22,14 +22,14 @@ export const schemas = {
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 
 export const handler = (deps: DeleteCategoryDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
+  return (ctx: Router.RouterContext) => {
     const parameters = ctx.params as RequestParameters;
 
-    const deleted = await deps.db
-      .deleteFrom("categories")
-      .where("id", "=", parameters.id)
-      .returningAll()
-      .executeTakeFirst();
+    const deleted = deps.db.get<CategoriesTable>(sql`
+      delete from categories
+      where id = ${parameters.id}
+      returning *
+    `);
 
     if (!deleted) {
       ctx.throw(404, "Entity not found");

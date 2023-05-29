@@ -1,12 +1,13 @@
 import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
+import sql, { type Database } from "@leafac/sqlite";
+import createHttpError from "http-errors";
+import { type FeedsTable } from "../../../../database/types/mod.js";
 import type makeLogger from "../../../../common/logger/mod.js";
 import type FeedService from "../../../../common/services/feed-service.js";
 
 type CreateFeedDeps = {
-  db: Kysely<DB>;
+  db: Database;
   logger: typeof makeLogger;
   feedService: FeedService;
 };
@@ -35,11 +36,13 @@ export const handler = (deps: CreateFeedDeps): Router.Middleware => {
   return async (ctx: Router.RouterContext) => {
     const body = ctx.request.body as RequestBody;
 
-    const feed = await deps.db
-      .insertInto("feeds")
-      .values(body)
-      .returningAll()
-      .executeTakeFirstOrThrow();
+    const feed = deps.db.get<FeedsTable>(sql`
+      insert into feeds (name, url, category_id)
+      values (${body.name}, ${body.url}, ${body.categoryId})
+      returning *
+    `);
+
+    if (!feed) throw createHttpError(400, "Could not create feed");
 
     deps.feedService
       .syncFeed(feed)

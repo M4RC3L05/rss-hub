@@ -18,11 +18,13 @@ const builder = new XMLBuilder({
   attributeNamePrefix: "@_",
   ignoreAttributes: false,
 });
-
 const { cron } = config.get<{
   cron: { pattern: string; tickerTimeout?: number; timezone: string };
 }>("apps.feeds-synchronizer");
-const db = makeDbClient({ path: config.get<string>("database.path"), randomUuid: randomUUID });
+const db = makeDbClient({
+  path: config.get<string>("database.path"),
+  randomUuid: randomUUID,
+});
 const feedService = new FeedService({ db, parser, builder, resolvers: feedResolvers });
 const job = new Cron(cron.pattern, cron.timezone, cron.tickerTimeout);
 const log = makeLogger("feeds-synchronizer");
@@ -31,12 +33,12 @@ const run = runner({ db, feedService, logger: makeLogger });
 processUtils.addHook({
   name: "feeds-synchronizer",
   async handler() {
-    await db.destroy();
+    db.close();
     await job.stop();
   },
 });
 
-log.info({ nextDate: job.nextTime() }, "Registered feeds-synchronizer");
+log.info({ nextAt: job.nextAt() }, "Registered feeds-synchronizer");
 
 for await (const signal of job.start()) {
   try {
@@ -47,6 +49,6 @@ for await (const signal of job.start()) {
     log.error(error, `Error running feeds-synchronizer task`);
   } finally {
     log.info(`feeds-synchronizer completed`);
-    log.info(`Next at ${job.nextTime() ?? "unknown"}`);
+    log.info(`Next at ${job.nextAt()}`);
   }
 }

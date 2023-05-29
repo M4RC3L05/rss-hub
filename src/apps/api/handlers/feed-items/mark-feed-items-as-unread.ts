@@ -1,10 +1,10 @@
 import type Router from "@koa/router";
+import sql, { type Database } from "@leafac/sqlite";
+import createHttpError from "http-errors";
 import { type FromSchema } from "json-schema-to-ts";
-import { type Kysely } from "kysely";
-import { type DB } from "kysely-codegen";
 
 type MarkFeedItemAsUnreadDeps = {
-  db: Kysely<DB>;
+  db: Database;
 };
 
 export const schemas = {
@@ -24,19 +24,18 @@ export const schemas = {
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
 export const handler = (deps: MarkFeedItemAsUnreadDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
+  return (ctx: Router.RouterContext) => {
     const body = ctx.request.body as RequestBody;
 
-    let q = deps.db
-      .updateTable("feedItems")
-      .set({ readedAt: null })
-      .where("readedAt", "is not", null);
+    const result = deps.db.run(sql`
+      update feed_items set
+        readed_at = ${new Date().toISOString()}
+      where
+        readed_at is null
+        $${"id" in body ? sql`and id = ${body.id}` : sql``}
+    `);
 
-    if ("id" in body) {
-      q = q.where("id", "=", (body as { id: string }).id);
-    }
-
-    await q.execute();
+    if (result.changes <= 0) throw createHttpError(400, "Could not mark feed as unread");
 
     ctx.status = 204;
   };

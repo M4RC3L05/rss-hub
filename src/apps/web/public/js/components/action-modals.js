@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLoaderData, useNavigate, useSearchParams } from "react-router-dom";
 import html from "../common/html.js";
 import FeedItemsModal from "../components/feed-items-modal.js";
@@ -14,6 +14,7 @@ const ActionModals = () => {
   const { data: categories } = useLoaderData();
   const navigate = useNavigate();
   const [searchParameters] = useSearchParams();
+  const [feedItemsModalOpen, setFeedItemsModalOpen] = useState();
   const selectedCategoryId = searchParameters.get("categoryId");
   const selectedFeedId = searchParameters.get("feedId");
   const selectedFeedItemId = searchParameters.get("feedItemId");
@@ -38,7 +39,8 @@ const ActionModals = () => {
       show=${selectedCategoryId &&
       selectedFeedId &&
       selectedFeedItemId &&
-      selectedAction === "view"}
+      selectedAction === "view" &&
+      feedItemsModalOpen}
       feedItem=${feedItem}
       handleClose=${() => {
         const s = new URLSearchParams(searchParameters);
@@ -47,12 +49,12 @@ const ActionModals = () => {
       }}
     />
     <${FeedItemsModal}
-      show=${selectedCategoryId &&
-      selectedFeedId &&
-      !selectedFeedItemId &&
-      selectedAction === "view"}
+      onOpen=${() => setFeedItemsModalOpen(true)}
+      onClose=${() => setFeedItemsModalOpen(false)}
+      show=${selectedCategoryId && selectedFeedId && selectedAction === "view"}
       feed=${feed}
       handleClose=${() => navigate("/")}
+      selectedFeedItemId=${selectedFeedItemId}
     />
     <${DeleteCategoryModal}
       show=${selectedAction === "delete" && Boolean(category) && !feed}

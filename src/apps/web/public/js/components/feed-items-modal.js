@@ -1,20 +1,28 @@
 import { Col, Row, Image, Modal, Button } from "react-bootstrap";
 import { useNavigate, useSearchParams, useFetcher } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import scrollIntoView from "scroll-into-view-if-needed";
 import html from "../common/html.js";
 import FeedItem from "./feed-item.js";
 
-const FeedItemsModal = ({ show, handleClose, feed }) => {
+const FeedItemsModal = ({ show, handleClose, feed, onOpen, onClose, selectedFeedItemId }) => {
   const [searchParameters] = useSearchParams();
   const [feedItems, setFeedItems] = useState(feed?.feedItems ?? []);
   const navigate = useNavigate();
   const fetcher = useFetcher();
+  const feedItemRef = useRef();
 
   const showUnreadOnly = searchParameters.get("unread") === "true";
 
   useEffect(() => {
     if (feed?.feedItems) setFeedItems(feed?.feedItems);
   }, [feed?.feedItems]);
+
+  useEffect(() => {
+    if (show && Boolean(selectedFeedItemId) && Boolean(feedItemRef.current)) {
+      scrollIntoView(feedItemRef.current, { scrollMode: "if-needed" });
+    }
+  }, [selectedFeedItemId, show]);
 
   return html`
     <${Modal}
@@ -25,6 +33,8 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
       scrollable
       centered
       onExited=${() => setFeedItems([])}
+      onEnter=${() => onOpen()}
+      onExit=${() => onClose()}
     >
       <${Modal.Header} closeButton>
         <${Modal.Title} className="d-flex align-items-center">
@@ -44,7 +54,10 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
           ${feedItems.map(
             (feedItem) =>
               html`
-                <${Col} key=${feedItem?.id}>
+                <${Col}
+                  key=${feedItem?.id}
+                  ref=${feedItem.id === selectedFeedItemId ? feedItemRef : null}
+                >
                   <${FeedItem} feedItem=${feedItem} />
                 <//>
               `,

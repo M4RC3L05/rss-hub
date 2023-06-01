@@ -54,7 +54,7 @@ const makeRouter = (deps: MakeRouterDeps) => {
     }),
     deps.feedsHandlers.getFeeds.handler,
   );
-  router.get(
+  router.post(
     "/feeds/url",
     deps.middlewares.requestValidator({
       validator: deps.validator,

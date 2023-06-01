@@ -39,8 +39,8 @@ export const handler = (deps: UpdateFeedDeps): Router.Middleware => {
 
     const feed = deps.db.get(sql`
       update feeds set
-        category_id = $${body.categoryId ? sql`${body.categoryId}` : sql`category_id`}
-        name = $${body.name ? sql`${body.name}` : sql`name`}
+        category_id = $${body.categoryId ? sql`${body.categoryId}` : sql`category_id`},
+        name = $${body.name ? sql`${body.name}` : sql`name`},
         url = $${body.url ? sql`${body.url}` : sql`url`}
       where id = ${parameters.id}
       returning *

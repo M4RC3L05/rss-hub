@@ -29,9 +29,9 @@ export const handler = (deps: MarkFeedItemAsUnreadDeps): Router.Middleware => {
 
     const result = deps.db.run(sql`
       update feed_items set
-        readed_at = ${new Date().toISOString()}
+        readed_at = null
       where
-        readed_at is null
+        readed_at is not null
         $${"id" in body ? sql`and id = ${body.id}` : sql``}
     `);
 

@@ -50,8 +50,6 @@ export const handler = (deps: MarkFeedItemAsReadDeps): Router.Middleware => {
       `,
     );
 
-    if (result.changes <= 0) throw createHttpError(400, "Could not mark feed as read");
-
     ctx.status = 204;
   };
 };

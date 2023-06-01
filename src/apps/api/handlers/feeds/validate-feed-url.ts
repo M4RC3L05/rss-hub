@@ -10,7 +10,7 @@ type ValidateFeedUrlDeps = {
 
 export const schemas = {
   request: {
-    query: {
+    body: {
       $id: "validate-feed-url-request-query",
       type: "object",
       properties: {
@@ -22,14 +22,14 @@ export const schemas = {
   },
 } as const;
 
-type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
+type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
 export const handler = (deps: ValidateFeedUrlDeps): Router.Middleware => {
   return async (ctx: Router.RouterContext) => {
-    const query = ctx.request.query as RequestQuery;
+    const body = ctx.request.body as RequestBody;
 
     try {
-      const extracted = await deps.feedService.verifyFeed(query.url);
+      const extracted = await deps.feedService.verifyFeed(body.url);
       const title = deps.feedService.getFeedTitle(extracted);
 
       ctx.body = { data: { title } };

@@ -1,3 +1,7 @@
+### v2.2.1 (2023-06-01)
+
+- [Make when selecting a feed item on refresh it scrolls to it in the list](https://github.com/M4RC3L05/rss-hub/commit/316c801ba22dd2499b205ee19148e89b1438f889)
+
 ### v2.2.0 (2023-06-01)
 
 - [Use react router dom and restructure web app](https://github.com/M4RC3L05/rss-hub/commit/4c4b123723ab145f2ce9baee6d62627270684c3e)

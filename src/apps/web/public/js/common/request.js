@@ -15,7 +15,7 @@ export const paths = {
     updateFeed: `${config.api.url}/api/feeds/:id`,
   },
   feedItems: {
-    feedFeedItems: `${config.api.url}/api/feed-items`,
+    getFeedItems: `${config.api.url}/api/feed-items`,
     markFeedItemAsRead: `${config.api.url}/api/feed-items/readed`,
     markFeedItemAsUnread: `${config.api.url}/api/feed-items/unread`,
   },
@@ -35,19 +35,16 @@ export const makeRequester = async (input, options = {}) => {
     },
   }).then((response) => {
     if (response.status === 204) {
-      return undefined;
+      return null;
     }
 
-    return response.json().then(({ data, error }) => {
-      if (error) throw error;
-
-      return data;
-    });
+    return response.json();
   });
 };
 
 const requests = {
   categories: {
+    getCategories: ({ cancel } = {}) => makeRequester(paths.categories.getCategories, { cancel }),
     deleteCategory: ({ cancel, id } = {}) =>
       makeRequester(paths.categories.deleteCategory.replace(":id", id), {
         signal: cancel,
@@ -73,6 +70,7 @@ const requests = {
       }),
   },
   feeds: {
+    getFeeds: ({ cancel } = {}) => makeRequester(paths.feeds.getFeeds, { cancel }),
     updateFeed: ({ cancel, body, id } = {}) =>
       makeRequester(paths.feeds.updateFeed.replace(":id", id), {
         signal: cancel,
@@ -97,15 +95,25 @@ const requests = {
         method: "DELETE",
       }),
     validateFeedUrl: ({ cancel, url } = {}) =>
-      makeRequester(`${paths.feeds.validateFeedUrl}?url=${url}`, {
+      makeRequester(`${paths.feeds.validateFeedUrl}`, {
         signal: cancel,
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({ url }),
         headers: {
           "content-type": "application/json",
         },
       }),
   },
   feedItems: {
+    getFeedItemsByFeedId({ cancel, feedId, unread } = {}) {
+      const url = new URL(paths.feedItems.getFeedItems);
+
+      url.searchParams.set("feedId", feedId);
+
+      if (unread) url.searchParams.set("unread", true);
+
+      return makeRequester(url.toString(), { cancel });
+    },
     markFeedItemsAsRead: ({ cancel, body } = {}) =>
       makeRequester(paths.feedItems.markFeedItemAsRead, {
         signal: cancel,

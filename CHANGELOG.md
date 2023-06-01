@@ -1,4 +1,9 @@
-### v2.1.0 (2023-05-29)
+### v2.2.0 (2023-06-01)
+
+- [Use react router dom and restructure web app](https://github.com/M4RC3L05/rss-hub/commit/4c4b123723ab145f2ce9baee6d62627270684c3e)
+- [Fixup bugs in api routes](https://github.com/M4RC3L05/rss-hub/commit/a12c5f73db4fc2ae27a38c81de0e69265ae6b942)
+
+### v2.1.0 (2023-05-30)
 
 - [Replace \`kysely\` with \`@leafac\/sqlite\`](https://github.com/M4RC3L05/rss-hub/commit/13f6f21578b4c9bf72d7da225dfa28f5c7c597da)
 - [Improve cron utils](https://github.com/M4RC3L05/rss-hub/commit/8edaaa23956b66dd8be0479dcc24184e04655f1c)

@@ -588,11 +588,11 @@ const FeedItem = ({ feedItem, mutate }) => {
 };
 
 const getKey =
-  ({ show, fetch, showAll, feedId }) =>
+  ({ fetch, showAll, feedId }) =>
   (pageIndex, previousPageData) => {
     if (previousPageData && previousPageData.length === 0) return null;
 
-    return show && fetch
+    return fetch
       ? showAll
         ? `${paths.feedItems.feedFeedItems}?feedId=${feedId}&page=${pageIndex}&limit=10`
         : `${paths.feedItems.feedFeedItems}?feedId=${feedId}&unread=true&page=${pageIndex}&limit=10`
@@ -612,14 +612,14 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
     mutate: feedItemsMutate,
     setSize,
     isLoading,
-  } = useSWRInfinite(getKey({ show, showAll, fetch, feedId: feed.id }), { parallel: true });
+  } = useSWRInfinite(getKey({ showAll, fetch, feedId: feed.id }), { parallel: true });
   const ref = useRef();
 
   useEffect(() => {
-    if (show && progress >= 80 && !isLoading && data?.at(-1)?.length > 0) {
+    if (fetch && progress >= 80 && !isLoading && data?.at(-1)?.length > 0) {
       setSize((s) => s + 1);
     }
-  }, [progress, setSize, show, isLoading, data?.at(-1)]);
+  }, [progress, setSize, fetch, isLoading, data?.at(-1)]);
 
   useLayoutEffect(() => {
     const container = ref.current;

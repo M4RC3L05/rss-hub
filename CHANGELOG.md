@@ -1,3 +1,7 @@
+### v2.3.1 (2023-06-02)
+
+- [Fixup revalidation](https://github.com/M4RC3L05/rss-hub/commit/ccc8ec4405323ec716ec8943bea7b0dab99abe89)
+
 ### v2.3.0 (2023-06-02)
 
 - [Make feed items deffered for ui be more responsive](https://github.com/M4RC3L05/rss-hub/commit/85d689741afdf9167e1fa1d9ae23ed87e8edc14a)

@@ -11,27 +11,26 @@ import UpdateFeedModal from "./update-feed-modal.js";
 import DeleteFeedModal from "./delete-feed-modal.js";
 
 const ActionModals = () => {
-  const { data: categories } = useLoaderData();
+  const {
+    data: { categories, feeds },
+  } = useLoaderData();
   const navigate = useNavigate();
   const [searchParameters] = useSearchParams();
   const [feedItemsModalOpen, setFeedItemsModalOpen] = useState();
+
   const selectedCategoryId = searchParameters.get("categoryId");
   const selectedFeedId = searchParameters.get("feedId");
-  const selectedFeedItemId = searchParameters.get("feedItemId");
   const selectedAction = searchParameters.get("action");
   const selectedEntity = searchParameters.get("entity");
+  const selectedFeedItemId = searchParameters.get("feedItemId");
 
   const category = useMemo(
-    () => categories.find(({ id }) => id === selectedCategoryId),
+    () => (categories ?? []).find(({ id }) => id === selectedCategoryId),
     [selectedCategoryId, categories],
   );
   const feed = useMemo(
-    () => (category?.feeds ?? []).find(({ id }) => id === selectedFeedId),
-    [category, selectedFeedId],
-  );
-  const feedItem = useMemo(
-    () => (feed?.feedItems ?? []).find(({ id }) => id === selectedFeedItemId),
-    [feed, selectedFeedId],
+    () => (feeds ?? []).find(({ id }) => id === selectedFeedId),
+    [selectedFeedId],
   );
 
   return html`
@@ -41,7 +40,7 @@ const ActionModals = () => {
       selectedFeedItemId &&
       selectedAction === "view" &&
       feedItemsModalOpen}
-      feedItem=${feedItem}
+      selectedFeedItemId=${selectedFeedItemId}
       handleClose=${() => {
         const s = new URLSearchParams(searchParameters);
         s.delete("feedItemId");

@@ -1,28 +1,81 @@
-import { Col, Row, Image, Modal, Button } from "react-bootstrap";
-import { useNavigate, useSearchParams, useFetcher } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { Col, Row, Image, Modal, Button, Card, Placeholder, Badge } from "react-bootstrap";
+import {
+  useNavigate,
+  useSearchParams,
+  useFetcher,
+  useLoaderData,
+  useAsyncValue,
+  Await,
+} from "react-router-dom";
+import { useEffect, useCallback, Suspense, useState } from "react";
 import scrollIntoView from "scroll-into-view-if-needed";
 import html from "../common/html.js";
 import FeedItem from "./feed-item.js";
 
+const FeedItemPlaceholder = () => html`
+  <${Col}>
+    <${Card} className="mx-2 mb-2">
+      <${Card.Body}>
+        <${Placeholder} as="div" style=${{ aspectRatio: 16 / 9 }} animation="wave">
+          <${Placeholder} xs=${12} style=${{ height: "100%" }} />
+        <//>
+        <${Placeholder} as=${Card.Title} animation="wave">
+          <${Placeholder} xs=${6} />
+        <//>
+        <${Placeholder} as=${Card.Subtitle} className="mb-2 text-muted" animation="wave">
+          <${Placeholder} xs=${4} />
+        <//>
+        <br />
+        <br />
+        <${Placeholder} as=${Badge} bg="info" animation="wave">
+          <${Placeholder} xs=${4} style=${{ width: "40px" }} />
+        <//>
+      <//>
+    <//>
+  <//>
+`;
+
+const FeedItemsRender = ({ selectedFeedItemId, show }) => {
+  const feedItems = useAsyncValue();
+  const [items, setItems] = useState();
+  const [toView, setToView] = useState(selectedFeedItemId);
+
+  useEffect(() => {
+    if (show && Boolean(feedItems)) setItems(feedItems);
+  }, [show, feedItems]);
+
+  useEffect(() => {
+    if (show && Boolean(selectedFeedItemId)) setToView(selectedFeedItemId);
+  }, [show, selectedFeedItemId]);
+
+  const scrollIntoViewRef = useCallback(
+    (node) => {
+      if (Boolean(selectedFeedItemId) && Boolean(node)) {
+        scrollIntoView(node, { scrollMode: "if-needed" });
+      }
+    },
+    [toView],
+  );
+
+  return html`${(items ?? []).map(
+    (feedItem) =>
+      html`
+        <${Col} key=${feedItem?.id} ref=${feedItem.id === toView ? scrollIntoViewRef : null}>
+          <${FeedItem} feedItem=${feedItem} />
+        <//>
+      `,
+  )}`;
+};
+
 const FeedItemsModal = ({ show, handleClose, feed, onOpen, onClose, selectedFeedItemId }) => {
+  const {
+    data: { feedItems },
+  } = useLoaderData();
   const [searchParameters] = useSearchParams();
-  const [feedItems, setFeedItems] = useState(feed?.feedItems ?? []);
   const navigate = useNavigate();
   const fetcher = useFetcher();
-  const feedItemRef = useRef();
 
   const showUnreadOnly = searchParameters.get("unread") === "true";
-
-  useEffect(() => {
-    if (feed?.feedItems) setFeedItems(feed?.feedItems);
-  }, [feed?.feedItems]);
-
-  useEffect(() => {
-    if (show && Boolean(selectedFeedItemId) && Boolean(feedItemRef.current)) {
-      scrollIntoView(feedItemRef.current, { scrollMode: "if-needed" });
-    }
-  }, [selectedFeedItemId, show]);
 
   return html`
     <${Modal}
@@ -32,7 +85,6 @@ const FeedItemsModal = ({ show, handleClose, feed, onOpen, onClose, selectedFeed
       fullscreen="lg-down"
       scrollable
       centered
-      onExited=${() => setFeedItems([])}
       onEnter=${() => onOpen()}
       onExit=${() => onClose()}
     >
@@ -51,17 +103,18 @@ const FeedItemsModal = ({ show, handleClose, feed, onOpen, onClose, selectedFeed
       <//>
       <${Modal.Body}>
         <${Row} xs=${1} lg=${2} className="g-4">
-          ${feedItems.map(
-            (feedItem) =>
-              html`
-                <${Col}
-                  key=${feedItem?.id}
-                  ref=${feedItem.id === selectedFeedItemId ? feedItemRef : null}
-                >
-                  <${FeedItem} feedItem=${feedItem} />
-                <//>
-              `,
-          )}
+          <${Suspense}
+            fallback=${html`
+              <${FeedItemPlaceholder} />
+              <${FeedItemPlaceholder} />
+              <${FeedItemPlaceholder} />
+              <${FeedItemPlaceholder} />
+            `}
+          >
+            <${Await} resolve=${feedItems} errorElement=${html`<p>Error fetching feed items</p>`}>
+              <${FeedItemsRender} show=${show} selectedFeedItemId=${selectedFeedItemId} />
+            <//>
+          <//>
         <//>
       <//>
       <${Modal.Footer} className="justify-content-start">

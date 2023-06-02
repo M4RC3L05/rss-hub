@@ -1,7 +1,7 @@
 import { Col, Container, Row } from "react-bootstrap";
 import { useDocumentTitle } from "usehooks-ts";
 import { useRef, useEffect } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, defer } from "react-router-dom";
 import Masonry from "masonry-layout";
 import html from "../common/html.js";
 import requests from "../common/request.js";
@@ -12,34 +12,26 @@ import CreateCategoryItem from "../components/create-category-item.js";
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
 
-  let [{ data: categories }, { data: feeds }] = await Promise.all([
+  const [categories, feeds] = await Promise.all([
     requests.categories.getCategories(),
     requests.feeds.getFeeds(),
   ]);
-
-  categories = categories.map((c) => ({
-    ...c,
-    feeds: feeds.filter(({ categoryId }) => categoryId === c.id),
-  }));
+  let feedItems;
 
   if (url.searchParams.has("feedId")) {
     const feedId = url.searchParams.get("feedId");
     const unread =
       url.searchParams.get("unread") === "true" ? url.searchParams.get("unread") : undefined;
 
-    const feedItems = await requests.feedItems
+    feedItems = requests.feedItems
       .getFeedItemsByFeedId({
         feedId,
         unread,
       })
       .then(({ data }) => data);
-
-    const feed = feeds.find((feed) => feed.id === feedId);
-
-    if (feed) feed.feedItems = feedItems;
   }
 
-  return { data: categories };
+  return defer({ data: { categories: categories.data, feeds: feeds.data, feedItems } });
 };
 
 export const action = async ({ request }) => {
@@ -120,7 +112,9 @@ export const action = async ({ request }) => {
 export const Component = () => {
   useDocumentTitle("RSS HUB");
 
-  const { data: categories } = useLoaderData();
+  const {
+    data: { categories },
+  } = useLoaderData();
   const rowRef = useRef();
   const masonryRef = useRef();
 

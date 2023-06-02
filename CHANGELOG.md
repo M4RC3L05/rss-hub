@@ -1,3 +1,7 @@
+### v3.0.0 (2023-06-02)
+
+- [Rollback react router dom migration](https://github.com/M4RC3L05/rss-hub/commit/b200ba52c35b363d6f634ece658dc8bd8e63018e)
+
 ### v2.3.3 (2023-06-02)
 
 - [Fixup mark\/unmark feeditems](https://github.com/M4RC3L05/rss-hub/commit/df7be774ce874e8ff6b6c0b8c58d5ae2381013ee)
@@ -30,7 +34,7 @@
 
 ### v2.0.0 (2023-05-26)
 
-- [Make feed_items strict, without rowid](https://github.com/M4RC3L05/rss-hub/commit/58743008740198cfba314b50b7291028b6542179)
+- [Make feed\_items strict, without rowid](https://github.com/M4RC3L05/rss-hub/commit/58743008740198cfba314b50b7291028b6542179)
 
 ### v1.2.1 (2023-05-25)
 

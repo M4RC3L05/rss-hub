@@ -1,3 +1,7 @@
+### v3.1.2 (2023-06-02)
+
+- [Fix feed items load more](https://github.com/M4RC3L05/rss-hub/commit/62546e9869b6f4a72a64235466e9fd0592b77ae1)
+
 ### v3.1.1 (2023-06-02)
 
 - [Remove \`parallel\` option from swr infinite](https://github.com/M4RC3L05/rss-hub/commit/e67e8de62606eebe93277ec67a171d4f474a2db0)

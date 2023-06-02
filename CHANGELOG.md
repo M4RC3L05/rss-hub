@@ -30,7 +30,7 @@
 
 ### v2.0.0 (2023-05-26)
 
-- [Make feed\_items strict, without rowid](https://github.com/M4RC3L05/rss-hub/commit/58743008740198cfba314b50b7291028b6542179)
+- [Make feed_items strict, without rowid](https://github.com/M4RC3L05/rss-hub/commit/58743008740198cfba314b50b7291028b6542179)
 
 ### v1.2.1 (2023-05-25)
 

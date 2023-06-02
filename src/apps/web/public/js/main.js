@@ -612,7 +612,7 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
     mutate: feedItemsMutate,
     setSize,
     isLoading,
-  } = useSWRInfinite(getKey({ showAll, fetch, feedId: feed.id }), { parallel: true });
+  } = useSWRInfinite(getKey({ showAll, fetch, feedId: feed.id }));
   const ref = useRef();
 
   useEffect(() => {

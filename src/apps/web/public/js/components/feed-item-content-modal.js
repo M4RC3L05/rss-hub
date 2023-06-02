@@ -1,5 +1,5 @@
 import { Modal, Button, Container, Row, Col, Placeholder } from "react-bootstrap";
-import { useRef, useEffect, Suspense } from "react";
+import { useRef, useEffect, Suspense, useState } from "react";
 import { useFetcher, useAsyncValue, useLoaderData, Await } from "react-router-dom";
 import html from "../common/html.js";
 
@@ -62,20 +62,23 @@ const FeedItemContentModalPlaceholder = () => {
 
 const FeedItemContentModalSync = ({ selectedFeedItemId, unreadRef, setAsRead }) => {
   const feedItems = useAsyncValue();
-  const feedItem = (feedItems ?? []).find(({ id }) => id === selectedFeedItemId);
   const fetcher = useFetcher();
   const markAsReadFetcher = useFetcher();
+  const [feedItem, setFeedItem] = useState(
+    (feedItems ?? []).find(({ id }) => id === selectedFeedItemId),
+  );
 
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data?.data?.ok) {
       unreadRef.current = true;
-      fetcher.submit({ action: "reset" }, { method: "POST" });
     }
   }, [fetcher]);
 
   useEffect(() => {
-    setAsRead(markAsRead);
-  });
+    if (Boolean(feedItems) && Boolean(selectedFeedItemId)) {
+      setFeedItem((feedItems ?? []).find(({ id }) => id === selectedFeedItemId));
+    }
+  }, [selectedFeedItemId, feedItems]);
 
   const enclosureToHtml = (enclosure) => {
     if (
@@ -105,6 +108,8 @@ const FeedItemContentModalSync = ({ selectedFeedItemId, unreadRef, setAsRead }) 
       { method: "PATCH" },
     );
   };
+
+  setAsRead(markAsRead);
 
   const uncheckRead =
     Boolean(feedItem?.readedAt) &&

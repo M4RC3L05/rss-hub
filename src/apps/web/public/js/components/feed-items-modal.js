@@ -8,7 +8,6 @@ import {
   Await,
 } from "react-router-dom";
 import { useEffect, useCallback, Suspense, useState } from "react";
-import scrollIntoView from "scroll-into-view-if-needed";
 import html from "../common/html.js";
 import FeedItem from "./feed-item.js";
 
@@ -41,8 +40,8 @@ const FeedItemsRender = ({ selectedFeedItemId, show }) => {
   const [toView, setToView] = useState(selectedFeedItemId);
 
   useEffect(() => {
-    if (show && Boolean(feedItems)) setItems(feedItems);
-  }, [show, feedItems]);
+    if (feedItems) setItems(feedItems);
+  }, [feedItems]);
 
   useEffect(() => {
     if (show && Boolean(selectedFeedItemId)) setToView(selectedFeedItemId);
@@ -51,7 +50,7 @@ const FeedItemsRender = ({ selectedFeedItemId, show }) => {
   const scrollIntoViewRef = useCallback(
     (node) => {
       if (Boolean(selectedFeedItemId) && Boolean(node)) {
-        scrollIntoView(node, { scrollMode: "if-needed" });
+        node.scrollIntoView({ block: "center" });
       }
     },
     [toView],

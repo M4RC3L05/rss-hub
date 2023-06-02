@@ -1,3 +1,7 @@
+### v2.3.2 (2023-06-02)
+
+- [Revalidate after mark as read](https://github.com/M4RC3L05/rss-hub/commit/080e2dada0f4a6451659594622501580bd4af065)
+
 ### v2.3.1 (2023-06-02)
 
 - [Fixup revalidation](https://github.com/M4RC3L05/rss-hub/commit/ccc8ec4405323ec716ec8943bea7b0dab99abe89)

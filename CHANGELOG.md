@@ -1,3 +1,10 @@
+### v3.1.0 (2023-06-02)
+
+- [Add better-sqlite3](https://github.com/M4RC3L05/rss-hub/commit/9ec64c9d1d60c2f28f278fc7b067d682f7dc3e60)
+- [Update getKey dependencies to fix modal no items on close](https://github.com/M4RC3L05/rss-hub/commit/24a3c4dba456926beaefa0f3a9f05ac504b1b6f5)
+- [Remove unused files](https://github.com/M4RC3L05/rss-hub/commit/4b0ab0adf5b30086cd7e692cd0cdef777907abc7)
+- [Add pagination to feed items](https://github.com/M4RC3L05/rss-hub/commit/63185643afd92114dcc8aa610d15ec0c758b03e3)
+
 ### v3.0.0 (2023-06-02)
 
 - [Rollback react router dom migration](https://github.com/M4RC3L05/rss-hub/commit/b200ba52c35b363d6f634ece658dc8bd8e63018e)

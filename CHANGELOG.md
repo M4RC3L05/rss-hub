@@ -1,3 +1,7 @@
+### v3.1.1 (2023-06-02)
+
+- [Remove \`parallel\` option from swr infinite](https://github.com/M4RC3L05/rss-hub/commit/e67e8de62606eebe93277ec67a171d4f474a2db0)
+
 ### v3.1.0 (2023-06-02)
 
 - [Add better-sqlite3](https://github.com/M4RC3L05/rss-hub/commit/9ec64c9d1d60c2f28f278fc7b067d682f7dc3e60)

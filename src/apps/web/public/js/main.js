@@ -25,6 +25,7 @@ import {
   ListGroupItem,
   Modal,
   Row,
+  Placeholder,
 } from "react-bootstrap";
 import { useDarkMode, useDebounce } from "usehooks-ts";
 import requests, { makeRequester, paths } from "./api.js";
@@ -599,6 +600,31 @@ const getKey =
       : null;
   };
 
+const FeedItemPlaceholder = () => {
+  return html`
+    <${Col}>
+      <${Card} className="mx-2 mb-2">
+        <${Card.Body}>
+          <${Placeholder} as="div" style=${{ aspectRatio: 16 / 9 }} animation="wave">
+            <${Placeholder} xs=${12} style=${{ height: "100%" }} />
+          <//>
+          <${Placeholder} as=${Card.Title} animation="wave">
+            <${Placeholder} xs=${6} />
+          <//>
+          <${Placeholder} as=${Card.Subtitle} className="mb-2 text-muted" animation="wave">
+            <${Placeholder} xs=${4} />
+          <//>
+          <br />
+          <br />
+          <${Placeholder} as=${Badge} bg="info" animation="wave">
+            <${Placeholder} xs=${4} style=${{ width: "40px" }} />
+          <//>
+        <//>
+      <//>
+    <//>
+  `;
+};
+
 const FeedItemsModal = ({ show, handleClose, feed }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -612,11 +638,12 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
     mutate: feedItemsMutate,
     setSize,
     isLoading,
+    isValidating,
   } = useSWRInfinite(getKey({ showAll, fetch, feedId: feed.id }));
   const ref = useRef();
 
   useEffect(() => {
-    if (fetch && progress >= 80 && !isLoading && data?.at(-1)?.length > 0) {
+    if (fetch && progress >= 80 && !isLoading && !isValidating && data?.at(-1)?.length > 0) {
       setSize((s) => s + 1);
     }
   }, [progress, setSize, fetch, isLoading, data?.at(-1)]);
@@ -707,6 +734,11 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
               `,
             ),
           )}
+          ${(isLoading || isValidating) &&
+          html`
+            <${FeedItemPlaceholder} />
+            <${FeedItemPlaceholder} />
+          `}
         <//>
       <//>
       <${Modal.Footer} className="justify-content-start">

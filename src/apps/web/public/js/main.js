@@ -1,6 +1,15 @@
+/* eslint-disable n/file-extension-in-import */
 import useSWR, { SWRConfig, useSWRConfig } from "swr";
+import useSWRInfinite from "swr/infinite";
 import htm from "htm";
-import React, { useState, useEffect, useCallback, useRef, StrictMode } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  StrictMode,
+  useLayoutEffect,
+} from "react";
 import { createRoot } from "react-dom/client";
 import Masonry from "masonry-layout";
 import {
@@ -578,6 +587,18 @@ const FeedItem = ({ feedItem, mutate }) => {
   `;
 };
 
+const getKey =
+  ({ show, fetch, showAll, feedId }) =>
+  (pageIndex, previousPageData) => {
+    if (previousPageData && previousPageData.length === 0) return null;
+
+    return show && fetch
+      ? showAll
+        ? `${paths.feedItems.feedFeedItems}?feedId=${feedId}&page=${pageIndex}&limit=10`
+        : `${paths.feedItems.feedFeedItems}?feedId=${feedId}&unread=true&page=${pageIndex}&limit=10`
+      : null;
+  };
+
 const FeedItemsModal = ({ show, handleClose, feed }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -585,13 +606,40 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
   const { mutate } = useSWRConfig();
   const [fetch, setFetch] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const { data, mutate: feedItemsMutate } = useSWR(
-    fetch
-      ? showAll
-        ? `${paths.feedItems.feedFeedItems}?feedId=${feed.id}`
-        : `${paths.feedItems.feedFeedItems}?feedId=${feed.id}&unread=true`
-      : null,
-  );
+  const [progress, setProgress] = useState(0);
+  const {
+    data,
+    mutate: feedItemsMutate,
+    setSize,
+    isLoading,
+  } = useSWRInfinite(getKey({ show, showAll, fetch, feedId: feed.id }), { parallel: true });
+  const ref = useRef();
+
+  useEffect(() => {
+    if (show && progress >= 80 && !isLoading && data?.at(-1)?.length > 0) {
+      setSize((s) => s + 1);
+    }
+  }, [progress, setSize, show, isLoading, data?.at(-1)]);
+
+  useLayoutEffect(() => {
+    const container = ref.current;
+    const listener = ref.current;
+
+    const foo = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const getProgress = (scrollPos, scrollSize, clientSize) =>
+        Number(((scrollPos / (scrollSize - clientSize)) * 100).toFixed(2));
+      const verticalProgress = getProgress(scrollTop, scrollHeight, clientHeight);
+
+      setProgress(verticalProgress);
+    };
+
+    listener?.addEventListener("scroll", foo);
+
+    return () => {
+      listener?.removeEventListener("scroll", foo);
+    };
+  }, [ref.current]);
 
   return html`
     <${UpdateFeedModal}
@@ -642,11 +690,11 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
           <span class="w-100" style=${{ wordWrap: "anywhere" }}>${feed.name}</span>
         <//>
       <//>
-      <${Modal.Body}>
+      <${Modal.Body} ref=${ref}>
         <${Row} xs=${1} lg=${2} className="g-4">
-          ${(data ?? []).map(
-            (feedItem) =>
-              html`
+          ${(data ?? [[]]).flatMap((feedItems) =>
+            feedItems.map(
+              (feedItem) => html`
                 <${Col} key=${feedItem.id}>
                   <${FeedItem}
                     mutate=${() => {
@@ -657,6 +705,7 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
                   />
                 <//>
               `,
+            ),
           )}
         <//>
       <//>

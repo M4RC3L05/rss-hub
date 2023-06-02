@@ -1,13 +1,6 @@
 import { Modal, Button, Container, Row, Col, Placeholder } from "react-bootstrap";
 import { useRef, useEffect, Suspense, useState } from "react";
-import {
-  useFetcher,
-  useAsyncValue,
-  useLoaderData,
-  Await,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { useFetcher, useAsyncValue, useLoaderData, Await } from "react-router-dom";
 import html from "../common/html.js";
 
 const FeedItemContentModalPlaceholder = () => {
@@ -70,8 +63,6 @@ const FeedItemContentModalPlaceholder = () => {
 const FeedItemContentModalSync = ({ selectedFeedItemId, unreadRef, setAsRead }) => {
   const feedItems = useAsyncValue();
   const fetcher = useFetcher();
-  const navigate = useNavigate();
-  const [searchParameters] = useSearchParams();
   const markAsReadFetcher = useFetcher();
   const [feedItem, setFeedItem] = useState(
     (feedItems ?? []).find(({ id }) => id === selectedFeedItemId),
@@ -82,12 +73,6 @@ const FeedItemContentModalSync = ({ selectedFeedItemId, unreadRef, setAsRead }) 
       unreadRef.current = true;
     }
   }, [fetcher]);
-
-  useEffect(() => {
-    if (markAsReadFetcher.state === "idle" && markAsReadFetcher.data?.data?.ok) {
-      navigate(`?${searchParameters.toString()}`);
-    }
-  }, [markAsReadFetcher]);
 
   useEffect(() => {
     if (Boolean(feedItems) && Boolean(selectedFeedItemId)) {

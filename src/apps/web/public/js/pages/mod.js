@@ -19,22 +19,7 @@ const router = createHashRouter(
       <${Route}
         index
         lazy=${() => import("./index-page.js")}
-        shouldRevalidate=${({ nextUrl, currentUrl }) => {
-          if (
-            !nextUrl.searchParams.has("feedItemId") &&
-            currentUrl.searchParams.has("feedItemId")
-          ) {
-            return false;
-          }
-
-          if (
-            nextUrl.searchParams.has("feedItemId") &&
-            !currentUrl.searchParams.has("feedItemId")
-          ) {
-            console.log("come in");
-            return false;
-          }
-
+        shouldRevalidate=${({ nextUrl }) => {
           if (nextUrl.searchParams.get("action") !== "view") {
             return false;
           }

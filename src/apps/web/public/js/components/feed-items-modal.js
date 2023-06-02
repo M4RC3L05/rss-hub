@@ -34,7 +34,7 @@ const FeedItemPlaceholder = () => html`
   <//>
 `;
 
-const FeedItemsRender = ({ selectedFeedItemId, show }) => {
+const FeedItemsRender = ({ selectedFeedItemId }) => {
   const feedItems = useAsyncValue();
   const [items, setItems] = useState();
   const [toView, setToView] = useState(selectedFeedItemId);
@@ -44,8 +44,8 @@ const FeedItemsRender = ({ selectedFeedItemId, show }) => {
   }, [feedItems]);
 
   useEffect(() => {
-    if (show && Boolean(selectedFeedItemId)) setToView(selectedFeedItemId);
-  }, [show, selectedFeedItemId]);
+    if (selectedFeedItemId) setToView(selectedFeedItemId);
+  }, [selectedFeedItemId]);
 
   const scrollIntoViewRef = useCallback(
     (node) => {
@@ -111,7 +111,7 @@ const FeedItemsModal = ({ show, handleClose, feed, onOpen, onClose, selectedFeed
             `}
           >
             <${Await} resolve=${feedItems} errorElement=${html`<p>Error fetching feed items</p>`}>
-              <${FeedItemsRender} show=${show} selectedFeedItemId=${selectedFeedItemId} />
+              <${FeedItemsRender} selectedFeedItemId=${selectedFeedItemId} />
             <//>
           <//>
         <//>

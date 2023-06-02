@@ -1,3 +1,7 @@
+### v2.3.0 (2023-06-02)
+
+- [Make feed items deffered for ui be more responsive](https://github.com/M4RC3L05/rss-hub/commit/85d689741afdf9167e1fa1d9ae23ed87e8edc14a)
+
 ### v2.2.1 (2023-06-01)
 
 - [Make when selecting a feed item on refresh it scrolls to it in the list](https://github.com/M4RC3L05/rss-hub/commit/316c801ba22dd2499b205ee19148e89b1438f889)

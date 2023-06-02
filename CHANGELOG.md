@@ -1,3 +1,7 @@
+### v2.3.3 (2023-06-02)
+
+- [Fixup mark\/unmark feeditems](https://github.com/M4RC3L05/rss-hub/commit/df7be774ce874e8ff6b6c0b8c58d5ae2381013ee)
+
 ### v2.3.2 (2023-06-02)
 
 - [Revalidate after mark as read](https://github.com/M4RC3L05/rss-hub/commit/080e2dada0f4a6451659594622501580bd4af065)

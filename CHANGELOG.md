@@ -1,3 +1,7 @@
+### v3.2.1 (2023-06-03)
+
+- [Fix opml attachment headers and type](https://github.com/M4RC3L05/rss-hub/commit/369b807d0e8e82d027c56ce98464c725984bb07d)
+
 ### v3.2.0 (2023-06-03)
 
 - [Allow to import export opml from web](https://github.com/M4RC3L05/rss-hub/commit/56e210733d65bfcbaf8e3ac1991d6dd727fee0c5)

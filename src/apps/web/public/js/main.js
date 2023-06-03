@@ -777,8 +777,72 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
   `;
 };
 
+const ImportOpmlModel = ({ show, handleClose }) => {
+  const [canInteract, setCanInteract] = useState(false);
+  const [opml, setOpml] = useState(undefined);
+  const { mutate } = useSWRConfig();
+
+  const submit = () => {
+    if (!canInteract) return;
+
+    const formData = new FormData();
+    formData.set("opml", opml);
+
+    requests.opml.importOpml({ body: formData }).then(() => {
+      handleClose();
+      mutate(paths.categories.getCategories);
+      mutate((key) => typeof key === "string" && key.startsWith(paths.feeds.getFeeds), undefined, {
+        revalidate: true,
+      });
+    });
+  };
+
+  const cancel = () => {
+    handleClose();
+  };
+
+  return html`
+    <${Modal}
+      show=${show}
+      onHide=${handleClose}
+      onEntered=${() => setCanInteract(true)}
+      onExit=${() => setCanInteract(false)}
+      onExited=${() => setOpml(undefined)}
+      centered
+    >
+      <${Modal.Header} closeButton>
+        <${Modal.Title}>Import opml<//>
+      <//>
+      <${Modal.Body}>
+        <${Form}
+          onSubmit=${(event) => {
+            event.preventDefault();
+            submit();
+          }}
+        >
+          <${Form.Group} className="mb-3">
+            <${Form.Label}>File<//>
+            <${Form.Control}
+              type="text"
+              placeholder="Name for the new category"
+              autoFocus
+              type="file"
+              onInput=${(event) => setOpml(event.target.files[0])}
+            />
+          <//>
+        <//>
+      <//>
+      <${Modal.Footer}>
+        <${Button} variant="primary" onClick=${submit}>Import<//>
+        <${Button} variant="secundary" onClick=${cancel}>Cancel<//>
+      <//>
+    <//>
+  `;
+};
+
 const CreateCategoryItem = ({ category }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   return html`
     <${CreateCategoryModel}
@@ -786,16 +850,29 @@ const CreateCategoryItem = ({ category }) => {
       show=${showCreateModal}
       handleClose=${() => setShowCreateModal(false)}
     />
-    <${Col}
-      sm="6"
-      lg="4"
-      className="mesonry-item mb-4"
-      style=${{ cursor: "pointer" }}
-      onClick=${() => setShowCreateModal(true)}
-    >
+    <${ImportOpmlModel} show=${showImportModal} handleClose=${() => setShowImportModal(false)} />
+    <${Col} sm="6" lg="4" className="mesonry-item mb-4">
       <${Card}>
-        <${Card.Body}>
-          <h1 class="text-center"><i class="bi bi-plus-square-dotted"></i></h1>
+        <${Card.Body} className="d-flex flex-direction-row justify-content-around">
+          <h1
+            style=${{ cursor: "pointer" }}
+            onClick=${() => setShowCreateModal(true)}
+            class="text-center"
+          >
+            <i class="bi bi-plus-square"></i>
+          </h1>
+          <h1
+            style=${{ cursor: "pointer" }}
+            onClick=${() => setShowImportModal(true)}
+            class="text-center"
+          >
+            <i class="bi bi-file-earmark-arrow-up"></i>
+          </h1>
+          <a href=${paths.opml.exportOpml} target="_blank" style=${{ color: "inherit" }}>
+            <h1 style=${{ cursor: "pointer" }} class="text-center">
+              <i class="bi bi-file-earmark-arrow-down"></i>
+            </h1>
+          </a>
         <//>
       <//>
     <//>

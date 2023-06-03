@@ -19,6 +19,10 @@ export const paths = {
     markFeedItemAsRead: `${config.api.url}/api/feed-items/readed`,
     markFeedItemAsUnread: `${config.api.url}/api/feed-items/unread`,
   },
+  opml: {
+    exportOpml: `${config.api.url}/api/opml/export`,
+    importOpml: `${config.api.url}/api/opml/import`,
+  },
 };
 
 /**
@@ -124,6 +128,14 @@ const requests = {
         headers: {
           "content-type": "application/json",
         },
+      }),
+  },
+  opml: {
+    importOpml: ({ cancel, body } = {}) =>
+      makeRequester(paths.opml.importOpml, {
+        signal: cancel,
+        method: "POST",
+        body,
       }),
   },
 };

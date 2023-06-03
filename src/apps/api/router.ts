@@ -12,6 +12,7 @@ type MakeRouterDeps = {
   categoriesHandlers: Map<(typeof handlers)["categoriesHandlers"]>;
   feedsHandlers: Map<(typeof handlers)["feedsHandlers"]>;
   feedItemsHandlers: Map<(typeof handlers)["feedItemsHandlers"]>;
+  opmlHandlers: Map<(typeof handlers)["opmlHandlers"]>;
   middlewares: {
     requestValidator: typeof requestValidator;
   };
@@ -111,6 +112,9 @@ const makeRouter = (deps: MakeRouterDeps) => {
     }),
     deps.feedItemsHandlers.markFeedItemsAsUnread.handler,
   );
+
+  router.post("/opml/import", deps.opmlHandlers.importOpml.handler);
+  router.get("/opml/export", deps.opmlHandlers.exportOpml.handler);
 
   return router;
 };

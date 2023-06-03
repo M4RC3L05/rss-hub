@@ -8,7 +8,9 @@ import cors from "@koa/cors";
 import koaQs from "koa-qs";
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import config from "config";
+import { encodeXML } from "entities";
 import basicAuth from "koa-basic-auth";
+import { Busboy } from "@fastify/busboy";
 import makeLogger from "../../common/logger/mod.js";
 import makeDbClient from "../../database/mod.js";
 import { processUtils } from "../../common/utils/mod.js";
@@ -19,7 +21,12 @@ import { feedResolvers } from "../../common/resolvers/mod.js";
 import FeedService from "../../common/services/feed-service.js";
 import makeApp from "./app.js";
 import makeRouter from "./router.js";
-import { categoriesHandlers, feedsHandlers, feedItemsHandlers } from "./handlers/mod.js";
+import {
+  categoriesHandlers,
+  feedsHandlers,
+  feedItemsHandlers,
+  opmlHandlers,
+} from "./handlers/mod.js";
 
 const validator = makeValidator([
   ...Object.values(categoriesHandlers.updateCategoryName.schemas.request),
@@ -127,6 +134,24 @@ const app = makeApp({
       createCategory: {
         schemas: categoriesHandlers.createCategory.schemas,
         handler: categoriesHandlers.createCategory.handler({ db }),
+      },
+    },
+    opmlHandlers: {
+      importOpml: {
+        handler: opmlHandlers.importOpml.handler({
+          feedService,
+          db,
+          formDataParser: ({ headers }) =>
+            new Busboy({
+              headers,
+              limits: { fields: 1, files: 1, fileSize: 1024 * 1024 * 10 },
+            }),
+          xmlParser,
+          logger: makeLogger,
+        }),
+      },
+      exportOpml: {
+        handler: opmlHandlers.exportOpml.handler({ db, encodeEntitiesXml: encodeXML }),
       },
     },
   }),

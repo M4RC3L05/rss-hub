@@ -212,7 +212,7 @@ const CreateFeedModel = ({ show, handleClose, category }) => {
     setCheckingUrl(true);
 
     try {
-      const { title } = await requests.feeds.validateFeedUrl({ url: encodeURIComponent(url) });
+      const { title } = await requests.feeds.validateFeedUrl({ url });
 
       setName(title);
       setValidUrl(true);
@@ -363,7 +363,7 @@ const UpdateFeedModal = ({ show, handleClose, toUpdate }) => {
     if (url.length <= 0) return;
 
     try {
-      const { title } = await requests.feeds.validateFeedUrl({ url: encodeURIComponent(url) });
+      const { title } = await requests.feeds.validateFeedUrl({ url });
 
       setName(title);
       setValidUrl(true);

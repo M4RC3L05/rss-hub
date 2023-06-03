@@ -97,9 +97,10 @@ const requests = {
         method: "DELETE",
       }),
     validateFeedUrl: ({ cancel, url } = {}) =>
-      makeRequester(`${paths.feeds.validateFeedUrl}?url=${url}`, {
+      makeRequester(paths.feeds.validateFeedUrl, {
         signal: cancel,
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({ url }),
         headers: {
           "content-type": "application/json",
         },

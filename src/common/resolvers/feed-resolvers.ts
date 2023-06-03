@@ -62,10 +62,12 @@ export const resolveFeedItemLink = (feed: Record<string, unknown>) => {
 export const resolveFeedItemTitle = (feed: Record<string, unknown>) => {
   const searchKeys = ["title", "title.#text"];
 
-  return _.chain(searchKeys)
-    .map((k) => _.get(feed, k))
-    .find((v) => typeof v === "string" && v.trim().length > 0)
-    .value() as string | undefined;
+  return (
+    _.chain(searchKeys)
+      .map((k) => _.get(feed, k))
+      .find((v) => typeof v === "string" && v.trim().length > 0)
+      .value() as string | undefined
+  )?.replace(/&\S*;/g, "");
 };
 
 export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {

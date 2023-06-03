@@ -1,3 +1,7 @@
+### v3.1.4 (2023-06-03)
+
+- [Fix unable to parse single item feeds](https://github.com/M4RC3L05/rss-hub/commit/af306c101641d8b964ab200f105298a0a6ed3692)
+
 ### v3.1.3 (2023-06-03)
 
 - [Ignore entities from feed item titles](https://github.com/M4RC3L05/rss-hub/commit/1716964d79e6feb0d5cef70e612b98df91380539)

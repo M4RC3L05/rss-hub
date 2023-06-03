@@ -28,8 +28,8 @@ export const resolveFeedItems = (feed: Record<string, unknown>) => {
   const searchKeys = ["channel.item", "channel.items", "item", "items", "entry"];
 
   return _.chain(searchKeys)
-    .map((k) => _.get(feed, k))
-    .find((v) => Array.isArray(v))
+    .map((k) => (Array.isArray(_.get(feed, k)) ? _.get(feed, k) : [_.get(feed, k)]))
+    .find((v) => !_.isEmpty(v))
     .value() as Array<Record<string, unknown>> | undefined;
 };
 

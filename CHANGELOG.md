@@ -1,3 +1,8 @@
+### v3.2.0 (2023-06-03)
+
+- [Allow to import export opml from web](https://github.com/M4RC3L05/rss-hub/commit/56e210733d65bfcbaf8e3ac1991d6dd727fee0c5)
+- [Add suport for import and export opml files from api](https://github.com/M4RC3L05/rss-hub/commit/8483ab285f595f508d3ff0dd35a906067bef68c9)
+
 ### v3.1.5 (2023-06-03)
 
 - [Remove null or undefined feed items](https://github.com/M4RC3L05/rss-hub/commit/78e477030132f189e2e7385e4afc82509c9d674b)

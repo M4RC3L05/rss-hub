@@ -31,8 +31,8 @@ export const handler = (deps: ImportOpmlDeps): Router.Middleware => {
 
     doc += `</body></opml>`;
 
-    ctx.set("content-disposition", "attachement; filename=feeds.opml");
-    ctx.type = "text/xml";
+    ctx.attachment("feeds.opml");
+    ctx.type = "text/x-opml";
     ctx.body = doc.trim();
   };
 };

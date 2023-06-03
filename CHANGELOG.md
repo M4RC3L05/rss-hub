@@ -1,3 +1,7 @@
+### v3.1.5 (2023-06-03)
+
+- [Remove null or undefined feed items](https://github.com/M4RC3L05/rss-hub/commit/78e477030132f189e2e7385e4afc82509c9d674b)
+
 ### v3.1.4 (2023-06-03)
 
 - [Fix unable to parse single item feeds](https://github.com/M4RC3L05/rss-hub/commit/af306c101641d8b964ab200f105298a0a6ed3692)

@@ -1,3 +1,8 @@
+### v3.1.3 (2023-06-03)
+
+- [Ignore entities from feed item titles](https://github.com/M4RC3L05/rss-hub/commit/1716964d79e6feb0d5cef70e612b98df91380539)
+- [Fix validate url request body](https://github.com/M4RC3L05/rss-hub/commit/e553924d60aa6e4cdc04fd300c309e9fb198474e)
+
 ### v3.1.2 (2023-06-02)
 
 - [Fix feed items load more](https://github.com/M4RC3L05/rss-hub/commit/62546e9869b6f4a72a64235466e9fd0592b77ae1)

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import * as _ from "lodash-es";
 import { type XMLBuilder, type XMLParser } from "fast-xml-parser";
 import sql, { type Database } from "@leafac/sqlite";
+import fetch from "node-fetch";
 import { type feedResolvers } from "../resolvers/mod.js";
 import { type FeedsTable } from "../../database/types/mod.js";
 

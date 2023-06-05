@@ -1,3 +1,7 @@
+### v3.2.2 (2023-06-05)
+
+- [Use fetch from installed \`node-fetch\`](https://github.com/M4RC3L05/rss-hub/commit/92a2dd4f98bfd6ba02f31c6c31b12cc7bc9fde0b)
+
 ### v3.2.1 (2023-06-03)
 
 - [Fix opml attachment headers and type](https://github.com/M4RC3L05/rss-hub/commit/369b807d0e8e82d027c56ce98464c725984bb07d)

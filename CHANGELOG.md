@@ -1,3 +1,7 @@
+### v3.2.3 (2023-06-11)
+
+- [Make update feed item input no be blocked  on empty url](https://github.com/M4RC3L05/rss-hub/commit/36674b90b634efdbcf51874f37b698dfe5f97d1d)
+
 ### v3.2.2 (2023-06-05)
 
 - [Use fetch from installed \`node-fetch\`](https://github.com/M4RC3L05/rss-hub/commit/92a2dd4f98bfd6ba02f31c6c31b12cc7bc9fde0b)

@@ -1,3 +1,8 @@
+### v3.3.0 (2023-06-11)
+
+- [Fix lint errors](https://github.com/M4RC3L05/rss-hub/commit/96f1a1fddf196242414a6a38bbcbbe68b22abc8b)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/fad35da8091e2367983903052084497ebce833f4)
+
 ### v3.2.3 (2023-06-11)
 
 - [Make update feed item input no be blocked  on empty url](https://github.com/M4RC3L05/rss-hub/commit/36674b90b634efdbcf51874f37b698dfe5f97d1d)

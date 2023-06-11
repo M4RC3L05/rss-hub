@@ -1,3 +1,7 @@
+### v3.3.1 (2023-06-11)
+
+- [Update schema.sql](https://github.com/M4RC3L05/rss-hub/commit/ec17a0dc9f47b2f442cddb93675453473384494d)
+
 ### v3.3.0 (2023-06-11)
 
 - [Fix lint errors](https://github.com/M4RC3L05/rss-hub/commit/96f1a1fddf196242414a6a38bbcbbe68b22abc8b)

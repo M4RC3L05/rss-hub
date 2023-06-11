@@ -4,7 +4,7 @@ import type makeLogger from "../logger/mod.js";
 
 type ErrorMapperDeps = {
   loggerFactory: typeof makeLogger;
-  mappers: Array<(error: unknown) => HttpError | void>;
+  mappers: Array<(error: unknown) => HttpError | undefined>;
   defaultMapper: (error: unknown) => HttpError;
 };
 
@@ -50,7 +50,7 @@ const errorMapper = (deps: ErrorMapperDeps) => {
         return;
       }
 
-      let mapped: HttpError | void;
+      let mapped: HttpError | undefined;
 
       for (const mapper of deps.mappers) {
         mapped = mapper(error);

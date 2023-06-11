@@ -360,7 +360,10 @@ const UpdateFeedModal = ({ show, handleClose, toUpdate }) => {
     setValidUrl(false);
     setCheckingUrl(true);
 
-    if (url.length <= 0) return;
+    if (url.length <= 0) {
+      setCheckingUrl(false);
+      return;
+    }
 
     try {
       const { title } = await requests.feeds.validateFeedUrl({ url });

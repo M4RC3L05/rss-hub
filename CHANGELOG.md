@@ -1,3 +1,9 @@
+### v3.4.0 (2023-06-19)
+
+- [Update lifecycle middleware to not print body and add query to request](https://github.com/M4RC3L05/rss-hub/commit/c86d366663b77104beefb748b9f1b489e4212f22)
+- [Use duckduckgo to get feed icons](https://github.com/M4RC3L05/rss-hub/commit/f1e362fc0266be303cb681efd4ac91f686f5e282)
+- [Remove lru-cache](https://github.com/M4RC3L05/rss-hub/commit/a283c645e8f5afbea4995cfd1a8d3fe39ff2f348)
+
 ### v3.3.3 (2023-06-19)
 
 - [Fix input types](https://github.com/M4RC3L05/rss-hub/commit/8bfe96b8513e31a1d787d1aea7a5056de357786c)

@@ -29,22 +29,18 @@ type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
 export const handler = (deps: GetFeedItemsDeps): Router.Middleware => {
   return (ctx: Router.RouterContext) => {
     const query = ctx.query as RequestQuery;
-    try {
-      const feedItems = deps.db.all<FeedItemsTable>(
-        sql`
-          select * from feed_items
-          where
-            feed_id = ${query.feedId}
-            $${"unread" in query ? sql`and readed_at is null` : sql``}
-          order by created_at desc
-          limit ${Number(query.limit)}
-          offset ${Number(query.page) * Number(query.limit)}
-        `,
-      );
+    const feedItems = deps.db.all<FeedItemsTable>(
+      sql`
+        select * from feed_items
+        where
+          feed_id = ${query.feedId}
+          $${"unread" in query ? sql`and readed_at is null` : sql``}
+        order by created_at desc
+        limit ${Number(query.limit)}
+        offset ${Number(query.page) * Number(query.limit)}
+      `,
+    );
 
-      ctx.body = { data: feedItems };
-    } catch (error) {
-      console.log(error);
-    }
+    ctx.body = { data: feedItems };
   };
 };

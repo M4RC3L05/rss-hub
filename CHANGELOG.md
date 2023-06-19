@@ -1,3 +1,8 @@
+### v3.3.2 (2023-06-19)
+
+- [Add \`title.\#text\` to feed item search title resolver](https://github.com/M4RC3L05/rss-hub/commit/36b1e0e2be473324d726e8ecbce88cbb639dd939)
+- [Remove schema dump on migration run](https://github.com/M4RC3L05/rss-hub/commit/ef7c927e38e11ec107fb8fe5f3f2151e149e2142)
+
 ### v3.3.1 (2023-06-11)
 
 - [Update schema.sql](https://github.com/M4RC3L05/rss-hub/commit/ec17a0dc9f47b2f442cddb93675453473384494d)

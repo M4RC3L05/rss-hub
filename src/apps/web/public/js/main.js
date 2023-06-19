@@ -1044,5 +1044,3 @@ createRoot(document.querySelector("#app")).render(html`
     <${Root} />
   <//>
 `);
-
-console.log("xxxxxxxx");

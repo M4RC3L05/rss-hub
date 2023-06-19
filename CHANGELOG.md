@@ -1,3 +1,7 @@
+### v3.3.3 (2023-06-19)
+
+- [Fix input types](https://github.com/M4RC3L05/rss-hub/commit/8bfe96b8513e31a1d787d1aea7a5056de357786c)
+
 ### v3.3.2 (2023-06-19)
 
 - [Add \`title.\#text\` to feed item search title resolver](https://github.com/M4RC3L05/rss-hub/commit/36b1e0e2be473324d726e8ecbce88cbb639dd939)

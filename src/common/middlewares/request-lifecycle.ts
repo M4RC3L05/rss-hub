@@ -13,7 +13,7 @@ const requestLifeCycle = (deps: RequestLifeCycleDeps) => {
     log.info(
       {
         request: Object.assign(
-          pick.default(ctx.request, ["method", "url", "header", "body"].join(" ")) as Record<
+          pick.default(ctx.request, ["method", "url", "header", "query"].join(" ")) as Record<
             string,
             unknown
           >,
@@ -29,16 +29,16 @@ const requestLifeCycle = (deps: RequestLifeCycleDeps) => {
       log.info(
         {
           request: Object.assign(
-            pick.default(ctx.request, ["method", "url", "header", "body"].join(" ")) as Record<
+            pick.default(ctx.request, ["method", "url", "header", "query"].join(" ")) as Record<
               string,
               unknown
             >,
             { query: ctx.query, params: (ctx as any)?.params as unknown },
           ),
-          response: pick.default(
-            ctx.response,
-            ["status", "message", "header", "body"].join(" "),
-          ) as Record<string, unknown>,
+          response: pick.default(ctx.response, ["status", "message", "header"].join(" ")) as Record<
+            string,
+            unknown
+          >,
         },
         `Outgoing ${ctx.req.method!} ${ctx.req.url!}`,
       );

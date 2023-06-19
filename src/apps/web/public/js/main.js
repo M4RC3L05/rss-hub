@@ -20,7 +20,7 @@ import {
   Col,
   Container,
   Form,
-  Image,
+  Image as BSTImage,
   ListGroup,
   ListGroupItem,
   Modal,
@@ -709,10 +709,8 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
     >
       <${Modal.Header} closeButton>
         <${Modal.Title} className="d-flex align-items-center">
-          <${Image}
-            src=${`https://s2.googleusercontent.com/s2/favicons?domain=${
-              new URL(feed.url).origin
-            }&sz=32`}
+          <${BSTImage}
+            src=${`https://icons.duckduckgo.com/ip3/${new URL(feed.url).host}.ico`}
             style=${{ width: "32px", height: "32px" }}
             roundedCircle
           />
@@ -917,10 +915,8 @@ const FeedListItem = ({ feed }) => {
       onClick=${() => setShowDetailsModal(true)}
       className="d-flex align-items-center"
     >
-      <${Image}
-        src=${`https://s2.googleusercontent.com/s2/favicons?domain=${
-          new URL(feed.url).origin
-        }&sz=16`}
+      <${BSTImage}
+        src=${`https://icons.duckduckgo.com/ip3/${new URL(feed.url).host}.ico`}
         style=${{ width: "16px", height: "16px" }}
         roundedCircle
       />

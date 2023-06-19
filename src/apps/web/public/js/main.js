@@ -172,7 +172,7 @@ const UpdateCategoryModel = ({ show, handleClose, toUpdate }) => {
           <${Form.Group} className="mb-3">
             <${Form.Label}>Name<//>
             <${Form.Control}
-              type="email"
+              type="text"
               placeholder="New name for the category"
               autoFocus
               value=${name}
@@ -424,7 +424,7 @@ const UpdateFeedModal = ({ show, handleClose, toUpdate }) => {
           <${Form.Group} className="mb-3">
             <${Form.Label}>Name<//>
             <${Form.Control}
-              type="email"
+              type="text"
               placeholder="New name for the feed"
               autoFocus
               value=${name}

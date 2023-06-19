@@ -1,3 +1,11 @@
+### v3.5.0 (2023-06-19)
+
+- [Make bootstrap dark\/light switch first script](https://github.com/M4RC3L05/rss-hub/commit/1d1d037605d357794af9c2c1e94e9136f06578aa)
+- [Remove console log](https://github.com/M4RC3L05/rss-hub/commit/190c7a5ca0bee9b0bec6e59883879c7d93287b82)
+- [Remove log error from get feed items](https://github.com/M4RC3L05/rss-hub/commit/6a9e5e7f6eea2e8515915fb686f5f76db352ee60)
+- [Add loading page](https://github.com/M4RC3L05/rss-hub/commit/2253bcd47d230b32e8d72d99838826992c0a40e0)
+- [Format html](https://github.com/M4RC3L05/rss-hub/commit/3cb0071ca6339a73ea5a5c0264c88694af038806)
+
 ### v3.4.0 (2023-06-19)
 
 - [Update lifecycle middleware to not print body and add query to request](https://github.com/M4RC3L05/rss-hub/commit/c86d366663b77104beefb748b9f1b489e4212f22)

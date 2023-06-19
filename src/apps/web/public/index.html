@@ -35,7 +35,6 @@
       }
     }
   </script>
-  <script src="./js/main.js" type="module"></script>
   <script>
     const getPreferredTheme = () => {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -52,6 +51,7 @@
       setTheme(getPreferredTheme())
     })
   </script>
+  <script src="./js/main.js" type="module"></script>
 </body>
 
 </html>

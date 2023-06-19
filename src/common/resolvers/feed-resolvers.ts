@@ -16,7 +16,7 @@ export const resolveFeed = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedTitle = (feed: Record<string, unknown>) => {
-  const searchKeys = ["channel.title", "title"];
+  const searchKeys = ["channel.title", "title", "title.#text"];
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))

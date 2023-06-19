@@ -27,7 +27,7 @@ import {
   Row,
   Placeholder,
 } from "react-bootstrap";
-import { useDarkMode, useDebounce } from "usehooks-ts";
+import { useDebounce } from "usehooks-ts";
 import requests, { makeRequester, paths } from "./api.js";
 
 const html = htm.bind(React.createElement);
@@ -1032,12 +1032,6 @@ const App = () => {
 };
 
 const Root = () => {
-  const { isDarkMode } = useDarkMode();
-
-  useEffect(() => {
-    document.documentElement.dataset.bsTheme = isDarkMode ? "dark" : "light";
-  }, [isDarkMode]);
-
   return html`
     <${SWRConfig} value=${{ fetcher: makeRequester }}>
       <${App} />
@@ -1050,3 +1044,5 @@ createRoot(document.querySelector("#app")).render(html`
     <${Root} />
   <//>
 `);
+
+console.log("xxxxxxxx");

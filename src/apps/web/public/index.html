@@ -10,7 +10,15 @@
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <div id="init-loading">
+      <img src="./loading.png" width="128" height="128" class="img-fluid mb-4" />
+      <div class="spinner-grow" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
 
   <script type="importmap">
     {
@@ -28,6 +36,22 @@
     }
   </script>
   <script src="./js/main.js" type="module"></script>
+  <script>
+    const getPreferredTheme = () => {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+
+    const setTheme = theme => {
+      document.documentElement.setAttribute('data-bs-theme', theme)
+    }
+
+    setTheme(getPreferredTheme())
+
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      setTheme(getPreferredTheme())
+    })
+  </script>
 </body>
 
 </html>

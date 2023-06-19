@@ -1,8 +1,10 @@
-html, body{
+html,
+body {
   width: 100vw;
 }
 
-body, #app {
+body,
+#app {
   overflow-x: hidden;
   min-height: 100%;
 }

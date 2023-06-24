@@ -1,4 +1,12 @@
-### v3.5.0 (2023-06-19)
+### v4.0.0 (2023-06-24)
+
+- [Fix high vulnerability](https://github.com/M4RC3L05/rss-hub/commit/6eb68a58d85a5c8cee9b0cbdd42acaa29aa5c955)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/48acbcd59e859d032e575ae7476323a03fd25f60)
+- [Update nodejs](https://github.com/M4RC3L05/rss-hub/commit/a51da710213870eb8efa061e2320a0d2b938daf2)
+- [Make esmsh be proxied form the server and allow to customize esm sh endpoin](https://github.com/M4RC3L05/rss-hub/commit/711644b29dba1a47975238fe378beeb77f24579e)
+- [Make bootstrap color mode switch a module](https://github.com/M4RC3L05/rss-hub/commit/d47e40064a3f72e0ef5b926e9107b6bdddbcbc35)
+
+### v3.5.0 (2023-06-20)
 
 - [Make bootstrap dark\/light switch first script](https://github.com/M4RC3L05/rss-hub/commit/1d1d037605d357794af9c2c1e94e9136f06578aa)
 - [Remove console log](https://github.com/M4RC3L05/rss-hub/commit/190c7a5ca0bee9b0bec6e59883879c7d93287b82)

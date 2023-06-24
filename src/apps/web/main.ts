@@ -5,6 +5,7 @@ import process from "node:process";
 import koaStatic from "koa-static";
 import config from "config";
 import basicAuth from "koa-basic-auth";
+import proxy from "koa-proxies";
 import makeLogger from "../../common/logger/mod.js";
 import { processUtils } from "../../common/utils/mod.js";
 import { requestLifeCycle } from "../../common/middlewares/mod.js";
@@ -16,6 +17,11 @@ const app = makeApp({
     requestLifeCycle: requestLifeCycle({ loggerFactory: makeLogger }),
     static: [koaStatic("./src/apps/web/public")],
     basicAuth: basicAuth({ ...config.get<{ name: string; pass: string }>("apps.web.basicAuth") }),
+    proxy: proxy("/deps", {
+      target: config.get("apps.web.esmsh"),
+      rewrite: (path) => path.replace("/deps", ""),
+      changeOrigin: true,
+    }),
   },
 });
 

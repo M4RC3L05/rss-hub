@@ -5,6 +5,7 @@ type MakeAppDeps = {
     requestLifeCycle: Middleware;
     static: Middleware[];
     basicAuth: Middleware;
+    proxy: Middleware;
   };
 };
 
@@ -17,6 +18,8 @@ const makeApp = (deps: MakeAppDeps) => {
   for (const s of deps.middlewares.static) {
     app.use(s);
   }
+
+  app.use(deps.middlewares.proxy);
 
   return app;
 };

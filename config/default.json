@@ -14,7 +14,8 @@
       "basicAuth": {
         "name": "foo",
         "pass": "bar"
-      }
+      },
+      "esmsh": "https://esm.sh/"
     },
     "feeds-synchronizer": {
       "cron": {

@@ -114,7 +114,7 @@ export const resolveFeedItemImage = (
   const content = resolveFeedItemContent(feed);
 
   if (content) {
-    const r = /<img.*?src=["']([^"']+)["']/im;
+    const r = /<img[^>]+src="([^"]+)"/im;
     const match = r.exec(content);
 
     return match?.[1];

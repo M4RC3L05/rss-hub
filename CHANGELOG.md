@@ -1,3 +1,9 @@
+### v4.1.0 (2023-07-01)
+
+- [Format html document](https://github.com/M4RC3L05/rss-hub/commit/57f97f5bbfdabd6290e126b94c75bae03a5e08e4)
+- [Improve first image src regex for feed item image](https://github.com/M4RC3L05/rss-hub/commit/2d79b50e92e999b3f9af9736db14613ea2f73078)
+- [Update frontend dependencies](https://github.com/M4RC3L05/rss-hub/commit/126de167cbb5456c713095b5d4884cb71005b09a)
+
 ### v4.0.0 (2023-06-24)
 
 - [Fix high vulnerability](https://github.com/M4RC3L05/rss-hub/commit/6eb68a58d85a5c8cee9b0cbdd42acaa29aa5c955)

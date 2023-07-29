@@ -1,3 +1,9 @@
+### v4.2.0 (2023-07-29)
+
+- [Add table indexes](https://github.com/M4RC3L05/rss-hub/commit/c2916009e40ffb1b4156d43d6f98467375dd9489)
+- [Remove \`knex\`](https://github.com/M4RC3L05/rss-hub/commit/4fd4db9e0aa6c54c05b5b980f15458e0a6c4cbe0)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/a89ac5085c3be1d0b73eaab1c2921c4ea86b56a4)
+
 ### v4.1.0 (2023-07-01)
 
 - [Format html document](https://github.com/M4RC3L05/rss-hub/commit/57f97f5bbfdabd6290e126b94c75bae03a5e08e4)

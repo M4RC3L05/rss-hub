@@ -1,3 +1,7 @@
+### v4.2.2 (2023-07-29)
+
+- [Fix fontend deps proxy](https://github.com/M4RC3L05/rss-hub/commit/4f26bcdb0d91299b04b9b5f06cd8abe4405d949b)
+
 ### v4.2.1 (2023-07-29)
 
 - [Fix lint](https://github.com/M4RC3L05/rss-hub/commit/fc93d882a7b927bd28a7d47d2cb64f8b5ec0b6fe)

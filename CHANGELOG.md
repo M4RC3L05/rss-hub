@@ -1,3 +1,7 @@
+### v4.2.1 (2023-07-29)
+
+- [Fix lint](https://github.com/M4RC3L05/rss-hub/commit/fc93d882a7b927bd28a7d47d2cb64f8b5ec0b6fe)
+
 ### v4.2.0 (2023-07-29)
 
 - [Add table indexes](https://github.com/M4RC3L05/rss-hub/commit/c2916009e40ffb1b4156d43d6f98467375dd9489)

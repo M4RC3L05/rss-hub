@@ -169,10 +169,10 @@ class FeedService {
           feed_items(id, feed_id, raw, content, img, created_at, title, enclosure, link, updated_at)
         values
           (${toInsert.id}, ${toInsert.feedId}, ${toInsert.raw}, ${toInsert.content}, ${
-        toInsert.img
-      }, ${toInsert.createdAt}, ${toInsert.title}, ${toInsert.enclosure}, ${toInsert.link}, ${
-        toInsert.updatedAt
-      })
+            toInsert.img
+          }, ${toInsert.createdAt}, ${toInsert.title}, ${toInsert.enclosure}, ${toInsert.link}, ${
+            toInsert.updatedAt
+          })
         on conflict
           (id, feed_id)
         do update set

@@ -1,4 +1,3 @@
-/* eslint-disable n/file-extension-in-import */
 import useSWR, { SWRConfig, useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 import htm from "htm";
@@ -1017,14 +1016,13 @@ const App = () => {
       <${Row} ref=${rowRef}>
         <${CreateCategoryItem} />
         ${(categories ?? []).map(
-          (category) =>
-            html`
-              <${CategoryItem}
-                category=${category}
-                key=${category.id}
-                relayoutMesonry=${relayoutMesonry}
-              />
-            `,
+          (category) => html`
+            <${CategoryItem}
+              category=${category}
+              key=${category.id}
+              relayoutMesonry=${relayoutMesonry}
+            />
+          `,
         )}
       <//>
     <//>

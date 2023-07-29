@@ -17,9 +17,8 @@ const app = makeApp({
     requestLifeCycle: requestLifeCycle({ loggerFactory: makeLogger }),
     static: [koaStatic("./src/apps/web/public")],
     basicAuth: basicAuth({ ...config.get<{ name: string; pass: string }>("apps.web.basicAuth") }),
-    proxy: proxy("/deps", {
+    proxy: proxy(/^\/(stable|v\d+)/, {
       target: config.get("apps.web.esmsh"),
-      rewrite: (path) => path.replace("/deps", ""),
       changeOrigin: true,
     }),
   },

@@ -1,0 +1,40 @@
+{
+  "apps": {
+    "api": {
+      "host": "APPS_API_HOST",
+      "port": {
+        "__name": "APPS_API_PORT",
+        "__format": "number"
+      },
+      "basicAuth": {
+        "name": "APPS_API_BASIC_AUTH_NAME",
+        "pass": "APPS_API_BASIC_AUTH_PASS"
+      }
+    },
+    "web": {
+      "host": "APPS_WEB_HOST",
+      "port": {
+        "__name": "APPS_WEB_PORT",
+        "__format": "number"
+      },
+      "basicAuth": {
+        "name": "APPS_WEB_BASIC_AUTH_NAME",
+        "pass": "APPS_WEB_BASIC_AUTH_PASS"
+      },
+      "esmsh": "APPS_WEB_ESMSH"
+    },
+    "feeds-synchronizer": {
+      "cron": {
+        "timezone": "FEEDS_SYNCHRONIZER_CRON_TIMEZONE",
+        "pattern": "FEEDS_SYNCHRONIZER_CRON_PATTERN",
+        "tickerTimeout": {
+          "__name": "FEEDS_SYNCHRONIZER_CRON_TICKER_TIMEOUT",
+          "__format": "number"
+        }
+      }
+    }
+  },
+  "database": {
+    "path": "DATABASE_PATH"
+  }
+}

@@ -1,3 +1,7 @@
+### v4.3.0 (2023-07-30)
+
+- [Prepare for dockerization](https://github.com/M4RC3L05/rss-hub/commit/30384858eaf163dc88f85994b0c092a5e60bf1f8)
+
 ### v4.2.2 (2023-07-29)
 
 - [Fix fontend deps proxy](https://github.com/M4RC3L05/rss-hub/commit/4f26bcdb0d91299b04b9b5f06cd8abe4405d949b)

@@ -10,17 +10,6 @@ const requestLifeCycle = (deps: RequestLifeCycleDeps) => {
   const log = deps.loggerFactory("request-lifecycle-middleware");
 
   return async (ctx: Context, next: Next) => {
-    log.info(
-      {
-        request: {
-          ...pick(ctx.request, ["method", "url", "header"]),
-          query: ctx.query,
-          params: (ctx as any)?.params as unknown,
-        },
-      },
-      `Incomming ${ctx.req.method!} ${ctx.req.url!}`,
-    );
-
     try {
       await next();
     } finally {
@@ -33,7 +22,7 @@ const requestLifeCycle = (deps: RequestLifeCycleDeps) => {
           },
           response: pick(ctx.response, ["status", "message", "header"]),
         },
-        `Outgoing ${ctx.req.method!} ${ctx.req.url!}`,
+        `Request ${ctx.req.method!} ${ctx.req.url!}`,
       );
     }
   };

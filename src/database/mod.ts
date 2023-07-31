@@ -17,10 +17,14 @@ const toCamelCase = <T>(data: unknown) => {
 
 class CustomDatabase extends Database {
   override get<T>(query: Query, options: Options = {}): T | undefined {
+    if (!this.open) return;
+
     return toCamelCase<T>(super.get<T>(query, options));
   }
 
   override all<T>(query: Query, options: Options = {}): T[] {
+    if (!this.open) return [];
+
     return toCamelCase<T[]>(super.all<T>(query, options));
   }
 }

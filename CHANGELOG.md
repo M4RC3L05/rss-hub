@@ -1,3 +1,7 @@
+### v4.4.1 (2023-07-31)
+
+- [Optimize docker images](https://github.com/M4RC3L05/rss-hub/commit/4ec1002a6e57e01e78f1f618bd3c5a47be295aa6)
+
 ### v4.4.0 (2023-07-31)
 
 - [Prevent running queries if db connection is closed](https://github.com/M4RC3L05/rss-hub/commit/6b3344bf770b19b0ff8653216d414d20813d4d55)

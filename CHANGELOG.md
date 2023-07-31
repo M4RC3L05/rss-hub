@@ -1,3 +1,9 @@
+### v4.4.0 (2023-07-31)
+
+- [Prevent running queries if db connection is closed](https://github.com/M4RC3L05/rss-hub/commit/6b3344bf770b19b0ff8653216d414d20813d4d55)
+- [Reduce amount of logs generated per request](https://github.com/M4RC3L05/rss-hub/commit/4aefea636dd9733b020f742c7d6bb46ad1b6166c)
+- [Remove \`json-pick-keys\`](https://github.com/M4RC3L05/rss-hub/commit/c31733ebeaa04da19c8311e8cc7eb47a24d61f1f)
+
 ### v4.3.0 (2023-07-30)
 
 - [Prepare for dockerization](https://github.com/M4RC3L05/rss-hub/commit/30384858eaf163dc88f85994b0c092a5e60bf1f8)

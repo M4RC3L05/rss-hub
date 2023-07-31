@@ -77,7 +77,6 @@
     "entities": "^4.5.0",
     "fast-xml-parser": "^4.2.6",
     "http-errors": "^2.0.0",
-    "json-pick-keys": "^0.1.4",
     "json-schema-to-ts": "^2.9.1",
     "koa": "^2.14.2",
     "koa-basic-auth": "^4.0.0",

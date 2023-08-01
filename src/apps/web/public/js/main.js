@@ -702,7 +702,10 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
         setFetch(false);
         if (wasDeletedRef.current) {
           wasDeletedRef.current = false;
-          mutate(`${paths.feeds.getFeeds}?categoryId=${feed.categoryId}`);
+          mutate(
+            (key) =>
+              typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+          );
         }
       }}
       centered
@@ -727,7 +730,6 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
                   <${FeedItem}
                     mutate=${() => {
                       feedItemsMutate();
-                      mutate(`${paths.feeds.getFeeds}?categoryId=${feed.categoryId}`);
                     }}
                     feedItem=${feedItem}
                   />
@@ -757,7 +759,11 @@ const FeedItemsModal = ({ show, handleClose, feed }) => {
           onClick=${() => {
             requests.feedItems.markFeedItemsAsRead({ body: { feedId: feed.id } }).then(() => {
               feedItemsMutate();
-              mutate(`${paths.feeds.getFeeds}?categoryId=${feed.categoryId}`);
+              mutate(
+                (key) =>
+                  typeof key === "string" &&
+                  key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+              );
             });
           }}
         >
@@ -976,7 +982,7 @@ const App = () => {
     categoryIds.length > 0
       ? // eslint-disable-next-line unicorn/no-array-reduce
         `${paths.feeds.getFeeds}?${categoryIds.reduce(
-          (acc, cid) => `${acc}&categoryId[]=${cid}`,
+          (acc, cid, index) => `${acc}${index === 0 ? "" : "&"}categoryId[]=${cid}`,
           "",
         )}`
       : null,

@@ -4,10 +4,11 @@ import htm from "htm";
 import React, {
   useState,
   useEffect,
-  useCallback,
   useRef,
+  useMemo,
   StrictMode,
   useLayoutEffect,
+  useCallback,
 } from "react";
 import { createRoot } from "react-dom/client";
 import Masonry from "masonry-layout";
@@ -927,26 +928,9 @@ const FeedListItem = ({ feed }) => {
   `;
 };
 
-const CategoryItem = ({ category, relayoutMesonry }) => {
+const CategoryItem = ({ category, feeds }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const {
-    data: feeds,
-    isLoading,
-    isValidating,
-  } = useSWR(`${paths.feeds.getFeeds}?categoryId=${category.id}`, { refreshInterval: 10_000 });
-
-  useEffect(() => {
-    if (!isLoading) {
-      relayoutMesonry();
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (!isValidating) {
-      relayoutMesonry();
-    }
-  }, [isValidating]);
 
   return html`
     <${DeleteCategoryModal}
@@ -983,6 +967,21 @@ const CategoryItem = ({ category, relayoutMesonry }) => {
 
 const App = () => {
   const { data: categories } = useSWR(paths.categories.getCategories);
+  const categoryIds = useMemo(() => (categories ?? [])?.map(({ id }) => id), [categories]);
+  const {
+    data: feeds,
+    isLoading,
+    isValidating,
+  } = useSWR(
+    categoryIds.length > 0
+      ? // eslint-disable-next-line unicorn/no-array-reduce
+        `${paths.feeds.getFeeds}?${categoryIds.reduce(
+          (acc, cid) => `${acc}&categoryId[]=${cid}`,
+          "",
+        )}`
+      : null,
+    { refreshInterval: 10_000 },
+  );
   const rowRef = useRef();
   const masonryRef = useRef();
 
@@ -1001,9 +1000,26 @@ const App = () => {
     masonryRef.current?.layout();
   }, [categories]);
 
-  const relayoutMesonry = useCallback(() => {
-    masonryRef.current?.layout();
-  }, []);
+  useEffect(() => {
+    if (!isLoading) {
+      masonryRef.current?.reloadItems();
+      masonryRef.current?.layout();
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (!isValidating) {
+      masonryRef.current?.reloadItems();
+      masonryRef.current?.layout();
+    }
+  }, [isValidating]);
+
+  const renderCategoryItem = useCallback(
+    ({ category, feeds }) => html`
+      <${CategoryItem} category=${category} feeds=${feeds} key=${category.id} />
+    `,
+    [],
+  );
 
   return html`
     <${Container} className="py-4">
@@ -1015,14 +1031,10 @@ const App = () => {
       <//>
       <${Row} ref=${rowRef}>
         <${CreateCategoryItem} />
-        ${(categories ?? []).map(
-          (category) => html`
-            <${CategoryItem}
-              category=${category}
-              key=${category.id}
-              relayoutMesonry=${relayoutMesonry}
-            />
-          `,
+        ${(categories ?? []).map((category) =>
+          category.id in (feeds ?? {})
+            ? renderCategoryItem({ category, feeds: feeds[category.id] })
+            : undefined,
         )}
       <//>
     <//>

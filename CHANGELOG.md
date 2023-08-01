@@ -1,3 +1,7 @@
+### v4.5.1 (2023-08-01)
+
+- [Refetch feeds when marking all as read or delete feed](https://github.com/M4RC3L05/rss-hub/commit/e8aff00caa131c9fdd5e3a62a325f157c3e351f3)
+
 ### v4.5.0 (2023-08-01)
 
 - [Make single request to fetch all feed items for a range of categories](https://github.com/M4RC3L05/rss-hub/commit/cf5b7b9d8daebeb1c65ac9e455c527b3e2dc3005)

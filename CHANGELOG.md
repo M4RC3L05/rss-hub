@@ -1,3 +1,8 @@
+### v4.5.0 (2023-08-01)
+
+- [Make single request to fetch all feed items for a range of categories](https://github.com/M4RC3L05/rss-hub/commit/cf5b7b9d8daebeb1c65ac9e455c527b3e2dc3005)
+- [Use async logging](https://github.com/M4RC3L05/rss-hub/commit/6687fdb0e351ca33bcbd54426ae8dee9eba6500b)
+
 ### v4.4.1 (2023-07-31)
 
 - [Optimize docker images](https://github.com/M4RC3L05/rss-hub/commit/4ec1002a6e57e01e78f1f618bd3c5a47be295aa6)

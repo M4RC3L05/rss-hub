@@ -1,3 +1,7 @@
+### v4.5.2 (2023-08-02)
+
+- [Create volume dir inside docker image](https://github.com/M4RC3L05/rss-hub/commit/60f9323f040f81eb974acf7a42d817fd8b77f16a)
+
 ### v4.5.1 (2023-08-01)
 
 - [Refetch feeds when marking all as read or delete feed](https://github.com/M4RC3L05/rss-hub/commit/e8aff00caa131c9fdd5e3a62a325f157c3e351f3)

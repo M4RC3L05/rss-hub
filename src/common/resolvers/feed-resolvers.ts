@@ -1,3 +1,4 @@
+import mime from "mime-types";
 import * as _ from "lodash-es";
 import { parse } from "node-html-parser";
 import { type XMLBuilder } from "fast-xml-parser";
@@ -74,12 +75,33 @@ export const resolveFeedItemTitle = (feed: Record<string, unknown>) => {
 export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {
   const searchKeys = ["enclosure", "media:content"];
 
-  return _.chain(searchKeys)
+  const standard = _.chain(searchKeys)
     .map((k) => _.get(feed, k) as Record<string, unknown>)
     .filter((v) => _.isPlainObject(v))
     .map((v) => ({ url: _.get(v, "@_url") as string, type: _.get(v, "@_type") as string }))
     .filter((v) => _.has(v, "url") && typeof v.url === "string" && v.url.trim().length > 0)
     .value() as Array<{ url: string; type?: string }>;
+
+  if (standard.length > 0) return standard;
+
+  const fromLink = resolveFeedItemLink(feed);
+  const ext = fromLink!.split(".").at(-1);
+
+  if (fromLink && ext) {
+    const mt = mime.lookup(ext);
+
+    if (
+      mt &&
+      (mt.startsWith("image") ||
+        mt.startsWith("img") ||
+        mt.startsWith("video") ||
+        mt.startsWith("audio"))
+    ) {
+      return [{ url: fromLink, type: mt }];
+    }
+  }
+
+  return [];
 };
 
 export const resolveFeedItemImage = (
@@ -100,11 +122,9 @@ export const resolveFeedItemImage = (
   const found = enclosures.find(({ type, url }) => {
     const isTypeImg = _.includes(type, "image") || _.includes(type, "img");
     const hasUrl = typeof url === "string" && url.trim().length > 0;
-    const hasImgUrl =
-      _.endsWith(url, ".png") ||
-      _.endsWith(url, ".jpg") ||
-      _.endsWith(url, ".jpeg") ||
-      _.endsWith(url, ".gif");
+    const ext = url?.split(".")?.at(-1);
+    const mt = mime.lookup(ext ?? "");
+    const hasImgUrl = mt && (mt.startsWith("image") || mt.startsWith("img"));
 
     return (isTypeImg && hasUrl) || hasImgUrl;
   });
@@ -117,7 +137,15 @@ export const resolveFeedItemImage = (
     const r = /<img[^>]+src="([^"]+)"/im;
     const match = r.exec(content);
 
-    return match?.[1];
+    if (match?.[1]) {
+      return match?.[1];
+    }
+  }
+
+  const imgFromLink = resolveFeedItemLink(feed);
+
+  if (["jpeg", "jpg", "gif", "png", "webp"].includes(imgFromLink?.split(".")?.at(-1) ?? "")) {
+    return imgFromLink;
   }
 };
 

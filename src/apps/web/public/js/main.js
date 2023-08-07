@@ -233,7 +233,9 @@ const CreateFeedModel = ({ show, handleClose, category }) => {
 
     requests.feeds.createFeed({ body: { name, url, categoryId: category.id } }).then(() => {
       handleClose();
-      mutate(`${paths.feeds.getFeeds}?categoryId=${category.id}`);
+      mutate(
+        (key) => typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+      );
     });
   };
 
@@ -389,11 +391,10 @@ const UpdateFeedModal = ({ show, handleClose, toUpdate }) => {
       .updateFeed({ body: { name, url, categoryId: selectedCategory }, id: toUpdate.id })
       .then(() => {
         handleClose();
-        mutate(`${paths.feeds.getFeeds}?categoryId=${toUpdate.categoryId}`);
-
-        if (toUpdate.categoryId !== selectedCategory) {
-          mutate(`${paths.feeds.getFeeds}?categoryId=${selectedCategory}`);
-        }
+        mutate(
+          (key) =>
+            typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+        );
       });
   };
 
@@ -960,11 +961,15 @@ const CategoryItem = ({ category, feeds }) => {
           <${Card.Link}
             style=${{ cursor: "pointer" }}
             onClick=${() => setShowDeleteModal(true)}
-          >Delete<//>
+          >
+            Delete
+          <//>
           <${Card.Link}
             style=${{ cursor: "pointer" }}
             onClick=${() => setShowUpdateModal(true)}
-          >Edit<//>
+          >
+            Edit
+          <//>
         <//>
       <//>
     <//>
@@ -1021,7 +1026,7 @@ const App = () => {
   }, [isValidating]);
 
   const renderCategoryItem = useCallback(
-    ({ category, feeds }) => html`
+    ({ category, feeds = [] }) => html`
       <${CategoryItem} category=${category} feeds=${feeds} key=${category.id} />
     `,
     [],
@@ -1038,9 +1043,7 @@ const App = () => {
       <${Row} ref=${rowRef}>
         <${CreateCategoryItem} />
         ${(categories ?? []).map((category) =>
-          category.id in (feeds ?? {})
-            ? renderCategoryItem({ category, feeds: feeds[category.id] })
-            : undefined,
+          renderCategoryItem({ category, feeds: feeds?.[category.id] }),
         )}
       <//>
     <//>

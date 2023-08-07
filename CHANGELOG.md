@@ -1,3 +1,8 @@
+### v4.6.0 (2023-08-07)
+
+- [Set enclosures and feed image based on feed link](https://github.com/M4RC3L05/rss-hub/commit/f48c17ca0641143a0af68ac0ee020f673c41a5d8)
+- [Fix category rendering](https://github.com/M4RC3L05/rss-hub/commit/c739a42a077a8b37ab034df0a23b4fc670cbad46)
+
 ### v4.5.2 (2023-08-02)
 
 - [Create volume dir inside docker image](https://github.com/M4RC3L05/rss-hub/commit/60f9323f040f81eb974acf7a42d817fd8b77f16a)

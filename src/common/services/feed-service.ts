@@ -1,16 +1,60 @@
 import { createHash } from "node:crypto";
+import { setTimeout } from "node:timers/promises";
 import * as _ from "lodash-es";
 import { type XMLBuilder, type XMLParser } from "fast-xml-parser";
 import sql, { type Database } from "@leafac/sqlite";
 import fetch from "node-fetch";
+import { AbortError, type Response } from "node-fetch";
+import { type Logger } from "pino";
 import { type feedResolvers } from "../resolvers/mod.js";
 import { type FeedsTable } from "../../database/types/mod.js";
+import makeLogger from "../logger/mod.js";
 
 type FeedServiceDeps = {
   db: Database;
   parser: XMLParser;
   builder: XMLBuilder;
   resolvers: typeof feedResolvers;
+};
+
+const log = makeLogger("feed-service");
+
+const request = async (
+  url: Parameters<typeof fetch>[0],
+  init: Parameters<typeof fetch>[1],
+  options: { retryN: number },
+): Promise<Response> => {
+  try {
+    const result = await Promise.race([
+      setTimeout(8000, new Error(`Request timeout excedded for "${url as any as string}"`), {
+        signal: init?.signal as any as AbortSignal,
+      }),
+      fetch(url, init),
+    ]);
+
+    if (result instanceof Error) {
+      throw result;
+    }
+
+    return result;
+  } catch (error: unknown) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw error;
+    }
+
+    if (options.retryN <= 3) {
+      log.error(error, "Could not fetch, proceed to retry");
+      log.info(`Retry Nº ${options.retryN}, retrying in 2 seconds`);
+
+      await setTimeout(2000, undefined, {
+        signal: init?.signal as any as AbortSignal,
+      });
+
+      return request(url, init, { ...options, retryN: options.retryN + 1 });
+    }
+
+    throw new Error("Retrys exausted");
+  }
 };
 
 class FeedService {
@@ -95,7 +139,7 @@ class FeedService {
 
   async #extractRawFeed(url: string, options?: { signal: AbortSignal }) {
     try {
-      const response = await fetch(url, options);
+      const response = await request(url, options, { retryN: 1 });
 
       if (!response.ok) {
         throw new Error(`Error fetching feed ${url}`, {

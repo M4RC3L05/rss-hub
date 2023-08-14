@@ -1,3 +1,7 @@
+### v4.7.0 (2023-08-14)
+
+- [Add fetch feed timeout and retries](https://github.com/M4RC3L05/rss-hub/commit/8eb1fb7696070630340d142efdbcc2d23e1518af)
+
 ### v4.6.0 (2023-08-07)
 
 - [Set enclosures and feed image based on feed link](https://github.com/M4RC3L05/rss-hub/commit/f48c17ca0641143a0af68ac0ee020f673c41a5d8)

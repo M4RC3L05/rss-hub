@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import * as _ from "lodash-es";
 import sql, { type Database } from "@leafac/sqlite";
+import { stdSerializers } from "pino";
 import type FeedService from "../../common/services/feed-service.js";
 import type makeLogger from "../../common/logger/mod.js";
 import { type FeedsTable } from "../../database/types/mod.js";
@@ -29,8 +30,16 @@ const runner = ({ db, logger, feedService }: FeedSynchronizerDeps) => {
         );
 
         log.info(
-          { failedReasons, faildCount, successCount, totalCount, feed },
-          `Done processing ${feed.url}, ${totalCount} items, with ${successCount} sucessed and ${faildCount} failed`,
+          {
+            failedReasons: failedReasons.map((reason) =>
+              reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+            ),
+            faildCount,
+            successCount,
+            totalCount,
+            feed,
+          },
+          `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,
         );
       } catch (error) {
         log.error(error, `Sync failed ${feed.url}`);

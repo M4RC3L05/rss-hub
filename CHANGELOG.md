@@ -1,3 +1,10 @@
+### v4.7.1 (2023-08-22)
+
+- [Improve req and res log serialization](https://github.com/M4RC3L05/rss-hub/commit/63d8eb8e449af59ac7afa0c523a7eca71b3024fe)
+- [Remove unused imports](https://github.com/M4RC3L05/rss-hub/commit/51a2994791aaf676076fb0de774c536348df9350)
+- [Fix bug on getting feed item enclosures](https://github.com/M4RC3L05/rss-hub/commit/f9149859242bdde83318c70744980af8e45650d4)
+- [Fix \`failedReasons\` log serialization](https://github.com/M4RC3L05/rss-hub/commit/cd9114adfb9686ca38c4de1084ab4e85e042043d)
+
 ### v4.7.0 (2023-08-14)
 
 - [Add fetch feed timeout and retries](https://github.com/M4RC3L05/rss-hub/commit/8eb1fb7696070630340d142efdbcc2d23e1518af)

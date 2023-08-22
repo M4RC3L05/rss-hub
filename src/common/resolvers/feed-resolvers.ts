@@ -85,7 +85,7 @@ export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {
   if (standard.length > 0) return standard;
 
   const fromLink = resolveFeedItemLink(feed);
-  const ext = fromLink!.split(".").at(-1);
+  const ext = fromLink?.split(".")?.at(-1);
 
   if (fromLink && ext) {
     const mt = mime.lookup(ext);

@@ -1,5 +1,5 @@
 import { type Context, type Next } from "koa";
-import { pick } from "lodash-es";
+import { stdSerializers } from "pino";
 import type makeLogger from "../logger/mod.js";
 
 type RequestLifeCycleDeps = {
@@ -14,14 +14,7 @@ const requestLifeCycle = (deps: RequestLifeCycleDeps) => {
       await next();
     } finally {
       log.info(
-        {
-          request: {
-            ...pick(ctx.request, ["method", "url", "header"]),
-            query: ctx.query,
-            params: (ctx as any)?.params as unknown,
-          },
-          response: pick(ctx.response, ["status", "message", "header"]),
-        },
+        { request: stdSerializers.req(ctx.req), response: stdSerializers.res(ctx.res) },
         `Request ${ctx.req.method!} ${ctx.req.url!}`,
       );
     }

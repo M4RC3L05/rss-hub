@@ -1,3 +1,7 @@
+### v4.7.2 (2023-08-27)
+
+- [Make request timeout to be unrefed from node](https://github.com/M4RC3L05/rss-hub/commit/77e1e10965ec8001e5d8bc77ee7cee5b65fa8484)
+
 ### v4.7.1 (2023-08-22)
 
 - [Improve req and res log serialization](https://github.com/M4RC3L05/rss-hub/commit/63d8eb8e449af59ac7afa0c523a7eca71b3024fe)

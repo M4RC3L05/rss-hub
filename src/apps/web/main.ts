@@ -6,7 +6,7 @@ import koaStatic from "koa-static";
 import config from "config";
 import basicAuth from "koa-basic-auth";
 import proxy from "koa-proxies";
-import makeLogger, { destination } from "../../common/logger/mod.js";
+import makeLogger from "../../common/logger/mod.js";
 import { processUtils } from "../../common/utils/mod.js";
 import { requestLifeCycle } from "../../common/middlewares/mod.js";
 import makeApp from "./app.js";
@@ -49,7 +49,5 @@ processUtils.addHook({
     await pClose().catch((error) => {
       log.error(error, "Could not close server");
     });
-
-    destination.flushSync();
   },
 });

@@ -11,7 +11,7 @@ import config from "config";
 import { encodeXML } from "entities";
 import basicAuth from "koa-basic-auth";
 import { Busboy } from "@fastify/busboy";
-import makeLogger, { destination } from "../../common/logger/mod.js";
+import makeLogger from "../../common/logger/mod.js";
 import makeDbClient from "../../database/mod.js";
 import { processUtils } from "../../common/utils/mod.js";
 import { errorMapper, requestLifeCycle, requestValidator } from "../../common/middlewares/mod.js";
@@ -184,7 +184,5 @@ processUtils.addHook({
     await pClose().catch((error) => {
       log.error(error, "Could not close server");
     });
-
-    destination.flushSync();
   },
 });

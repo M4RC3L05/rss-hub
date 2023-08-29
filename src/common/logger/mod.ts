@@ -1,8 +1,6 @@
 import { pino } from "pino";
 
-export const destination = pino.destination({ sync: false });
-export const logger = pino(destination);
-
-const makeLogger = (namespace: string) => logger.child({ name: namespace });
+const makeLogger = (namespace: string) =>
+  pino({ name: namespace, formatters: { level: (level) => ({ level }) } });
 
 export default makeLogger;

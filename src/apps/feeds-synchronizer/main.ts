@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import config from "config";
-import makeLogger, { destination } from "../../common/logger/mod.js";
+import makeLogger from "../../common/logger/mod.js";
 import FeedService from "../../common/services/feed-service.js";
 import { Cron } from "../../common/utils/cron-utils.js";
 import { processUtils } from "../../common/utils/mod.js";
@@ -35,7 +35,6 @@ processUtils.addHook({
   async handler() {
     db.close();
     await job.stop();
-    destination.flushSync();
   },
 });
 

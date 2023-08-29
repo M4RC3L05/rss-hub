@@ -1,3 +1,8 @@
+### v4.8.0 (2023-08-29)
+
+- [Restructure docker images](https://github.com/M4RC3L05/rss-hub/commit/ff3f2aeb06553fb22881145475ccb47905ab6ed5)
+- [Display lavel labels](https://github.com/M4RC3L05/rss-hub/commit/f1f886193aa85e95dfb4343e022ac6df0d87e5f6)
+
 ### v4.7.2 (2023-08-27)
 
 - [Make request timeout to be unrefed from node](https://github.com/M4RC3L05/rss-hub/commit/77e1e10965ec8001e5d8bc77ee7cee5b65fa8484)

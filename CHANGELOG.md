@@ -1,3 +1,12 @@
+### v4.9.0 (2023-09-05)
+
+- [Better defaults for feed timestamps](https://github.com/M4RC3L05/rss-hub/commit/8bcd2b6eb4921e1d0696e6a87cd091a362cd5b76)
+- [Improve feed resolvers and add \`resolveUpdatedAt\`](https://github.com/M4RC3L05/rss-hub/commit/69461d3bd9b99ad234f4a2a80c55cebeb35de0bd)
+- [Improve logging for sync on create feed](https://github.com/M4RC3L05/rss-hub/commit/5561779c2b5adbaf326adafcf6a1e38208e37b70)
+- [Fix vulnerability](https://github.com/M4RC3L05/rss-hub/commit/850384043b77ddf8a3f3a4f908fbb4bca05f6625)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/c7f1dcc3f9b91c36e1c2e749fd65de93ff8e64db)
+- [Make dbmate a dev dependency](https://github.com/M4RC3L05/rss-hub/commit/87b02cba3da9dd57e106161f1748d1eea2f2adbc)
+
 ### v4.8.0 (2023-08-29)
 
 - [Restructure docker images](https://github.com/M4RC3L05/rss-hub/commit/ff3f2aeb06553fb22881145475ccb47905ab6ed5)

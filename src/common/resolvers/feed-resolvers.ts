@@ -17,7 +17,7 @@ export const resolveFeed = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedTitle = (feed: Record<string, unknown>) => {
-  const searchKeys = ["channel.title", "title", "title.#text"];
+  const searchKeys = ["channel.title", "title", "title.#text", "atom:title", "a10:title"];
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))
@@ -40,7 +40,17 @@ export const resolveFeedItems = (feed: Record<string, unknown>) => {
  */
 
 export const resolveFeedItemGuid = (feed: Record<string, unknown>) => {
-  const searchKeys = ["guid", "guid.#text", "id", "id.#text", "newsid"];
+  const searchKeys = [
+    "guid",
+    "guid.#text",
+    "id",
+    "id.#text",
+    "newsid",
+    "atom:id",
+    "a10:id",
+    "atom:guid",
+    "a10:guid",
+  ];
 
   const value = _.chain(searchKeys)
     .map((k) => _.get(feed, k))
@@ -53,7 +63,7 @@ export const resolveFeedItemGuid = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedItemLink = (feed: Record<string, unknown>) => {
-  const searchKeys = ["link", "link.@_href"];
+  const searchKeys = ["link", "link.@_href", "atom:link", "a10:link"];
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))
@@ -62,7 +72,7 @@ export const resolveFeedItemLink = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedItemTitle = (feed: Record<string, unknown>) => {
-  const searchKeys = ["title", "title.#text"];
+  const searchKeys = ["title", "title.#text", "atom:title", "a10:title"];
 
   return (
     _.chain(searchKeys)
@@ -73,7 +83,7 @@ export const resolveFeedItemTitle = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {
-  const searchKeys = ["enclosure", "media:content"];
+  const searchKeys = ["enclosure"];
 
   const standard = _.chain(searchKeys)
     .map((k) => _.get(feed, k) as Record<string, unknown>)
@@ -108,7 +118,17 @@ export const resolveFeedItemImage = (
   resolveFeedItemContent: (arg: Record<string, unknown>) => string | undefined,
   feed: Record<string, any>,
 ) => {
-  const searchKeys = ["description.img.@_src"];
+  const searchKeys = [
+    "description.img",
+    "description.img.@_src",
+    "media:content",
+    "media:content.@_url",
+    "media:thumbnail",
+    "media:thumbnail.@_url",
+    "logo",
+    "atom:logo",
+    "a10:logo",
+  ];
 
   const result = _.chain(searchKeys)
     .map((k) => _.get(feed, k) as unknown)
@@ -158,6 +178,10 @@ export const resolveFeedItemContent = (builder: XMLBuilder, feed: Record<string,
     "description.#text",
     "summary",
     "summary.#text",
+    "atom:content",
+    "a10:content",
+    "atom:sumary",
+    "a10:sumary",
   ];
 
   const xhtmlContent = _.get(feed, "content.@_type") === "xhtml";
@@ -197,7 +221,27 @@ export const formatFeedItemContent = (content?: string) => {
 };
 
 export const resolveFeedItemPubDate = (feed: Record<string, unknown>) => {
-  const searchKeys = ["pubDate", "published"];
+  const searchKeys = [
+    "pubDate",
+    "published",
+    "atom:pubDate",
+    "a10:pubDate",
+    "atom:published",
+    "a10:published",
+  ];
+
+  return _.chain(searchKeys)
+    .map((k) => _.get(feed, k))
+    .find((v) => typeof v === "string" && v.trim().length > 0)
+    .thru((v) => {
+      const d = new Date(v as string);
+      return Number.isNaN(d.valueOf()) ? undefined : d;
+    })
+    .value() as Date | undefined;
+};
+
+export const resolveUpdatedAt = (feed: Record<string, unknown>) => {
+  const searchKeys = ["updated", "atom:updated", "a10:updated"];
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))

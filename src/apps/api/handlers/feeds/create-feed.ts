@@ -2,6 +2,7 @@ import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
 import sql, { type Database } from "@leafac/sqlite";
 import createHttpError from "http-errors";
+import { stdSerializers } from "pino";
 import { type FeedsTable } from "../../../../database/types/mod.js";
 import type makeLogger from "../../../../common/logger/mod.js";
 import type FeedService from "../../../../common/services/feed-service.js";
@@ -46,8 +47,19 @@ export const handler = (deps: CreateFeedDeps): Router.Middleware => {
 
     deps.feedService
       .syncFeed(feed)
-      .then((result) => {
-        log.info(result, `Synching feed ${feed.url}`);
+      .then(({ faildCount, failedReasons, successCount, totalCount }) => {
+        log.info(
+          {
+            failedReasons: failedReasons.map((reason) =>
+              reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+            ),
+            faildCount,
+            successCount,
+            totalCount,
+            feed,
+          },
+          `Synching feed ${feed.url}`,
+        );
       })
       .catch((error) => {
         log.error(error, `Could not sync ${feed.url}`);

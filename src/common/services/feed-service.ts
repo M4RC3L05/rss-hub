@@ -190,6 +190,7 @@ class FeedService {
       this.#resolvers.resolveFeedItemContent(this.#builder, feedItem),
     );
     const pubDate = this.#resolvers.resolveFeedItemPubDate(feedItem);
+    const updatedAt = this.#resolvers.resolveUpdatedAt(feedItem);
     const link = this.#resolvers.resolveFeedItemLink(feedItem);
     const title = this.#resolvers.resolveFeedItemTitle(feedItem);
 
@@ -199,11 +200,11 @@ class FeedService {
       raw: JSON.stringify(feedItem),
       content: content ?? "",
       img: feedImage ?? null,
-      createdAt: new Date(pubDate ?? new Date()).toISOString(),
+      createdAt: pubDate?.toISOString() ?? updatedAt?.toISOString() ?? new Date().toISOString(),
       title: title ?? "",
       enclosure: JSON.stringify(enclosures),
       link: link ?? null,
-      updatedAt: new Date(pubDate ?? new Date()).toISOString(),
+      updatedAt: updatedAt?.toISOString() ?? pubDate?.toISOString() ?? new Date().toISOString(),
     };
 
     this.#db.run(

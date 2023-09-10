@@ -118,25 +118,6 @@ export const resolveFeedItemImage = (
   resolveFeedItemContent: (arg: Record<string, unknown>) => string | undefined,
   feed: Record<string, any>,
 ) => {
-  const searchKeys = [
-    "description.img",
-    "description.img.@_src",
-    "media:content",
-    "media:content.@_url",
-    "media:thumbnail",
-    "media:thumbnail.@_url",
-    "logo",
-    "atom:logo",
-    "a10:logo",
-  ];
-
-  const result = _.chain(searchKeys)
-    .map((k) => _.get(feed, k) as unknown)
-    .find((v) => typeof v === "string" && v.trim().length > 0)
-    .value() as string | undefined;
-
-  if (result) return result;
-
   const enclosures = resolveFeedItemEnclosures(feed);
 
   const found = enclosures.find(({ type, url }) => {
@@ -150,6 +131,34 @@ export const resolveFeedItemImage = (
   });
 
   if (found) return found.url;
+
+  if (
+    _.has(feed, "media:content") &&
+    _.has(feed, "media:content.@_url") &&
+    (_.get(feed, "media:content.@_medium") === "image" ||
+      _.includes(_.get(feed, "media:content.@_type") as string, "image") ||
+      _.includes(_.get(feed, "media:content.@_type") as string, "img") ||
+      ["jpeg", "jpg", "gif", "png", "webp"].includes(_.get(feed, "media:content.@_url") as string))
+  ) {
+    return _.get(feed, "media:content.@_url") as string;
+  }
+
+  const searchKeys = [
+    "description.img",
+    "description.img.@_src",
+    "media:thumbnail",
+    "media:thumbnail.@_url",
+    "logo",
+    "atom:logo",
+    "a10:logo",
+  ];
+
+  const result = _.chain(searchKeys)
+    .map((k) => _.get(feed, k) as unknown)
+    .find((v) => typeof v === "string" && v.trim().length > 0)
+    .value() as string | undefined;
+
+  if (result) return result;
 
   const content = resolveFeedItemContent(feed);
 

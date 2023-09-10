@@ -1,3 +1,7 @@
+### v4.9.1 (2023-09-10)
+
+- [Better feed image resolution](https://github.com/M4RC3L05/rss-hub/commit/fbf8d9c2d32b0d127ff1dfc486b02f679372ca2a)
+
 ### v4.9.0 (2023-09-05)
 
 - [Better defaults for feed timestamps](https://github.com/M4RC3L05/rss-hub/commit/8bcd2b6eb4921e1d0696e6a87cd091a362cd5b76)

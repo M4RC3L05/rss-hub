@@ -5,6 +5,7 @@ import { type XMLBuilder, type XMLParser } from "fast-xml-parser";
 import sql, { type Database } from "@leafac/sqlite";
 import fetch from "node-fetch";
 import { type Response } from "node-fetch";
+import * as entities from "entities";
 import { type feedResolvers } from "../resolvers/mod.js";
 import { type FeedsTable } from "../../database/types/mod.js";
 import makeLogger from "../logger/mod.js";
@@ -182,7 +183,7 @@ class FeedService {
   async #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
     const id = this.#resolvers.resolveFeedItemGuid(feedItem);
     const enclosures = this.#resolvers.resolveFeedItemEnclosures(feedItem);
-    const feedImage = this.#resolvers.resolveFeedItemImage(
+    let feedImage = this.#resolvers.resolveFeedItemImage(
       (feed) => this.#resolvers.resolveFeedItemContent(this.#builder, feed),
       feedItem,
     );
@@ -193,6 +194,10 @@ class FeedService {
     const updatedAt = this.#resolvers.resolveUpdatedAt(feedItem);
     const link = this.#resolvers.resolveFeedItemLink(feedItem);
     const title = this.#resolvers.resolveFeedItemTitle(feedItem);
+
+    if (feedImage) {
+      feedImage = entities.decodeXML(feedImage);
+    }
 
     const toInsert = {
       id: id ?? createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),

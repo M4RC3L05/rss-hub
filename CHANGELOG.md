@@ -1,3 +1,8 @@
+### v4.9.2 (2023-09-17)
+
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/433f21ecfe1f47b03504f81fcc10cf76edc9e290)
+- [Handle xml entities of feed image links](https://github.com/M4RC3L05/rss-hub/commit/1ec162c0f676472900dd2d722868bc6a5ff9a051)
+
 ### v4.9.1 (2023-09-10)
 
 - [Better feed image resolution](https://github.com/M4RC3L05/rss-hub/commit/fbf8d9c2d32b0d127ff1dfc486b02f679372ca2a)

@@ -148,6 +148,8 @@ export const resolveFeedItemImage = (
     "description.img.@_src",
     "media:thumbnail",
     "media:thumbnail.@_url",
+    "media:group.media:thumbnail",
+    "media:group.media:thumbnail.@_url",
     "logo",
     "atom:logo",
     "a10:logo",
@@ -191,6 +193,7 @@ export const resolveFeedItemContent = (builder: XMLBuilder, feed: Record<string,
     "a10:content",
     "atom:sumary",
     "a10:sumary",
+    "media:group.media:description",
   ];
 
   const xhtmlContent = _.get(feed, "content.@_type") === "xhtml";

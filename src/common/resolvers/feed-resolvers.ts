@@ -201,6 +201,11 @@ export const resolveFeedItemContent = (builder: XMLBuilder, feed: Record<string,
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k) as unknown)
     .unshift(parsedXhtml)
+    .map((v) =>
+      Array.isArray(v)
+        ? v.filter((x) => typeof x === "string" && x.trim().length > 0).join("\n")
+        : v,
+    )
     .find((v) => typeof v === "string" && v.trim().length > 0)
     .value() as string | undefined;
 };

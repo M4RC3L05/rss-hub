@@ -1,3 +1,7 @@
+### v4.9.3 (2023-09-20)
+
+- [Handle content tags parsed as array from xml](https://github.com/M4RC3L05/rss-hub/commit/8205a2348b9fbe9c71ce6b8cd6ac6eee7972d654)
+
 ### v4.9.2 (2023-09-17)
 
 - [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/433f21ecfe1f47b03504f81fcc10cf76edc9e290)

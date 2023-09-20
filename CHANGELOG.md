@@ -1,3 +1,7 @@
+### v4.9.4 (2023-09-20)
+
+- [Allow to get thumb for feed item in \`media:group\`](https://github.com/M4RC3L05/rss-hub/commit/f959dd2cbe3d26078f650412e4d0d6cef48ba37a)
+
 ### v4.9.3 (2023-09-20)
 
 - [Handle content tags parsed as array from xml](https://github.com/M4RC3L05/rss-hub/commit/8205a2348b9fbe9c71ce6b8cd6ac6eee7972d654)

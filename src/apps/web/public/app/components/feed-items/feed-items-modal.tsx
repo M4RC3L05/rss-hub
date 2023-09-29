@@ -54,10 +54,10 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
   const ref = useRef<HTMLDivElement>();
 
   useEffect(() => {
-    if (fetch && progress >= 80 && !isLoading && !isValidating && (data?.[0]?.length ?? 0) > 0) {
+    if (fetch && progress >= 80 && !isLoading && !isValidating && (data?.at(-1)?.length ?? 0) > 0) {
       void setSize((s) => s + 1);
     }
-  }, [progress, setSize, fetch, isLoading, data?.at(-1)]);
+  }, [progress, setSize, fetch, isLoading, data?.at(-1)?.length]);
 
   useLayoutEffect(() => {
     const container = ref.current;

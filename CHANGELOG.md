@@ -1,3 +1,7 @@
+### v4.10.1 (2023-09-29)
+
+- [Fix feed items pagination](https://github.com/M4RC3L05/rss-hub/commit/5134daa19990cbc893ffd6b4dfe55343fa700b31)
+
 ### v4.10.0 (2023-09-29)
 
 - [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/d2c5ed71e12935242b2ab244f140ada7b9e01d48)

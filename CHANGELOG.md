@@ -1,3 +1,9 @@
+### v4.10.0 (2023-09-29)
+
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/d2c5ed71e12935242b2ab244f140ada7b9e01d48)
+- [Use ts on web app](https://github.com/M4RC3L05/rss-hub/commit/e5c29a8835c86df2fe26d38c5e370a264713d7d7)
+- [Update nodejs version](https://github.com/M4RC3L05/rss-hub/commit/b4c5ca8bb97ef05ee159ac9bd821e947b30597a3)
+
 ### v4.9.4 (2023-09-20)
 
 - [Allow to get thumb for feed item in \`media:group\`](https://github.com/M4RC3L05/rss-hub/commit/f959dd2cbe3d26078f650412e4d0d6cef48ba37a)

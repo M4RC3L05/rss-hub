@@ -9,6 +9,7 @@ export type FeedsTable = {
   id: string;
   name: string;
   url: string;
+  categoryId: string;
   createdAt: string;
   updatedAt: string;
 };

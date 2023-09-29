@@ -1,6 +1,7 @@
 import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
 import sql, { type Database } from "@leafac/sqlite";
+import { type CategoriesTable } from "../../../../database/types/mod.js";
 
 type UpdateCategoryNameDeps = {
   db: Database;
@@ -33,7 +34,7 @@ export const handler = (deps: UpdateCategoryNameDeps): Router.Middleware => {
     const parameters = ctx.params as RequestParameters;
     const body = ctx.request.body as RequestBody;
 
-    const updated = deps.db.get(sql`
+    const updated = deps.db.get<CategoriesTable>(sql`
       update categories set name = ${body.name}
       where id = ${parameters.id}
       returning *

@@ -39,7 +39,16 @@
       "node",
       "browser"
     ],
-    "prettier": true
+    "prettier": true,
+    "overrides": [
+      {
+        "files": "**/public/**/*.ts",
+        "rules": {
+          "import/no-extraneous-dependencies": "off",
+          "@typescript-eslint/naming-convention": "off"
+        }
+      }
+    ]
   },
   "devDependencies": {
     "@swc/cli": "^0.1.62",
@@ -54,15 +63,23 @@
     "@types/koa-qs": "^2.0.1",
     "@types/koa-static": "^4.0.2",
     "@types/lodash-es": "^4.17.9",
+    "@types/masonry-layout": "^4.2.5",
     "@types/mime-types": "^2.1.1",
     "@types/node": "^20.6.2",
+    "@types/react-dom": "^18.2.8",
     "dbmate": "^2.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
+    "masonry-layout": "^4.2.2",
     "offline-github-changelog": "^3.0.1",
     "pino-pretty": "^10.2.0",
     "prettier": "^3.0.3",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.0",
+    "react-dom": "^18.2.0",
+    "swr": "^2.2.4",
     "typescript": "^5.2.2",
+    "usehooks-ts": "^2.9.1",
     "xo": "^0.56.0"
   },
   "dependencies": {

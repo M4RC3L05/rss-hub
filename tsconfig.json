@@ -6,6 +6,8 @@
     "skipLibCheck": true,
     "noEmit": true,
 
+    "jsx": "react-jsx",
+
     "strict": true,
     "noImplicitOverride": true,
 

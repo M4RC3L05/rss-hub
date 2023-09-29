@@ -1,3 +1,4 @@
+import { type CategoriesTable, type FeedsTable } from "../../../../../database/types/mod.js";
 import config from "./config.js";
 
 export const paths = {
@@ -25,11 +26,13 @@ export const paths = {
   },
 };
 
-/**
- * @param {Parameters<typeof fetch>[0]} input
- * @param {Parameters<typeof fetch>[1]} options
- */
-export const makeRequester = async (input, options = {}) => {
+export class RequestError extends Error {
+  constructor(error: Record<string, unknown>) {
+    super("Request error", { cause: error });
+  }
+}
+
+export const makeRequester = async <T>(input: string, options: RequestInit = {}): Promise<T> => {
   const url = new URL(input, config.api.url);
   return fetch(url.toString(), {
     ...options,
@@ -37,28 +40,34 @@ export const makeRequester = async (input, options = {}) => {
       ...options.headers,
       Authorization: `Basic ${window.btoa(`${config.api.auth.name}:${config.api.auth.pass}`)}`,
     },
-  }).then((response) => {
+  }).then(async (response) => {
     if (response.status === 204) {
       return undefined;
     }
 
     return response.json().then(({ data, error }) => {
-      if (error) throw error;
+      if (error) throw new RequestError(error as Record<string, unknown>);
 
-      return data;
+      return data as T;
     });
-  });
+  }) as Promise<T>;
 };
 
 const requests = {
   categories: {
-    deleteCategory: ({ cancel, id } = {}) =>
-      makeRequester(paths.categories.deleteCategory.replace(":id", id), {
+    deleteCategory: async ({ cancel, id }: { cancel?: AbortSignal; id: string }) =>
+      makeRequester<void>(paths.categories.deleteCategory.replace(":id", id), {
         signal: cancel,
         method: "DELETE",
       }),
-    createCategory: ({ cancel, body } = {}) =>
-      makeRequester(paths.categories.createCategory, {
+    createCategory: async ({
+      cancel,
+      body,
+    }: {
+      cancel?: AbortSignal;
+      body: Record<string, unknown>;
+    }) =>
+      makeRequester<CategoriesTable>(paths.categories.createCategory, {
         signal: cancel,
         method: "POST",
         body: JSON.stringify(body),
@@ -66,8 +75,16 @@ const requests = {
           "content-type": "application/json",
         },
       }),
-    updateCategoryName: ({ cancel, body, id } = {}) =>
-      makeRequester(paths.categories.updateCategoryName.replace(":id", id), {
+    updateCategoryName: async ({
+      cancel,
+      body,
+      id,
+    }: {
+      cancel?: AbortSignal;
+      id: string;
+      body: Record<string, unknown>;
+    }) =>
+      makeRequester<CategoriesTable>(paths.categories.updateCategoryName.replace(":id", id), {
         signal: cancel,
         method: "PATCH",
         body: JSON.stringify(body),
@@ -77,8 +94,16 @@ const requests = {
       }),
   },
   feeds: {
-    updateFeed: ({ cancel, body, id } = {}) =>
-      makeRequester(paths.feeds.updateFeed.replace(":id", id), {
+    updateFeed: async ({
+      cancel,
+      body,
+      id,
+    }: {
+      cancel?: AbortSignal;
+      id: string;
+      body: Record<string, unknown>;
+    }) =>
+      makeRequester<FeedsTable>(paths.feeds.updateFeed.replace(":id", id), {
         signal: cancel,
         method: "PATCH",
         body: JSON.stringify(body),
@@ -86,8 +111,8 @@ const requests = {
           "content-type": "application/json",
         },
       }),
-    createFeed: ({ cancel, body } = {}) =>
-      makeRequester(paths.feeds.createFeed, {
+    createFeed: async ({ cancel, body }: { cancel?: AbortSignal; body: Record<string, unknown> }) =>
+      makeRequester<FeedsTable>(paths.feeds.createFeed, {
         signal: cancel,
         method: "POST",
         body: JSON.stringify(body),
@@ -95,13 +120,13 @@ const requests = {
           "content-type": "application/json",
         },
       }),
-    deleteFeed: ({ cancel, id } = {}) =>
-      makeRequester(paths.feeds.deleteFeed.replace(":id", id), {
+    deleteFeed: async ({ cancel, id }: { cancel?: AbortSignal; id: string }) =>
+      makeRequester<void>(paths.feeds.deleteFeed.replace(":id", id), {
         signal: cancel,
         method: "DELETE",
       }),
-    validateFeedUrl: ({ cancel, url } = {}) =>
-      makeRequester(paths.feeds.validateFeedUrl, {
+    validateFeedUrl: async ({ cancel, url }: { cancel?: AbortSignal; url: string }) =>
+      makeRequester<{ title: string }>(paths.feeds.validateFeedUrl, {
         signal: cancel,
         method: "POST",
         body: JSON.stringify({ url }),
@@ -111,8 +136,14 @@ const requests = {
       }),
   },
   feedItems: {
-    markFeedItemsAsRead: ({ cancel, body } = {}) =>
-      makeRequester(paths.feedItems.markFeedItemAsRead, {
+    markFeedItemsAsRead: async ({
+      cancel,
+      body,
+    }: {
+      cancel?: AbortSignal;
+      body: Record<string, unknown>;
+    }) =>
+      makeRequester<void>(paths.feedItems.markFeedItemAsRead, {
         signal: cancel,
         method: "PATCH",
         body: JSON.stringify(body),
@@ -120,8 +151,14 @@ const requests = {
           "content-type": "application/json",
         },
       }),
-    markFeedItemAsUnread: ({ cancel, body } = {}) =>
-      makeRequester(paths.feedItems.markFeedItemAsUnread, {
+    markFeedItemAsUnread: async ({
+      cancel,
+      body,
+    }: {
+      cancel?: AbortSignal;
+      body: Record<string, unknown>;
+    }) =>
+      makeRequester<void>(paths.feedItems.markFeedItemAsUnread, {
         signal: cancel,
         method: "PATCH",
         body: JSON.stringify(body),
@@ -131,8 +168,8 @@ const requests = {
       }),
   },
   opml: {
-    importOpml: ({ cancel, body } = {}) =>
-      makeRequester(paths.opml.importOpml, {
+    importOpml: async ({ cancel, body }: { cancel?: AbortSignal; body: FormData }) =>
+      makeRequester<void>(paths.opml.importOpml, {
         signal: cancel,
         method: "POST",
         body,

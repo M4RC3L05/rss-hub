@@ -1,3 +1,8 @@
+### v4.11.0 (2023-10-12)
+
+- [Improve project structure](https://github.com/M4RC3L05/rss-hub/commit/dd070c366461e5de83bc249f40a4e4601c3f0773)
+- [Improve docker file](https://github.com/M4RC3L05/rss-hub/commit/67a4b8976147fd88fd327b8baf5c5dff0ae9bd33)
+
 ### v4.10.1 (2023-09-29)
 
 - [Fix feed items pagination](https://github.com/M4RC3L05/rss-hub/commit/5134daa19990cbc893ffd6b4dfe55343fa700b31)

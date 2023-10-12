@@ -1,59 +1,52 @@
 /* eslint-disable no-await-in-loop */
 import * as _ from "lodash-es";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import { stdSerializers } from "pino";
-import type FeedService from "../../common/services/feed-service.js";
-import type makeLogger from "../../common/logger/mod.js";
 import { type FeedsTable } from "../../database/types/mod.js";
+import { makeLogger } from "../../common/logger/mod.js";
+import { db } from "../../database/mod.js";
+import { feedService } from "../../services/mod.js";
 
-type FeedSynchronizerDeps = {
-  db: Database;
-  logger: typeof makeLogger;
-  feedService: FeedService;
-};
+const log = makeLogger("feed-synchronizer-runner");
 
-const runner = ({ db, logger, feedService }: FeedSynchronizerDeps) => {
-  const log = logger("feed-synchronizer-runner");
+const runner = async (signal: AbortSignal) => {
+  const feeds = db.all<FeedsTable>(sql`select * from feeds`);
 
-  return async (signal: AbortSignal) => {
-    const feeds = db.all<FeedsTable>(sql`select * from feeds`);
+  log.info("Synching begin");
 
-    log.info("Synching begin");
+  for (const feed of feeds) {
+    log.info({ feed }, `Synching feed ${feed.url}`);
 
-    for (const feed of feeds) {
-      log.info({ feed }, `Synching feed ${feed.url}`);
+    try {
+      const { faildCount, failedReasons, successCount, totalCount } = await feedService.syncFeed(
+        feed,
+        { signal },
+      );
 
-      try {
-        const { faildCount, failedReasons, successCount, totalCount } = await feedService.syncFeed(
+      log.info(
+        {
+          failedReasons: failedReasons.map((reason) =>
+            reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+          ),
+          faildCount,
+          successCount,
+          totalCount,
           feed,
-          { signal },
-        );
-
-        log.info(
-          {
-            failedReasons: failedReasons.map((reason) =>
-              reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
-            ),
-            faildCount,
-            successCount,
-            totalCount,
-            feed,
-          },
-          `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,
-        );
-      } catch (error) {
-        log.error(error, `Sync failed ${feed.url}`);
-      } finally {
-        log.info({ feed }, `Synching synced ${feed.url}`);
-      }
-
-      if (signal.aborted) {
-        break;
-      }
+        },
+        `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,
+      );
+    } catch (error) {
+      log.error(error, `Sync failed ${feed.url}`);
+    } finally {
+      log.info({ feed }, `Synching synced ${feed.url}`);
     }
 
-    log.info(`Synching ended`);
-  };
+    if (signal.aborted) {
+      break;
+    }
+  }
+
+  log.info(`Synching ended`);
 };
 
 export default runner;

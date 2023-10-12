@@ -1,12 +1,7 @@
 import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
 import createHttpError from "http-errors";
-import type FeedService from "../../../../common/services/feed-service.js";
-
-type ValidateFeedUrlDeps = {
-  feedService: FeedService;
-  resolveTile: (feed: Record<string, unknown>) => string | undefined;
-};
+import { feedService } from "../../../../services/mod.js";
 
 export const schemas = {
   request: {
@@ -24,17 +19,15 @@ export const schemas = {
 
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = (deps: ValidateFeedUrlDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
-    const body = ctx.request.body as RequestBody;
+export const handler = async (ctx: Router.RouterContext) => {
+  const body = ctx.request.body as RequestBody;
 
-    try {
-      const extracted = await deps.feedService.verifyFeed(body.url);
-      const title = deps.feedService.getFeedTitle(extracted);
+  try {
+    const extracted = await feedService.verifyFeed(body.url);
+    const title = feedService.getFeedTitle(extracted);
 
-      ctx.body = { data: { title } };
-    } catch (error) {
-      throw createHttpError(422, { cause: error, message: "Invalid feed url" });
-    }
-  };
+    ctx.body = { data: { title } };
+  } catch (error) {
+    throw createHttpError(422, { cause: error, message: "Invalid feed url" });
+  }
 };

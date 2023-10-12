@@ -1,17 +1,12 @@
 import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import createHttpError from "http-errors";
 import { stdSerializers } from "pino";
 import { type FeedsTable } from "../../../../database/types/mod.js";
-import type makeLogger from "../../../../common/logger/mod.js";
-import type FeedService from "../../../../common/services/feed-service.js";
-
-type CreateFeedDeps = {
-  db: Database;
-  logger: typeof makeLogger;
-  feedService: FeedService;
-};
+import { makeLogger } from "../../../../common/logger/mod.js";
+import { db } from "../../../../database/mod.js";
+import { feedService } from "../../../../services/mod.js";
 
 export const schemas = {
   request: {
@@ -31,41 +26,39 @@ export const schemas = {
 
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = (deps: CreateFeedDeps): Router.Middleware => {
-  const log = deps.logger("create-feed-handler");
+const log = makeLogger("create-feed-handler");
 
-  return async (ctx: Router.RouterContext) => {
-    const body = ctx.request.body as RequestBody;
+export const handler = async (ctx: Router.RouterContext) => {
+  const body = ctx.request.body as RequestBody;
 
-    const feed = deps.db.get<FeedsTable>(sql`
-      insert into feeds (name, url, category_id)
-      values (${body.name}, ${body.url}, ${body.categoryId})
-      returning *
-    `);
+  const feed = db.get<FeedsTable>(sql`
+    insert into feeds (name, url, category_id)
+    values (${body.name}, ${body.url}, ${body.categoryId})
+    returning *
+  `);
 
-    if (!feed) throw createHttpError(400, "Could not create feed");
+  if (!feed) throw createHttpError(400, "Could not create feed");
 
-    deps.feedService
-      .syncFeed(feed)
-      .then(({ faildCount, failedReasons, successCount, totalCount }) => {
-        log.info(
-          {
-            failedReasons: failedReasons.map((reason) =>
-              reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
-            ),
-            faildCount,
-            successCount,
-            totalCount,
-            feed,
-          },
-          `Synching feed ${feed.url}`,
-        );
-      })
-      .catch((error) => {
-        log.error(error, `Could not sync ${feed.url}`);
-      });
+  feedService
+    .syncFeed(feed)
+    .then(({ faildCount, failedReasons, successCount, totalCount }) => {
+      log.info(
+        {
+          failedReasons: failedReasons.map((reason) =>
+            reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+          ),
+          faildCount,
+          successCount,
+          totalCount,
+          feed,
+        },
+        `Synching feed ${feed.url}`,
+      );
+    })
+    .catch((error) => {
+      log.error(error, `Could not sync ${feed.url}`);
+    });
 
-    ctx.status = 201;
-    ctx.body = { data: feed };
-  };
+  ctx.status = 201;
+  ctx.body = { data: feed };
 };

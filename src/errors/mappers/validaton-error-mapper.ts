@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { RequestValidationError } from "../../middlewares/request-validator.js";
+import RequestValidationError from "../request-validation-error.js";
 
 const validationalidatorErrorMapper = (error: unknown) => {
   if (!(error instanceof RequestValidationError)) return;

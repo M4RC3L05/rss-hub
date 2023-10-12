@@ -1,11 +1,8 @@
 import type Router from "@koa/router";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import createHttpError from "http-errors";
 import { type FromSchema } from "json-schema-to-ts";
-
-type UpdateFeedDeps = {
-  db: Database;
-};
+import { db } from "../../../../database/mod.js";
 
 export const schemas = {
   request: {
@@ -32,23 +29,21 @@ export const schemas = {
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 
-export const handler = (deps: UpdateFeedDeps): Router.Middleware => {
-  return (ctx: Router.RouterContext) => {
-    const body = ctx.request.body as RequestBody;
-    const parameters = ctx.params as RequestParameters;
+export const handler = (ctx: Router.RouterContext) => {
+  const body = ctx.request.body as RequestBody;
+  const parameters = ctx.params as RequestParameters;
 
-    const feed = deps.db.get(sql`
-      update feeds set
-        category_id = $${body.categoryId ? sql`${body.categoryId}` : sql`category_id`},
-        name = $${body.name ? sql`${body.name}` : sql`name`},
-        url = $${body.url ? sql`${body.url}` : sql`url`}
-      where id = ${parameters.id}
-      returning *
-    `);
+  const feed = db.get(sql`
+    update feeds set
+      category_id = $${body.categoryId ? sql`${body.categoryId}` : sql`category_id`},
+      name = $${body.name ? sql`${body.name}` : sql`name`},
+      url = $${body.url ? sql`${body.url}` : sql`url`}
+    where id = ${parameters.id}
+    returning *
+  `);
 
-    if (!feed) throw createHttpError(404, "Feed not found");
+  if (!feed) throw createHttpError(404, "Feed not found");
 
-    ctx.status = 200;
-    ctx.body = { data: feed };
-  };
+  ctx.status = 200;
+  ctx.body = { data: feed };
 };

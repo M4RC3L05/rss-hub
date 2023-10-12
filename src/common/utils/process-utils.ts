@@ -1,5 +1,5 @@
 import process from "node:process";
-import makeLogger from "../logger/mod.js";
+import { makeLogger } from "../logger/mod.js";
 
 type ProcessHook = {
   name: string;

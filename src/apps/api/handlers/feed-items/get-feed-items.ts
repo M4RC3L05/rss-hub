@@ -1,11 +1,8 @@
 import type Router from "@koa/router";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
 import { type FeedItemsTable } from "../../../../database/types/mod.js";
-
-type GetFeedItemsDeps = {
-  db: Database;
-};
+import { db } from "../../../../database/mod.js";
 
 export const schemas = {
   request: {
@@ -26,21 +23,19 @@ export const schemas = {
 
 type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
 
-export const handler = (deps: GetFeedItemsDeps): Router.Middleware => {
-  return (ctx: Router.RouterContext) => {
-    const query = ctx.query as RequestQuery;
-    const feedItems = deps.db.all<FeedItemsTable>(
-      sql`
-        select * from feed_items
-        where
-          feed_id = ${query.feedId}
-          $${"unread" in query ? sql`and readed_at is null` : sql``}
-        order by created_at desc
-        limit ${Number(query.limit)}
-        offset ${Number(query.page) * Number(query.limit)}
-      `,
-    );
+export const handler = (ctx: Router.RouterContext) => {
+  const query = ctx.query as RequestQuery;
+  const feedItems = db.all<FeedItemsTable>(
+    sql`
+      select * from feed_items
+      where
+        feed_id = ${query.feedId}
+        $${"unread" in query ? sql`and readed_at is null` : sql``}
+      order by created_at desc
+      limit ${Number(query.limit)}
+      offset ${Number(query.page) * Number(query.limit)}
+    `,
+  );
 
-    ctx.body = { data: feedItems };
-  };
+  ctx.body = { data: feedItems };
 };

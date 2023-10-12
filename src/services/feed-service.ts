@@ -1,75 +1,14 @@
 import { createHash } from "node:crypto";
-import { setTimeout } from "node:timers/promises";
 import * as _ from "lodash-es";
-import { type XMLBuilder, type XMLParser } from "fast-xml-parser";
-import sql, { type Database } from "@leafac/sqlite";
-import fetch from "node-fetch";
-import { type Response } from "node-fetch";
+import sql from "@leafac/sqlite";
 import * as entities from "entities";
-import { type feedResolvers } from "../resolvers/mod.js";
-import { type FeedsTable } from "../../database/types/mod.js";
-import makeLogger from "../logger/mod.js";
+import { type FeedsTable } from "../database/types/mod.js";
+import { request } from "../common/utils/fetch-utils.js";
+import { feedResolvers } from "../resolvers/mod.js";
+import { db } from "../database/mod.js";
+import { xmlBuilder, xmlParser } from "../common/utils/xml-utils.js";
 
-type FeedServiceDeps = {
-  db: Database;
-  parser: XMLParser;
-  builder: XMLBuilder;
-  resolvers: typeof feedResolvers;
-};
-
-const log = makeLogger("feed-service");
-
-const request = async (
-  url: Parameters<typeof fetch>[0],
-  init: Parameters<typeof fetch>[1],
-  options: { retryN: number },
-): Promise<Response> => {
-  try {
-    const result = await Promise.race([
-      setTimeout(8000, new Error(`Request timeout excedded for "${url as any as string}"`), {
-        ref: false,
-      }),
-      fetch(url, init),
-    ]);
-
-    if (result instanceof Error) {
-      throw result;
-    }
-
-    return result;
-  } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw error;
-    }
-
-    if (options.retryN <= 3) {
-      log.error(error, "Could not fetch, proceed to retry");
-      log.info(`Retry Nº ${options.retryN}, retrying in 2 seconds`);
-
-      await setTimeout(2000, undefined, {
-        signal: init?.signal as any as AbortSignal,
-      });
-
-      return request(url, init, { ...options, retryN: options.retryN + 1 });
-    }
-
-    throw new Error("Retrys exausted");
-  }
-};
-
-class FeedService {
-  #db;
-  #parser: XMLParser;
-  #builder: XMLBuilder;
-  #resolvers: typeof feedResolvers;
-
-  constructor({ db, parser, builder, resolvers }: FeedServiceDeps) {
-    this.#db = db;
-    this.#parser = parser;
-    this.#builder = builder;
-    this.#resolvers = resolvers;
-  }
-
+export class FeedService {
   async syncFeed(feed: FeedsTable, options?: { signal: AbortSignal }) {
     let data;
 
@@ -84,7 +23,7 @@ class FeedService {
       throw new Error("Aborted");
     }
 
-    const feedPage = this.#resolvers.resolveFeed(data);
+    const feedPage = feedResolvers.resolveFeed(data);
 
     if (!feedPage) {
       throw new Error(`Could not get feed for feed ${feed.url}`, { cause: data });
@@ -94,7 +33,7 @@ class FeedService {
       throw new Error("Aborted");
     }
 
-    const feedItems = this.#resolvers.resolveFeedItems(feedPage);
+    const feedItems = feedResolvers.resolveFeedItems(feedPage);
 
     if (!feedItems) {
       throw new Error(`No feed items for feed "${feed.url}"`, { cause: feedPage });
@@ -118,14 +57,14 @@ class FeedService {
   }
 
   toObject(data: string): Record<string, unknown> {
-    return this.#parser.parse(data) as Record<string, unknown>;
+    return xmlParser.parse(data) as Record<string, unknown>;
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
     const rawFeed = await this.#extractRawFeed(url, options);
     const parsed = this.toObject(rawFeed);
 
-    if (!this.#resolvers.resolveFeed(parsed)) {
+    if (!feedResolvers.resolveFeed(parsed)) {
       throw new Error(`No feed found in url ${url}`);
     }
 
@@ -133,8 +72,8 @@ class FeedService {
   }
 
   getFeedTitle(raw: Record<string, unknown>) {
-    const feed = this.#resolvers.resolveFeed(raw)!;
-    return this.#resolvers.resolveFeedTitle(feed);
+    const feed = feedResolvers.resolveFeed(raw)!;
+    return feedResolvers.resolveFeedTitle(feed);
   }
 
   async #extractRawFeed(url: string, options?: { signal: AbortSignal }) {
@@ -181,19 +120,19 @@ class FeedService {
   }
 
   async #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
-    const id = this.#resolvers.resolveFeedItemGuid(feedItem);
-    const enclosures = this.#resolvers.resolveFeedItemEnclosures(feedItem);
-    let feedImage = this.#resolvers.resolveFeedItemImage(
-      (feed) => this.#resolvers.resolveFeedItemContent(this.#builder, feed),
+    const id = feedResolvers.resolveFeedItemGuid(feedItem);
+    const enclosures = feedResolvers.resolveFeedItemEnclosures(feedItem);
+    let feedImage = feedResolvers.resolveFeedItemImage(
+      (feed) => feedResolvers.resolveFeedItemContent(xmlBuilder, feed),
       feedItem,
     );
-    const content = this.#resolvers.formatFeedItemContent(
-      this.#resolvers.resolveFeedItemContent(this.#builder, feedItem),
+    const content = feedResolvers.formatFeedItemContent(
+      feedResolvers.resolveFeedItemContent(xmlBuilder, feedItem),
     );
-    const pubDate = this.#resolvers.resolveFeedItemPubDate(feedItem);
-    const updatedAt = this.#resolvers.resolveUpdatedAt(feedItem);
-    const link = this.#resolvers.resolveFeedItemLink(feedItem);
-    const title = this.#resolvers.resolveFeedItemTitle(feedItem);
+    const pubDate = feedResolvers.resolveFeedItemPubDate(feedItem);
+    const updatedAt = feedResolvers.resolveUpdatedAt(feedItem);
+    const link = feedResolvers.resolveFeedItemLink(feedItem);
+    const title = feedResolvers.resolveFeedItemTitle(feedItem);
 
     if (feedImage) {
       feedImage = entities.decodeXML(feedImage);
@@ -212,7 +151,7 @@ class FeedService {
       updatedAt: updatedAt?.toISOString() ?? pubDate?.toISOString() ?? new Date().toISOString(),
     };
 
-    this.#db.run(
+    db.run(
       sql`
         insert into
           feed_items(id, feed_id, raw, content, img, created_at, title, enclosure, link, updated_at)
@@ -236,4 +175,4 @@ class FeedService {
   }
 }
 
-export default FeedService;
+export const feedService = new FeedService();

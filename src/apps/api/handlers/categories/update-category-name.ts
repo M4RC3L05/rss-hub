@@ -1,11 +1,8 @@
 import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
-
-type UpdateCategoryNameDeps = {
-  db: Database;
-};
+import { db } from "../../../../database/mod.js";
 
 export const schemas = {
   request: {
@@ -29,21 +26,19 @@ export const schemas = {
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = (deps: UpdateCategoryNameDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
-    const parameters = ctx.params as RequestParameters;
-    const body = ctx.request.body as RequestBody;
+export const handler = async (ctx: Router.RouterContext) => {
+  const parameters = ctx.params as RequestParameters;
+  const body = ctx.request.body as RequestBody;
 
-    const updated = deps.db.get<CategoriesTable>(sql`
-      update categories set name = ${body.name}
-      where id = ${parameters.id}
-      returning *
-    `);
+  const updated = db.get<CategoriesTable>(sql`
+    update categories set name = ${body.name}
+    where id = ${parameters.id}
+    returning *
+  `);
 
-    if (!updated) {
-      ctx.throw(404, "Entity not found");
-    }
+  if (!updated) {
+    ctx.throw(404, "Entity not found");
+  }
 
-    ctx.body = { data: updated };
-  };
+  ctx.body = { data: updated };
 };

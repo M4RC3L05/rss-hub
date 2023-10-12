@@ -1,12 +1,9 @@
 import type Router from "@koa/router";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
 import createHttpError from "http-errors";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
-
-type CreateCategoryDeps = {
-  db: Database;
-};
+import { db } from "../../../../database/mod.js";
 
 export const schemas = {
   request: {
@@ -22,21 +19,19 @@ export const schemas = {
 
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = (deps: CreateCategoryDeps): Router.Middleware => {
-  return (ctx: Router.RouterContext) => {
-    const body = ctx.request.body as RequestBody;
+export const handler = (ctx: Router.RouterContext) => {
+  const body = ctx.request.body as RequestBody;
 
-    const category = deps.db.get<CategoriesTable>(sql`
-      insert into categories (name)
-      values (${body.name})
-      returning *
-    `);
+  const category = db.get<CategoriesTable>(sql`
+    insert into categories (name)
+    values (${body.name})
+    returning *
+  `);
 
-    if (!category) {
-      throw createHttpError(400, "Could not create category");
-    }
+  if (!category) {
+    throw createHttpError(400, "Could not create category");
+  }
 
-    ctx.status = 201;
-    ctx.body = { data: category };
-  };
+  ctx.status = 201;
+  ctx.body = { data: category };
 };

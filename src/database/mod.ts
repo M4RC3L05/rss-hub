@@ -1,10 +1,10 @@
+import { randomUUID } from "node:crypto";
 import sql, { Database, type Options, type Query } from "@leafac/sqlite";
 import { camelCase, isObject, mapKeys } from "lodash-es";
+import config from "config";
+import { makeLogger } from "../common/logger/mod.js";
 
-type MakeDbClientDeps = {
-  path: string;
-  randomUuid: () => string;
-};
+const log = makeLogger("database");
 
 const toCamelCase = <T>(data: unknown) => {
   if (Array.isArray(data))
@@ -29,12 +29,12 @@ class CustomDatabase extends Database {
   }
 }
 
-const makeDbClient = (deps: MakeDbClientDeps) => {
-  return new CustomDatabase(deps.path)
-    .execute(sql`pragma journal_mode = WAL`)
-    .execute(sql`pragma busy_timeout = 5000`)
-    .execute(sql`pragma foreign_keys = ON`)
-    .function("uuid_v4", () => deps.randomUuid());
-};
-
-export default makeDbClient;
+export const db = new CustomDatabase(config.get("database.path"), {
+  verbose(message, ...args) {
+    log.debug({ sql: message, args }, "Running sql");
+  },
+})
+  .execute(sql`pragma journal_mode = WAL`)
+  .execute(sql`pragma busy_timeout = 5000`)
+  .execute(sql`pragma foreign_keys = ON`)
+  .function("uuid_v4", () => randomUUID());

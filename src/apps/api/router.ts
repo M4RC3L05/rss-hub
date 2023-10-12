@@ -1,122 +1,94 @@
-import Router, { type RouterContext } from "@koa/router";
-import type Ajv from "ajv";
-import type requestValidator from "../../common/middlewares/request-validator.js";
-import type * as handlers from "./handlers/mod.js";
+import Router from "@koa/router";
+import requestValidator from "../../middlewares/request-validator.js";
+import {
+  categoriesHandlers,
+  feedItemsHandlers,
+  feedsHandlers,
+  opmlHandlers,
+} from "./handlers/mod.js";
 
-type Map<Type> = {
-  [Key in keyof Type]: Omit<Type[Key], "handler"> & { handler: Router.Middleware };
-};
+export const router = new Router({ prefix: "/api" });
 
-type MakeRouterDeps = {
-  validator: Ajv.default;
-  categoriesHandlers: Map<(typeof handlers)["categoriesHandlers"]>;
-  feedsHandlers: Map<(typeof handlers)["feedsHandlers"]>;
-  feedItemsHandlers: Map<(typeof handlers)["feedItemsHandlers"]>;
-  opmlHandlers: Map<(typeof handlers)["opmlHandlers"]>;
-  middlewares: {
-    requestValidator: typeof requestValidator;
-  };
-};
+router.post(
+  "/categories",
+  requestValidator({
+    schemas: categoriesHandlers.createCategory.schemas,
+  }),
+  categoriesHandlers.createCategory.handler,
+);
+router.get("/categories", categoriesHandlers.getCategories.handler);
+router.patch(
+  "/categories/:id/name",
+  requestValidator({
+    schemas: categoriesHandlers.updateCategoryName.schemas,
+  }),
+  categoriesHandlers.updateCategoryName.handler,
+);
+router.delete(
+  "/categories/:id",
+  requestValidator({
+    schemas: categoriesHandlers.deleteCatagory.schemas,
+  }),
+  categoriesHandlers.deleteCatagory.handler,
+);
 
-const makeRouter = (deps: MakeRouterDeps) => {
-  const router = new Router({ prefix: "/api" });
+router.get(
+  "/feeds",
+  requestValidator({
+    schemas: feedsHandlers.getFeeds.schemas,
+  }),
+  feedsHandlers.getFeeds.handler,
+);
+router.post(
+  "/feeds/url",
+  requestValidator({
+    schemas: feedsHandlers.validateFeedUrl.schemas,
+  }),
+  feedsHandlers.validateFeedUrl.handler,
+);
+router.post(
+  "/feeds",
+  requestValidator({
+    schemas: feedsHandlers.createFeed.schemas,
+  }),
+  feedsHandlers.createFeed.handler,
+);
+router.delete(
+  "/feeds/:id",
+  requestValidator({
+    schemas: feedsHandlers.deleteFeed.schemas,
+  }),
+  feedsHandlers.deleteFeed.handler,
+);
+router.patch(
+  "/feeds/:id",
+  requestValidator({
+    schemas: feedsHandlers.updateFeed.schemas,
+  }),
+  feedsHandlers.updateFeed.handler,
+);
 
-  router.post(
-    "/categories",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.categoriesHandlers.createCategory.schemas,
-    }),
-    deps.categoriesHandlers.createCategory.handler,
-  );
-  router.get("/categories", deps.categoriesHandlers.getCategories.handler);
-  router.patch(
-    "/categories/:id/name",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.categoriesHandlers.updateCategoryName.schemas,
-    }),
-    deps.categoriesHandlers.updateCategoryName.handler,
-  );
-  router.delete(
-    "/categories/:id",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.categoriesHandlers.deleteCatagory.schemas,
-    }),
-    deps.categoriesHandlers.deleteCatagory.handler,
-  );
+router.get(
+  "/feed-items",
+  requestValidator({
+    schemas: feedItemsHandlers.getFeedItems.schemas,
+  }),
+  feedItemsHandlers.getFeedItems.handler,
+);
+router.patch(
+  "/feed-items/readed",
+  requestValidator({
+    schemas: feedItemsHandlers.markFeedItemsAsRead.schemas,
+  }),
+  feedItemsHandlers.markFeedItemsAsRead.handler,
+);
+router.patch(
+  "/feed-items/unread",
+  requestValidator({
+    schemas: feedItemsHandlers.markFeedItemsAsUnread.schemas,
+  }),
+  feedItemsHandlers.markFeedItemsAsUnread.handler,
+);
 
-  router.get(
-    "/feeds",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedsHandlers.getFeeds.schemas,
-    }),
-    deps.feedsHandlers.getFeeds.handler,
-  );
-  router.post(
-    "/feeds/url",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedsHandlers.validateFeedUrl.schemas,
-    }),
-    deps.feedsHandlers.validateFeedUrl.handler,
-  );
-  router.post(
-    "/feeds",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedsHandlers.createFeed.schemas,
-    }),
-    deps.feedsHandlers.createFeed.handler,
-  );
-  router.delete(
-    "/feeds/:id",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedsHandlers.deleteFeed.schemas,
-    }),
-    deps.feedsHandlers.deleteFeed.handler,
-  );
-  router.patch(
-    "/feeds/:id",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedsHandlers.updateFeed.schemas,
-    }),
-    deps.feedsHandlers.updateFeed.handler,
-  );
-
-  router.get(
-    "/feed-items",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedItemsHandlers.getFeedItems.schemas,
-    }),
-    deps.feedItemsHandlers.getFeedItems.handler,
-  );
-  router.patch(
-    "/feed-items/readed",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedItemsHandlers.markFeedItemsAsRead.schemas,
-    }),
-    deps.feedItemsHandlers.markFeedItemsAsRead.handler,
-  );
-  router.patch(
-    "/feed-items/unread",
-    deps.middlewares.requestValidator({
-      validator: deps.validator,
-      schemas: deps.feedItemsHandlers.markFeedItemsAsUnread.schemas,
-    }),
-    deps.feedItemsHandlers.markFeedItemsAsUnread.handler,
-  );
-
-  router.post("/opml/import", deps.opmlHandlers.importOpml.handler);
-  router.get("/opml/export", deps.opmlHandlers.exportOpml.handler);
-
-  return router;
-};
-
-export default makeRouter;
+router.post("/opml/import", opmlHandlers.importOpml.handler);
+router.get("/opml/export", opmlHandlers.exportOpml.handler);

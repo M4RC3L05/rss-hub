@@ -1,10 +1,7 @@
 import type Router from "@koa/router";
-import sql, { type Database } from "@leafac/sqlite";
+import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
-
-type CreateFeedDeps = {
-  db: Database;
-};
+import { db } from "../../../../database/mod.js";
 
 export const schemas = {
   request: {
@@ -20,20 +17,18 @@ export const schemas = {
 
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 
-export const handler = (deps: CreateFeedDeps): Router.Middleware => {
-  return async (ctx: Router.RouterContext) => {
-    const parameters = ctx.params as RequestParameters;
+export const handler = async (ctx: Router.RouterContext) => {
+  const parameters = ctx.params as RequestParameters;
 
-    const deleted = deps.db.get(sql`
-      delete from feeds
-      where id = ${parameters.id}
-      returning *
-    `);
+  const deleted = db.get(sql`
+    delete from feeds
+    where id = ${parameters.id}
+    returning *
+  `);
 
-    if (!deleted) {
-      ctx.throw(404, "Entity not found");
-    }
+  if (!deleted) {
+    ctx.throw(404, "Entity not found");
+  }
 
-    ctx.status = 204;
-  };
+  ctx.status = 204;
 };

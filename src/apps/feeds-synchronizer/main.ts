@@ -15,8 +15,13 @@ const log = makeLogger("feeds-synchronizer");
 addHook({
   name: "feeds-synchronizer",
   async handler() {
-    await job.stop();
+    await job.stop().catch((error) => {
+      log.error(error, "Could not close job");
+    });
+    log.info("Server closed");
+
     db.close();
+    log.info("DB Closed");
   },
 });
 

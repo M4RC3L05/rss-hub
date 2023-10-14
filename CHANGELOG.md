@@ -1,3 +1,8 @@
+### v4.11.1 (2023-10-14)
+
+- [Pass original error on cause for retryes exausted](https://github.com/M4RC3L05/rss-hub/commit/f527f3b204630eae55d8407c68898e2db696aa0e)
+- [Better close hook for feed synchronizer](https://github.com/M4RC3L05/rss-hub/commit/1eb6a78e0047991eed6b5c2f5f93eb6bb4b08a8d)
+
 ### v4.11.0 (2023-10-12)
 
 - [Improve project structure](https://github.com/M4RC3L05/rss-hub/commit/dd070c366461e5de83bc249f40a4e4601c3f0773)

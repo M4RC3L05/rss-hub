@@ -1,4 +1,5 @@
 import { setTimeout } from "node:timers/promises";
+import fetch, { type Response } from "node-fetch";
 import { makeLogger } from "../logger/mod.js";
 
 const log = makeLogger("fetch-utils");

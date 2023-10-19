@@ -1,3 +1,8 @@
+### v4.12.0 (2023-10-19)
+
+- [Use node-fetch](https://github.com/M4RC3L05/rss-hub/commit/247bb2e6a7c38233baccecda69fb939a80a1e01d)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/6e91667c133dcfa0a53b01c21ebb64d80ddf3731)
+
 ### v4.11.1 (2023-10-14)
 
 - [Pass original error on cause for retryes exausted](https://github.com/M4RC3L05/rss-hub/commit/f527f3b204630eae55d8407c68898e2db696aa0e)

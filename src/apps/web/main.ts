@@ -1,11 +1,10 @@
 import http from "node:http";
 import { promisify } from "node:util";
-import { type AddressInfo } from "node:net";
 import process from "node:process";
+import { type AddressInfo } from "node:net";
 import config from "config";
 import { makeLogger } from "../../common/logger/mod.js";
 import { addHook } from "../../common/utils/process-utils.js";
-import { db } from "../../database/mod.js";
 import makeApp from "./app.js";
 
 const log = makeLogger("web");
@@ -33,8 +32,5 @@ addHook({
       log.error(error, "Could not close server");
     });
     log.info("Server closed");
-
-    db.close();
-    log.info("DB Closed");
   },
 });

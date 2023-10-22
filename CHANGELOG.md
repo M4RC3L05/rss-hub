@@ -1,3 +1,10 @@
+### v4.13.0 (2023-10-22)
+
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/37fb8bba5649ff98c1f2bf79b65288cdd597cdc1)
+- [Improve imports to not import deps when not needed](https://github.com/M4RC3L05/rss-hub/commit/74c5b4cbef30e437cc0e9cc0450143e7c8c0c75a)
+- [Improve refetch](https://github.com/M4RC3L05/rss-hub/commit/14b2779404a78561a2f2c594e34bdc4092c03f17)
+- [Improve xo config](https://github.com/M4RC3L05/rss-hub/commit/cb59cd790cf9ccdc8bdc5669fbb203e083f30849)
+
 ### v4.12.0 (2023-10-19)
 
 - [Use node-fetch](https://github.com/M4RC3L05/rss-hub/commit/247bb2e6a7c38233baccecda69fb939a80a1e01d)

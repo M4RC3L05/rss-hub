@@ -1,6 +1,5 @@
 import { useState, type FC, useRef, useEffect, useLayoutEffect, type RefObject } from "react";
 import { useSWRConfig } from "swr";
-// eslint-disable-next-line n/file-extension-in-import
 import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
 import { Modal, Image as BSImage, Col, Row, Button } from "react-bootstrap";
 import { type FeedItemsTable, type FeedsTable } from "../../../../../../database/types/mod.js";
@@ -115,10 +114,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
           setFetch(false);
           if (wasDeletedRef.current) {
             wasDeletedRef.current = false;
-            void mutate(
-              (key) =>
-                typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
-            );
+            void mutate((key) => typeof key === "string" && key.startsWith(paths.feeds.getFeeds));
           }
         }}
         centered
@@ -144,6 +140,12 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
                   <FeedItem
                     mutate={() => {
                       void feedItemsMutate();
+                      void mutate(
+                        (key) =>
+                          typeof key === "string" &&
+                          (key.startsWith(paths.feeds.getFeeds) ||
+                            key.startsWith(`${paths.feedItems.feedFeedItems}?feedId=${feed.id}`)),
+                      );
                     }}
                     feedItem={feedItem}
                   />

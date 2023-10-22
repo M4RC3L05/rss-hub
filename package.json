@@ -21,7 +21,7 @@
     "postinstall": "patch-package"
   },
   "engines": {
-    "node": "18.x.x"
+    "node": ">=18.x.x"
   },
   "prettier": {
     "arrowParens": "always",
@@ -42,8 +42,9 @@
     "prettier": true,
     "overrides": [
       {
-        "files": "**/public/**/*.ts",
+        "files": "**/public/**/*.{tsx,ts}",
         "rules": {
+          "n/file-extension-in-import": "off",
           "import/no-extraneous-dependencies": "off",
           "@typescript-eslint/naming-convention": "off"
         }

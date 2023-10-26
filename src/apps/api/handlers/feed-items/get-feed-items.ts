@@ -1,6 +1,6 @@
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { type FeedItemsTable } from "../../../../database/types/mod.js";
 import { db } from "../../../../database/mod.js";
 
@@ -23,8 +23,8 @@ export const schemas = {
 
 type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
 
-export const handler = (ctx: Router.RouterContext) => {
-  const query = ctx.query as RequestQuery;
+export const handler: RouteMiddleware = (request, response) => {
+  const query = request.searchParams as RequestQuery;
   const feedItems = db.all<FeedItemsTable>(
     sql`
       select * from feed_items
@@ -37,5 +37,8 @@ export const handler = (ctx: Router.RouterContext) => {
     `,
   );
 
-  ctx.body = { data: feedItems };
+  response.statusCode = 200;
+
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: feedItems }));
 };

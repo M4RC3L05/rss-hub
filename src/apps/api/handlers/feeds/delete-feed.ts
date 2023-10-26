@@ -1,7 +1,8 @@
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { db } from "../../../../database/mod.js";
+import { makeLogger } from "../../../../common/logger/mod.js";
 
 export const schemas = {
   request: {
@@ -17,18 +18,20 @@ export const schemas = {
 
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 
-export const handler = async (ctx: Router.RouterContext) => {
-  const parameters = ctx.params as RequestParameters;
+const log = makeLogger("delete-feed-handler");
 
-  const deleted = db.get(sql`
+export const handler: RouteMiddleware = async (request, response) => {
+  const parameters = request.params as RequestParameters;
+
+  const { changes } = db.run(sql`
     delete from feeds
     where id = ${parameters.id}
-    returning *
   `);
 
-  if (!deleted) {
-    ctx.throw(404, "Entity not found");
+  if (changes === 0) {
+    log.warn({ feedId: parameters.id }, "No feed was deleted");
   }
 
-  ctx.status = 204;
+  response.statusCode = 204;
+  response.end();
 };

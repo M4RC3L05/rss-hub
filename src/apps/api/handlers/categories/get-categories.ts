@@ -1,9 +1,9 @@
-import type Router from "@koa/router";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import sql from "@leafac/sqlite";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
 import { db } from "../../../../database/mod.js";
 
-export const handler = (ctx: Router.RouterContext) => {
+export const handler: RouteMiddleware = (_, response) => {
   const categories = db.all<CategoriesTable & { feedCount: number }>(sql`
     select c.*, count(f.id) as "feedCount"
     from categories c
@@ -12,5 +12,8 @@ export const handler = (ctx: Router.RouterContext) => {
     order by name collate nocase asc
   `);
 
-  ctx.body = { data: categories };
+  response.statusCode = 200;
+
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: categories }));
 };

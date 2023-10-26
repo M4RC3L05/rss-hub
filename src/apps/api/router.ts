@@ -1,5 +1,7 @@
-import Router from "@koa/router";
-import requestValidator from "../../middlewares/request-validator.js";
+import { type Middleware, Router } from "@m4rc3l05/sss";
+import bodyParser from "body-parser";
+import qs from "qs";
+import { jsonBodyParser, requestValidator } from "../../middlewares/mod.js";
 import validator from "../../validator/mod.js";
 import {
   categoriesHandlers,
@@ -8,19 +10,23 @@ import {
   opmlHandlers,
 } from "./handlers/mod.js";
 
-export const router = new Router({ prefix: "/api" });
+export const router = await new Router().setup({
+  querystringParser: (s: string) => qs.parse(s),
+});
 
+router.get("/api/categories", categoriesHandlers.getCategories.handler);
 router.post(
-  "/categories",
+  "/api/categories",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: categoriesHandlers.createCategory.schemas,
   }),
   categoriesHandlers.createCategory.handler,
 );
-router.get("/categories", categoriesHandlers.getCategories.handler);
 router.patch(
-  "/categories/:id/name",
+  "/api/categories/:id/name",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: categoriesHandlers.updateCategoryName.schemas,
@@ -28,7 +34,7 @@ router.patch(
   categoriesHandlers.updateCategoryName.handler,
 );
 router.delete(
-  "/categories/:id",
+  "/api/categories/:id",
   requestValidator({
     validator,
     schemas: categoriesHandlers.deleteCatagory.schemas,
@@ -37,7 +43,7 @@ router.delete(
 );
 
 router.get(
-  "/feeds",
+  "/api/feeds",
   requestValidator({
     validator,
     schemas: feedsHandlers.getFeeds.schemas,
@@ -45,7 +51,8 @@ router.get(
   feedsHandlers.getFeeds.handler,
 );
 router.post(
-  "/feeds/url",
+  "/api/feeds/url",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: feedsHandlers.validateFeedUrl.schemas,
@@ -53,32 +60,34 @@ router.post(
   feedsHandlers.validateFeedUrl.handler,
 );
 router.post(
-  "/feeds",
+  "/api/feeds",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: feedsHandlers.createFeed.schemas,
   }),
   feedsHandlers.createFeed.handler,
 );
-router.delete(
-  "/feeds/:id",
-  requestValidator({
-    validator,
-    schemas: feedsHandlers.deleteFeed.schemas,
-  }),
-  feedsHandlers.deleteFeed.handler,
-);
 router.patch(
-  "/feeds/:id",
+  "/api/feeds/:id",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: feedsHandlers.updateFeed.schemas,
   }),
   feedsHandlers.updateFeed.handler,
 );
+router.delete(
+  "/api/feeds/:id",
+  requestValidator({
+    validator,
+    schemas: feedsHandlers.deleteFeed.schemas,
+  }),
+  feedsHandlers.deleteFeed.handler,
+);
 
 router.get(
-  "/feed-items",
+  "/api/feed-items",
   requestValidator({
     validator,
     schemas: feedItemsHandlers.getFeedItems.schemas,
@@ -86,7 +95,8 @@ router.get(
   feedItemsHandlers.getFeedItems.handler,
 );
 router.patch(
-  "/feed-items/readed",
+  "/api/feed-items/readed",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: feedItemsHandlers.markFeedItemsAsRead.schemas,
@@ -94,7 +104,8 @@ router.patch(
   feedItemsHandlers.markFeedItemsAsRead.handler,
 );
 router.patch(
-  "/feed-items/unread",
+  "/api/feed-items/unread",
+  jsonBodyParser(),
   requestValidator({
     validator,
     schemas: feedItemsHandlers.markFeedItemsAsUnread.schemas,
@@ -102,5 +113,5 @@ router.patch(
   feedItemsHandlers.markFeedItemsAsUnread.handler,
 );
 
-router.post("/opml/import", opmlHandlers.importOpml.handler);
-router.get("/opml/export", opmlHandlers.exportOpml.handler);
+router.post("/api/opml/import", opmlHandlers.importOpml.handler);
+router.get("/api/opml/export", opmlHandlers.exportOpml.handler);

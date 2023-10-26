@@ -1,16 +1,16 @@
-import { type Context, type Next } from "koa";
 import { stdSerializers } from "pino";
+import { type Middleware } from "@m4rc3l05/sss";
 import { makeLogger } from "../common/logger/mod.js";
 
 const log = makeLogger("request-lifecycle-middleware");
 
-const requestLifeCycle = async (ctx: Context, next: Next) => {
+const requestLifeCycle: Middleware = async (request, response, next) => {
   try {
     await next();
   } finally {
     log.info(
-      { request: stdSerializers.req(ctx.req), response: stdSerializers.res(ctx.res) },
-      `Request ${ctx.req.method!} ${ctx.req.url!}`,
+      { request: stdSerializers.req(request), response: stdSerializers.res(response) },
+      `Request ${request.method!} ${request.url!}`,
     );
   }
 };

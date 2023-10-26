@@ -1,8 +1,8 @@
-import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
 import sql from "@leafac/sqlite";
 import createHttpError from "http-errors";
 import { stdSerializers } from "pino";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { type FeedsTable } from "../../../../database/types/mod.js";
 import { makeLogger } from "../../../../common/logger/mod.js";
 import { db } from "../../../../database/mod.js";
@@ -28,8 +28,8 @@ type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
 const log = makeLogger("create-feed-handler");
 
-export const handler = async (ctx: Router.RouterContext) => {
-  const body = ctx.request.body as RequestBody;
+export const handler: RouteMiddleware = async (request, response) => {
+  const { body } = request as any as { body: RequestBody };
 
   const feed = db.get<FeedsTable>(sql`
     insert into feeds (name, url, category_id)
@@ -59,6 +59,8 @@ export const handler = async (ctx: Router.RouterContext) => {
       log.error(error, `Could not sync ${feed.url}`);
     });
 
-  ctx.status = 201;
-  ctx.body = { data: feed };
+  response.statusCode = 201;
+
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: feed }));
 };

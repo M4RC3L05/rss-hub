@@ -1,6 +1,6 @@
-import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
 import sql from "@leafac/sqlite";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
 import { db } from "../../../../database/mod.js";
 
@@ -26,9 +26,9 @@ export const schemas = {
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = async (ctx: Router.RouterContext) => {
-  const parameters = ctx.params as RequestParameters;
-  const body = ctx.request.body as RequestBody;
+export const handler: RouteMiddleware = (request, response) => {
+  const parameters = request.params as RequestParameters;
+  const { body } = request as any as { body: RequestBody };
 
   const updated = db.get<CategoriesTable>(sql`
     update categories set name = ${body.name}
@@ -37,8 +37,14 @@ export const handler = async (ctx: Router.RouterContext) => {
   `);
 
   if (!updated) {
-    ctx.throw(404, "Entity not found");
+    response.statusCode = 404;
+
+    response.setHeader("content-type", "application/json");
+    response.end(JSON.stringify({ error: { code: "not_found", message: "Category not found" } }));
+    return;
   }
 
-  ctx.body = { data: updated };
+  response.statusCode = 200;
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: updated }));
 };

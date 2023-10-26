@@ -1,7 +1,6 @@
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
-import createHttpError from "http-errors";
+import { type Middleware } from "@m4rc3l05/sss";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
 import { db } from "../../../../database/mod.js";
 
@@ -19,8 +18,8 @@ export const schemas = {
 
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = (ctx: Router.RouterContext) => {
-  const body = ctx.request.body as RequestBody;
+export const handler: Middleware = (request, response) => {
+  const { body } = request as any as { body: RequestBody };
 
   const category = db.get<CategoriesTable>(sql`
     insert into categories (name)
@@ -29,9 +28,16 @@ export const handler = (ctx: Router.RouterContext) => {
   `);
 
   if (!category) {
-    throw createHttpError(400, "Could not create category");
+    response.statusCode = 400;
+
+    response.setHeader("content-type", "application/json");
+    response.end(
+      JSON.stringify({ error: { code: "bad_request", message: "Could not create category" } }),
+    );
   }
 
-  ctx.status = 201;
-  ctx.body = { data: category };
+  response.statusCode = 201;
+
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: category }));
 };

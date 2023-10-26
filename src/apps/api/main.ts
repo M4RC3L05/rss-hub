@@ -12,7 +12,7 @@ const log = makeLogger("api");
 const app = makeApp();
 
 const { port, host } = config.get<{ port: number; host: string }>("apps.api");
-const server = http.createServer(app.callback());
+const server = http.createServer(app.handle());
 const pClose = promisify<void>(server.close).bind(server);
 
 server.listen(port, host, () => {

@@ -1,7 +1,6 @@
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
-import createHttpError from "http-errors";
 import { type FromSchema } from "json-schema-to-ts";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { db } from "../../../../database/mod.js";
 
 export const schemas = {
@@ -29,9 +28,9 @@ export const schemas = {
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
 
-export const handler = (ctx: Router.RouterContext) => {
-  const body = ctx.request.body as RequestBody;
-  const parameters = ctx.params as RequestParameters;
+export const handler: RouteMiddleware = (request, response) => {
+  const { body } = request as any as { body: RequestBody };
+  const parameters = request.params as RequestParameters;
 
   const feed = db.get(sql`
     update feeds set
@@ -42,8 +41,16 @@ export const handler = (ctx: Router.RouterContext) => {
     returning *
   `);
 
-  if (!feed) throw createHttpError(404, "Feed not found");
+  if (!feed) {
+    response.statusCode = 404;
 
-  ctx.status = 200;
-  ctx.body = { data: feed };
+    response.setHeader("content-type", "application/json");
+    response.end(JSON.stringify({ error: { code: "not_found", message: "Category not found" } }));
+    return;
+  }
+
+  response.statusCode = 200;
+
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: feed }));
 };

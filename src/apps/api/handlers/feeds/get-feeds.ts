@@ -1,7 +1,7 @@
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
 import { type FromSchema } from "json-schema-to-ts";
 import { groupBy } from "lodash-es";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { type FeedsTable } from "../../../../database/types/mod.js";
 import { db } from "../../../../database/mod.js";
 
@@ -18,8 +18,8 @@ export const schemas = {
 
 type RequestQuery = FromSchema<(typeof schemas)["request"]["query"]>;
 
-export const handler = async (ctx: Router.RouterContext) => {
-  const query = ctx.query as RequestQuery;
+export const handler: RouteMiddleware = async (request, response) => {
+  const query = request.searchParams as RequestQuery;
   const feeds = db.all<FeedsTable>(sql`
     select f.*, count(fi.id) as "unreadCount"
     from feeds f
@@ -37,5 +37,8 @@ export const handler = async (ctx: Router.RouterContext) => {
     order by f.name collate nocase asc
   `);
 
-  ctx.body = { data: groupBy(feeds, "categoryId") };
+  response.statusCode = 200;
+
+  response.setHeader("content-type", "application/json");
+  response.end(JSON.stringify({ data: groupBy(feeds, "categoryId") }));
 };

@@ -1,9 +1,10 @@
 import { type IncomingMessage } from "node:http";
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
 import createHttpError from "http-errors";
 import { Busboy, type BusboyHeaders } from "@fastify/busboy";
-import { castArray, get } from "lodash-es";
+import { castArray, compact, get } from "lodash-es";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
+import { decodeXML } from "entities";
 import { type FeedsTable } from "../../../../database/types/mod.js";
 import { makeLogger } from "../../../../common/logger/mod.js";
 import { xmlParser } from "../../../../common/utils/xml-utils.js";
@@ -44,14 +45,14 @@ const formDataParser = ({ headers }: { headers: BusboyHeaders }) =>
     limits: { fields: 1, files: 1, fileSize: 1024 * 1024 * 10 },
   });
 
-const log = makeLogger("opml-import");
+const log = makeLogger("opml-import-handler");
 
-export const handler = async (ctx: Router.RouterContext) => {
+export const handler: RouteMiddleware = async (request, response) => {
   const files = await getFileAsync(
     formDataParser({
-      headers: ctx.headers as any as BusboyHeaders,
+      headers: request.headers as any as BusboyHeaders,
     }),
-    ctx.req,
+    request,
   );
 
   const file = files.get("opml");
@@ -80,17 +81,19 @@ export const handler = async (ctx: Router.RouterContext) => {
         );
       }
 
-      for (const feed of castArray(get(category as { outline: unknown }, "outline"))) {
-        const feedName = get(feed as { "@_text": string }, "@_text");
-        const feedUrl =
+      for (const feed of compact(castArray(get(category as { outline: unknown }, "outline")))) {
+        const feedName = decodeXML(get(feed as { "@_text": string }, "@_text"));
+        const feedUrl = decodeXML(
           get(feed as { "@_xmlUrl": string }, "@_xmlUrl") ??
-          get(feed as { "@_htmlUrl": string }, "@_htmlUrl");
+            get(feed as { "@_htmlUrl": string }, "@_htmlUrl"),
+        );
 
         const feedStored = db.get(
-          sql`select * from feeds where name = ${feedName} and url = ${feedUrl} limit 1`,
+          sql`select * from feeds where name is ${feedName} and url = ${feedUrl} limit 1`,
         );
 
         if (!feedStored) {
+          console.log(!feedStored, feedName, feedUrl);
           const feed = db.get<FeedsTable>(
             sql`
               insert into feeds
@@ -130,5 +133,6 @@ export const handler = async (ctx: Router.RouterContext) => {
     })();
   }
 
-  ctx.status = 204;
+  response.statusCode = 204;
+  response.end();
 };

@@ -1,7 +1,6 @@
-import type Router from "@koa/router";
 import sql from "@leafac/sqlite";
-import createHttpError from "http-errors";
 import { type FromSchema } from "json-schema-to-ts";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { db } from "../../../../database/mod.js";
 
 export const schemas = {
@@ -20,8 +19,8 @@ export const schemas = {
 
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = (ctx: Router.RouterContext) => {
-  const body = ctx.request.body as RequestBody;
+export const handler: RouteMiddleware = (request, response) => {
+  const { body } = request as any as { body: RequestBody };
 
   const result = db.run(sql`
     update feed_items set
@@ -32,8 +31,17 @@ export const handler = (ctx: Router.RouterContext) => {
   `);
 
   if (result.changes <= 0) {
-    throw createHttpError(400, "Could not mark feed as unread");
+    response.statusCode = 400;
+
+    response.setHeader("content-type", "application/json");
+    response.end(
+      JSON.stringify({ error: { code: "bad_request", message: "Could not mark feed as unread" } }),
+    );
+
+    return;
   }
 
-  ctx.status = 204;
+  response.statusCode = 204;
+
+  response.end();
 };

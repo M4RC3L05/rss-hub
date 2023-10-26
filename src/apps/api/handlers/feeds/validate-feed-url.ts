@@ -1,7 +1,7 @@
-import type Router from "@koa/router";
 import { type FromSchema } from "json-schema-to-ts";
-import createHttpError from "http-errors";
+import { type RouteMiddleware } from "@m4rc3l05/sss";
 import { feedService } from "../../../../services/mod.js";
+import { makeLogger } from "../../../../common/logger/mod.js";
 
 export const schemas = {
   request: {
@@ -19,15 +19,27 @@ export const schemas = {
 
 type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
 
-export const handler = async (ctx: Router.RouterContext) => {
-  const body = ctx.request.body as RequestBody;
+const log = makeLogger("validate-feed-url-handler");
+
+export const handler: RouteMiddleware = async (request, response) => {
+  const { body } = request as any as { body: RequestBody };
 
   try {
     const extracted = await feedService.verifyFeed(body.url);
     const title = feedService.getFeedTitle(extracted);
 
-    ctx.body = { data: { title } };
+    response.statusCode = 200;
+
+    response.setHeader("content-type", "application/json");
+    response.end(JSON.stringify({ data: { title } }));
   } catch (error) {
-    throw createHttpError(422, { cause: error, message: "Invalid feed url" });
+    log.error(error, "Error while checking feed url");
+
+    response.statusCode = 200;
+
+    response.setHeader("content-type", "application/json");
+    response.end(
+      JSON.stringify({ error: { code: "validation_error", message: "Invalid feed url" } }),
+    );
   }
 };

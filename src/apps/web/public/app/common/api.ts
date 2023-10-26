@@ -16,7 +16,7 @@ export const paths = {
     updateFeed: `${config.api.url}/api/feeds/:id`,
   },
   feedItems: {
-    feedFeedItems: `${config.api.url}/api/feed-items`,
+    getFeedItems: `${config.api.url}/api/feed-items`,
     markFeedItemAsRead: `${config.api.url}/api/feed-items/readed`,
     markFeedItemAsUnread: `${config.api.url}/api/feed-items/unread`,
   },
@@ -32,7 +32,7 @@ export class RequestError extends Error {
   }
 }
 
-export const makeRequester = async <T>(input: string, options: RequestInit = {}): Promise<T> => {
+export const makeRequester = async <T>(input: string, options: RequestInit = {}) => {
   const url = new URL(input, config.api.url);
   return fetch(url.toString(), {
     ...options,
@@ -45,10 +45,13 @@ export const makeRequester = async <T>(input: string, options: RequestInit = {})
       return undefined;
     }
 
-    return response.json().then(({ data, error }) => {
+    return response.json().then(({ data, error, pagination }) => {
       if (error) throw new RequestError(error as Record<string, unknown>);
 
-      return data as T;
+      return pagination
+        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-assignment
+          ({ data, pagination } as { data: T; pagination: { nextCursor: string | undefined } })
+        : (data as T);
     });
   }) as Promise<T>;
 };

@@ -18,14 +18,27 @@ const getKey =
     fetch: boolean;
     showAll: boolean;
     feedId: string;
-  }): SWRInfiniteKeyLoader<FeedItemsTable[]> =>
+  }): SWRInfiniteKeyLoader<{ data: FeedItemsTable[]; pagination: { nextCursor: string } }> =>
   (pageIndex, previousPageData) => {
-    if (previousPageData && previousPageData.length === 0) return null;
+    if (pageIndex === 0)
+      return fetch
+        ? showAll
+          ? `${paths.feedItems.getFeedItems}?feedId=${feedId}&limit=10`
+          : `${paths.feedItems.getFeedItems}?feedId=${feedId}&unread=true&limit=10`
+        : null;
+
+    if (!previousPageData?.pagination.nextCursor) return null;
 
     return fetch
       ? showAll
-        ? `${paths.feedItems.feedFeedItems}?feedId=${feedId}&page=${pageIndex}&limit=10`
-        : `${paths.feedItems.feedFeedItems}?feedId=${feedId}&unread=true&page=${pageIndex}&limit=10`
+        ? `${paths.feedItems.getFeedItems}?feedId=${feedId}&nextCursor=${encodeURIComponent(
+            previousPageData.pagination.nextCursor,
+          )}&limit=10`
+        : `${
+            paths.feedItems.getFeedItems
+          }?feedId=${feedId}&unread=true&nextCursor=${encodeURIComponent(
+            previousPageData.pagination.nextCursor,
+          )}&limit=10`
       : null;
   };
 
@@ -49,14 +62,22 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
     setSize,
     isLoading,
     isValidating,
-  } = useSWRInfinite<FeedItemsTable[]>(getKey({ showAll, fetch, feedId: feed.id }));
+  } = useSWRInfinite<{ data: FeedItemsTable[]; pagination: { nextCursor: string } }>(
+    getKey({ showAll, fetch, feedId: feed.id }),
+  );
   const ref = useRef<HTMLDivElement>();
 
   useEffect(() => {
-    if (fetch && progress >= 80 && !isLoading && !isValidating && (data?.at(-1)?.length ?? 0) > 0) {
+    if (
+      fetch &&
+      progress >= 80 &&
+      !isLoading &&
+      !isValidating &&
+      Boolean(data?.at(-1)?.pagination.nextCursor)
+    ) {
       void setSize((s) => s + 1);
     }
-  }, [progress, setSize, fetch, isLoading, data?.at(-1)?.length]);
+  }, [progress, setSize, fetch, isLoading, data?.at(-1)?.pagination.nextCursor]);
 
   useLayoutEffect(() => {
     const container = ref.current;
@@ -112,6 +133,13 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
         }}
         onExited={() => {
           setFetch(false);
+
+          void mutate(
+            (key) => typeof key === "string" && key.startsWith(paths.feedItems.getFeedItems),
+            undefined,
+            { revalidate: false },
+          );
+
           if (wasDeletedRef.current) {
             wasDeletedRef.current = false;
             void mutate((key) => typeof key === "string" && key.startsWith(paths.feeds.getFeeds));
@@ -134,7 +162,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
         </Modal.Header>
         <Modal.Body ref={ref as any as RefObject<HTMLDivElement>}>
           <Row xs={1} lg={2} className="g-4">
-            {(data ?? [[]]).flatMap((feedItems) =>
+            {(data ?? []).flatMap(({ data: feedItems }) =>
               feedItems.map((feedItem) => (
                 <Col key={feedItem.id}>
                   <FeedItem
@@ -144,7 +172,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
                         (key) =>
                           typeof key === "string" &&
                           (key.startsWith(paths.feeds.getFeeds) ||
-                            key.startsWith(`${paths.feedItems.feedFeedItems}?feedId=${feed.id}`)),
+                            key.startsWith(`${paths.feedItems.getFeedItems}?feedId=${feed.id}`)),
                       );
                     }}
                     feedItem={feedItem}
@@ -186,7 +214,16 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
             size="sm"
             onClick={() => {
               void requests.feedItems
-                .markFeedItemsAsRead({ body: { feedId: feed.id } })
+                .markFeedItemsAsRead({
+                  body: {
+                    feedId: feed.id,
+                    from: btoa(
+                      `${(data![0].data[0] as any as { rowid: number }).rowid}@@${
+                        data![0].data[0].createdAt
+                      }`,
+                    ),
+                  },
+                })
                 .then(() => {
                   void feedItemsMutate();
                   void mutate(

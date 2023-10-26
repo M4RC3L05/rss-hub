@@ -93,7 +93,6 @@ export const handler: RouteMiddleware = async (request, response) => {
         );
 
         if (!feedStored) {
-          console.log(!feedStored, feedName, feedUrl);
           const feed = db.get<FeedsTable>(
             sql`
               insert into feeds

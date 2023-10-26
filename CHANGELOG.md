@@ -1,3 +1,8 @@
+### v4.14.0 (2023-10-26)
+
+- [Swap to in house http lib](https://github.com/M4RC3L05/rss-hub/commit/39e5864c8863d36df41a9033d406c5b61d510230)
+- [Add timeout to process handlers](https://github.com/M4RC3L05/rss-hub/commit/a8e2f89f5193d7b6e599cffd73c365695397601e)
+
 ### v4.13.0 (2023-10-22)
 
 - [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/37fb8bba5649ff98c1f2bf79b65288cdd597cdc1)

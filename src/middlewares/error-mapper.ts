@@ -1,7 +1,7 @@
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import { type HttpError, isHttpError } from "http-errors";
 import { type ErrorHandler } from "@m4rc3l05/sss";
-import { camelCase } from "lodash-es";
+import { camelCase, snakeCase } from "lodash-es";
 import { makeLogger } from "../common/logger/mod.js";
 
 type ErrorMapperDeps = {
@@ -23,7 +23,7 @@ const respond = (error: HttpError, _: IncomingMessage, response: ServerResponse)
   response.end(
     JSON.stringify({
       error: {
-        code: camelCase(error.name),
+        code: snakeCase(error.name),
         message: error.message,
       },
     }),

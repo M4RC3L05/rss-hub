@@ -1,3 +1,10 @@
+### v4.15.0 (2023-10-27)
+
+- [Move \`patch-package\` to dev dependency](https://github.com/M4RC3L05/rss-hub/commit/4ce77a46f1b6481f73f690bac839f70b56736471)
+- [Update to node 20.x.x LTS](https://github.com/M4RC3L05/rss-hub/commit/35d901813f19f06867c65b304e89231c714d68e2)
+- [Update @m4rc3l05\/sss](https://github.com/M4RC3L05/rss-hub/commit/2a34a2ef2d7bb593bc43504d6c7dcc83b01faf4e)
+- [Add cursor based pagination to feed items](https://github.com/M4RC3L05/rss-hub/commit/055da0e2528f6d9d15a8d9b67d440e5c4b984a1b)
+
 ### v4.14.0 (2023-10-26)
 
 - [Swap to in house http lib](https://github.com/M4RC3L05/rss-hub/commit/39e5864c8863d36df41a9033d406c5b61d510230)

@@ -40,7 +40,7 @@ const makeApp = async () => {
   app.use(requestLifeCycle);
   app.use(basicAuth({ user: config.get<{ name: string; pass: string }>("apps.web.basicAuth") }));
 
-  app.use(async (request, response, next) => {
+  app.use((request, response, next) => {
     if (!/^\/(stable|v\d+)/.test(request.url ?? "")) return next();
 
     return new Promise<void>((resolve, reject) => {

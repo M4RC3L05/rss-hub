@@ -21,7 +21,7 @@
     "postinstall": "patch-package"
   },
   "engines": {
-    "node": ">=18.x.x"
+    "node": ">=20.x.x"
   },
   "prettier": {
     "arrowParens": "always",

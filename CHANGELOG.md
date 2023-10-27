@@ -1,3 +1,9 @@
+### v4.15.1 (2023-10-27)
+
+- [Use snake case for error codes](https://github.com/M4RC3L05/rss-hub/commit/98a86ab887e034d4caf878553f2d57b2113af406)
+- [Remove unused imports](https://github.com/M4RC3L05/rss-hub/commit/20a27640bd881c9eb90c8aa3b5200e79d4cd14c2)
+- [Remove unused async](https://github.com/M4RC3L05/rss-hub/commit/bfc48c5744bca4fda1b8a662fa659516dacf5221)
+
 ### v4.15.0 (2023-10-27)
 
 - [Move \`patch-package\` to dev dependency](https://github.com/M4RC3L05/rss-hub/commit/4ce77a46f1b6481f73f690bac839f70b56736471)

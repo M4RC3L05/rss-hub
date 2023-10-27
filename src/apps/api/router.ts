@@ -1,5 +1,4 @@
-import { type Middleware, Router } from "@m4rc3l05/sss";
-import bodyParser from "body-parser";
+import { Router } from "@m4rc3l05/sss";
 import qs from "qs";
 import { jsonBodyParser, requestValidator } from "../../middlewares/mod.js";
 import validator from "../../validator/mod.js";

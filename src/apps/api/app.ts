@@ -2,9 +2,9 @@ import config from "config";
 import { App } from "@m4rc3l05/sss";
 import { basicAuth, cors, errorMapper, requestLifeCycle } from "../../middlewares/mod.js";
 import { errorMappers } from "../../errors/mod.js";
-import { router } from "./router.js";
+import { makeRouter } from "./router.js";
 
-const makeApp = () => {
+const makeApp = async () => {
   const app = new App();
 
   app.onError(
@@ -13,6 +13,8 @@ const makeApp = () => {
       defaultMapper: errorMappers.defaultErrorMapper,
     }),
   );
+
+  const router = await makeRouter(app);
 
   app.use(requestLifeCycle);
   app.use(cors);

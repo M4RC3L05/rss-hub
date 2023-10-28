@@ -9,7 +9,7 @@ import { db } from "../../database/mod.js";
 import makeApp from "./app.js";
 
 const log = makeLogger("api");
-const app = makeApp();
+const app = await makeApp();
 
 const { port, host } = config.get<{ port: number; host: string }>("apps.api");
 const server = http.createServer(app.handle());

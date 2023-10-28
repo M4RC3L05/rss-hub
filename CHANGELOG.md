@@ -1,3 +1,7 @@
+### v4.16.0 (2023-10-28)
+
+- [Update @m4rc3l05\/sss](https://github.com/M4RC3L05/rss-hub/commit/29a7cfa4cd4dcaf2619e223167c6fa29029c17ee)
+
 ### v4.15.1 (2023-10-27)
 
 - [Use snake case for error codes](https://github.com/M4RC3L05/rss-hub/commit/98a86ab887e034d4caf878553f2d57b2113af406)

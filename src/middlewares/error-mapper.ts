@@ -5,32 +5,38 @@ import { camelCase, snakeCase } from "lodash-es";
 import { makeLogger } from "../common/logger/mod.js";
 
 type ErrorMapperDeps = {
+  isJsonResponse?: boolean;
   mappers: Array<(error: unknown) => HttpError | undefined>;
   defaultMapper: (error: unknown) => HttpError;
 };
 
 const log = makeLogger("error-mapper-middleware");
 
-const respond = (error: HttpError, _: IncomingMessage, response: ServerResponse) => {
-  response.statusCode = error.statusCode;
+const respond =
+  (isJson?: boolean) => (error: HttpError, _: IncomingMessage, response: ServerResponse) => {
+    response.statusCode = error.statusCode;
 
-  if (error.headers) {
-    for (const [key, value] of Object.entries(error.headers)) {
-      response.setHeader(key, value);
+    if (error.headers) {
+      for (const [key, value] of Object.entries(error.headers)) {
+        response.setHeader(key, value);
+      }
     }
-  }
 
-  response.end(
-    JSON.stringify({
-      error: {
-        code: snakeCase(error.name),
-        message: error.message,
-      },
-    }),
-  );
-};
+    response.setHeader("content-type", isJson ? "application/json" : "text/html");
+
+    response.end(
+      JSON.stringify({
+        error: {
+          code: snakeCase(error.name),
+          message: error.message,
+        },
+      }),
+    );
+  };
 
 const errorMapper = (deps: ErrorMapperDeps): ErrorHandler => {
+  const respondBinded = respond(deps.isJsonResponse);
+
   return (error, request, response) => {
     log.error(
       !(error instanceof Error) && !(typeof error === "object") ? { error } : error,
@@ -38,7 +44,7 @@ const errorMapper = (deps: ErrorMapperDeps): ErrorHandler => {
     );
 
     if (isHttpError(error)) {
-      respond(error, request, response);
+      respondBinded(error, request, response);
 
       return;
     }
@@ -55,7 +61,7 @@ const errorMapper = (deps: ErrorMapperDeps): ErrorHandler => {
       mapped = deps.defaultMapper(error);
     }
 
-    respond(mapped, request, response);
+    respondBinded(mapped, request, response);
   };
 };
 

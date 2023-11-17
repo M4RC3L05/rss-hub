@@ -9,6 +9,7 @@ const makeApp = async () => {
 
   app.onError(
     errorMapper({
+      isJsonResponse: true,
       mappers: [errorMappers.validationErrorMapper, errorMappers.sqliteErrorMapper],
       defaultMapper: errorMappers.defaultErrorMapper,
     }),

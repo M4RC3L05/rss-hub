@@ -1,3 +1,8 @@
+### v4.16.1 (2023-11-17)
+
+- [Allow to set content type on error mapper middleware](https://github.com/M4RC3L05/rss-hub/commit/496f9e9888c438c30118aeedc4a0cf78947071e0)
+- [Fix vulnerable basic auth middleware](https://github.com/M4RC3L05/rss-hub/commit/15996c699f0e31b09990f9c0d737f302e8f2cbb4)
+
 ### v4.16.0 (2023-10-28)
 
 - [Update @m4rc3l05\/sss](https://github.com/M4RC3L05/rss-hub/commit/29a7cfa4cd4dcaf2619e223167c6fa29029c17ee)

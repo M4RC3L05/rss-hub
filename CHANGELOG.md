@@ -1,3 +1,7 @@
+### v4.17.0 (2023-11-18)
+
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/2a2fbf08b68317a0104b4e9ff745c946cb7d2189)
+
 ### v4.16.1 (2023-11-17)
 
 - [Allow to set content type on error mapper middleware](https://github.com/M4RC3L05/rss-hub/commit/496f9e9888c438c30118aeedc4a0cf78947071e0)

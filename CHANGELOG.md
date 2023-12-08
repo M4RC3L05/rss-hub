@@ -1,3 +1,10 @@
+### v4.18.0 (2023-12-08)
+
+- [Update node version on dockerfile](https://github.com/M4RC3L05/rss-hub/commit/45fc1d98a1c7a2dc2dd2f4c4a5d21f087b8ef1a8)
+- [Update tools versions](https://github.com/M4RC3L05/rss-hub/commit/8b580b95158b902f82b75c60fd363327cc1fde15)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/be093b97695fffe0294050030736594435c562c4)
+- [Pin deps versions](https://github.com/M4RC3L05/rss-hub/commit/b0a28aa63429c87b1d26eb222ebe93a6b2d7b2b5)
+
 ### v4.17.0 (2023-11-18)
 
 - [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/2a2fbf08b68317a0104b4e9ff745c946cb7d2189)

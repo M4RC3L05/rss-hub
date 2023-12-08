@@ -1,4 +1,4 @@
-FROM docker.io/node:20.9-alpine as build
+FROM docker.io/node:20.10-alpine as build
 
 USER node
 

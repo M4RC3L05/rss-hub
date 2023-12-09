@@ -1,3 +1,7 @@
+### v4.18.1 (2023-12-09)
+
+- [Fix docker node version](https://github.com/M4RC3L05/rss-hub/commit/29c233c6e2b2d082946937657a1ef81ce4c2e18a)
+
 ### v4.18.0 (2023-12-08)
 
 - [Update node version on dockerfile](https://github.com/M4RC3L05/rss-hub/commit/45fc1d98a1c7a2dc2dd2f4c4a5d21f087b8ef1a8)

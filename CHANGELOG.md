@@ -1,3 +1,8 @@
+### v4.19.1 (2023-12-10)
+
+- [Fix endpoint to mark all\/single items as read](https://github.com/M4RC3L05/rss-hub/commit/0c505e901ffedc3edacfd5d8924706047429c0c8)
+- [Use hono has http lib](https://github.com/M4RC3L05/rss-hub/commit/55add2a9947d16868f11b66d34ac04557cca1d60)
+
 ### v4.19.0 (2023-12-10)
 
 - [Use hono has http lib](https://github.com/M4RC3L05/rss-hub/commit/6e17807342724e8e19c70e28e1244b95559db229)

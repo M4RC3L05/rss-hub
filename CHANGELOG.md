@@ -1,3 +1,7 @@
+### v4.19.0 (2023-12-10)
+
+- [Use hono has http lib](https://github.com/M4RC3L05/rss-hub/commit/6e17807342724e8e19c70e28e1244b95559db229)
+
 ### v4.18.1 (2023-12-09)
 
 - [Fix docker node version](https://github.com/M4RC3L05/rss-hub/commit/29c233c6e2b2d082946937657a1ef81ce4c2e18a)

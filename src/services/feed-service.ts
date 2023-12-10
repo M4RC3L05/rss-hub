@@ -5,11 +5,11 @@ import * as entities from "entities";
 import { type FeedsTable } from "../database/types/mod.js";
 import { request } from "../common/utils/fetch-utils.js";
 import { feedResolvers } from "../resolvers/mod.js";
-import { db } from "../database/mod.js";
 import { xmlBuilder, xmlParser } from "../common/utils/xml-utils.js";
+import { type CustomDatabase } from "../database/mod.js";
 
 export class FeedService {
-  async syncFeed(feed: FeedsTable, options?: { signal: AbortSignal }) {
+  async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal; database: CustomDatabase }) {
     let data;
 
     try {
@@ -44,7 +44,7 @@ export class FeedService {
     }
 
     const status = await Promise.allSettled(
-      feedItems.map(async (entry) => this.#syncFeedEntry(entry, feed.id)),
+      feedItems.map(async (entry) => this.#syncFeedEntry(entry, feed.id, options?.database)),
     );
     const totalCount = status.length;
     const successCount = status.filter(({ status }) => status === "fulfilled").length;
@@ -61,7 +61,7 @@ export class FeedService {
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
-    const rawFeed = await this.#extractRawFeed(url, options);
+    const rawFeed = await this.#extractRawFeed(url, options as Omit<typeof options, "database">);
     const parsed = this.toObject(rawFeed);
 
     if (!feedResolvers.resolveFeed(parsed)) {
@@ -76,7 +76,7 @@ export class FeedService {
     return feedResolvers.resolveFeedTitle(feed);
   }
 
-  async #extractRawFeed(url: string, options?: { signal: AbortSignal }) {
+  async #extractRawFeed(url: string, options: { signal?: AbortSignal }) {
     try {
       const response = await request(url, options, { retryN: 1 });
 
@@ -119,7 +119,11 @@ export class FeedService {
     }
   }
 
-  async #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
+  async #syncFeedEntry(
+    feedItem: Record<string, unknown>,
+    feedId: string,
+    datababse: CustomDatabase,
+  ) {
     const id = feedResolvers.resolveFeedItemGuid(feedItem);
     const enclosures = feedResolvers.resolveFeedItemEnclosures(feedItem);
     let feedImage = feedResolvers.resolveFeedItemImage(
@@ -151,7 +155,7 @@ export class FeedService {
       updatedAt: updatedAt?.toISOString() ?? pubDate?.toISOString() ?? new Date().toISOString(),
     };
 
-    db.run(
+    datababse.run(
       sql`
         insert into
           feed_items(id, feed_id, raw, content, img, created_at, title, enclosure, link, updated_at)

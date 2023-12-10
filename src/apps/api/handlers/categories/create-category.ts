@@ -1,43 +1,36 @@
 import sql from "@leafac/sqlite";
-import { type FromSchema } from "json-schema-to-ts";
-import { type Middleware } from "@m4rc3l05/sss";
+import { type Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
-import { db } from "../../../../database/mod.js";
+import { RequestValidationError } from "../../../../errors/mod.js";
 
-export const schemas = {
-  request: {
-    body: {
-      $id: "create-category-request-body",
-      type: "object",
-      properties: { name: { type: "string", minLength: 2 } },
-      required: ["name"],
-      additionalProperties: false,
+const requestBodySchema = z
+  .object({
+    name: z.string().min(2),
+  })
+  .strict();
+
+export const handler = (router: Hono) => {
+  router.post(
+    "/api/categories",
+    zValidator("json", requestBodySchema, (result) => {
+      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+    }),
+    (c) => {
+      const data = c.req.valid("json");
+      const category = c.get("database").get<CategoriesTable>(sql`
+        insert into categories (name)
+        values (${data.name})
+        returning *
+      `);
+
+      if (!category) {
+        throw new HTTPException(400, { message: "Could not create category" });
+      }
+
+      return c.json({ data: category });
     },
-  },
-} as const;
-
-type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
-
-export const handler: Middleware = (request, response) => {
-  const { body } = request as any as { body: RequestBody };
-
-  const category = db.get<CategoriesTable>(sql`
-    insert into categories (name)
-    values (${body.name})
-    returning *
-  `);
-
-  if (!category) {
-    response.statusCode = 400;
-
-    response.setHeader("content-type", "application/json");
-    response.end(
-      JSON.stringify({ error: { code: "bad_request", message: "Could not create category" } }),
-    );
-  }
-
-  response.statusCode = 201;
-
-  response.setHeader("content-type", "application/json");
-  response.end(JSON.stringify({ data: category }));
+  );
 };

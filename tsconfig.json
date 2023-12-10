@@ -5,17 +5,18 @@
     "moduleResolution": "nodenext",
     "skipLibCheck": true,
     "noEmit": true,
-
     "jsx": "react-jsx",
-
     "strict": true,
     "noImplicitOverride": true,
-
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "exclude": ["node_modules/**/*"],
-  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules/**/*"
+  ],
+  "include": [
+    "src/**/*"
+  ],
   "ts-node": {
     "esm": true,
     "swc": true,

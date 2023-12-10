@@ -1,66 +1,63 @@
-import { type FromSchema } from "json-schema-to-ts";
 import sql from "@leafac/sqlite";
-import createHttpError from "http-errors";
 import { stdSerializers } from "pino";
-import { type RouteMiddleware } from "@m4rc3l05/sss";
+import { type Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { type FeedsTable } from "../../../../database/types/mod.js";
 import { makeLogger } from "../../../../common/logger/mod.js";
-import { db } from "../../../../database/mod.js";
 import { feedService } from "../../../../services/mod.js";
+import { RequestValidationError } from "../../../../errors/mod.js";
 
-export const schemas = {
-  request: {
-    body: {
-      $id: "create-feed-request-body",
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2 },
-        url: { type: "string", format: "uri" },
-        categoryId: { type: "string", format: "uuid" },
-      },
-      required: ["name", "url", "categoryId"],
-      additionalProperties: false,
-    },
-  },
-} as const;
-
-type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
+const requestBodySchema = z
+  .object({
+    name: z.string().min(2),
+    url: z.string().url(),
+    categoryId: z.string().uuid(),
+  })
+  .strict();
 
 const log = makeLogger("create-feed-handler");
 
-export const handler: RouteMiddleware = async (request, response) => {
-  const { body } = request as any as { body: RequestBody };
+export const handler = (router: Hono) => {
+  router.post(
+    "/api/feeds",
+    zValidator("json", requestBodySchema, (result) => {
+      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+    }),
+    (c) => {
+      const data = c.req.valid("json");
+      const feed = c.get("database").get<FeedsTable>(sql`
+        insert into feeds (name, url, category_id)
+        values (${data.name}, ${data.url}, ${data.categoryId})
+        returning *
+      `);
 
-  const feed = db.get<FeedsTable>(sql`
-    insert into feeds (name, url, category_id)
-    values (${body.name}, ${body.url}, ${body.categoryId})
-    returning *
-  `);
+      if (!feed) {
+        throw new HTTPException(400, { message: "Could not create feed" });
+      }
 
-  if (!feed) throw createHttpError(400, "Could not create feed");
+      feedService
+        .syncFeed(feed, { database: c.get("database"), signal: c.req.raw.signal })
+        .then(({ faildCount, failedReasons, successCount, totalCount }) => {
+          log.info(
+            {
+              failedReasons: failedReasons.map((reason) =>
+                reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+              ),
+              faildCount,
+              successCount,
+              totalCount,
+              feed,
+            },
+            `Synching feed ${feed.url}`,
+          );
+        })
+        .catch((error) => {
+          log.error(error, `Could not sync ${feed.url}`);
+        });
 
-  feedService
-    .syncFeed(feed)
-    .then(({ faildCount, failedReasons, successCount, totalCount }) => {
-      log.info(
-        {
-          failedReasons: failedReasons.map((reason) =>
-            reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
-          ),
-          faildCount,
-          successCount,
-          totalCount,
-          feed,
-        },
-        `Synching feed ${feed.url}`,
-      );
-    })
-    .catch((error) => {
-      log.error(error, `Could not sync ${feed.url}`);
-    });
-
-  response.statusCode = 201;
-
-  response.setHeader("content-type", "application/json");
-  response.end(JSON.stringify({ data: feed }));
+      return c.json({ data: feed }, 201);
+    },
+  );
 };

@@ -1,50 +1,37 @@
-import { type FromSchema } from "json-schema-to-ts";
 import sql from "@leafac/sqlite";
-import { type RouteMiddleware } from "@m4rc3l05/sss";
+import { type Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
-import { db } from "../../../../database/mod.js";
+import { RequestValidationError } from "../../../../errors/mod.js";
 
-export const schemas = {
-  request: {
-    params: {
-      $id: "update-category-name-request-params",
-      type: "object",
-      properties: { id: { type: "string", format: "uuid" } },
-      required: ["id"],
-      additionalProperties: false,
+const requestParametersSchema = z.object({ id: z.string().uuid() }).strict();
+const requestBodySchema = z.object({ name: z.string().min(2) }).strict();
+
+export const handler = (router: Hono) => {
+  router.patch(
+    "/api/categories/:id",
+    zValidator("param", requestParametersSchema, (result) => {
+      if (!result.success) throw new RequestValidationError({ request: { params: result.error } });
+    }),
+    zValidator("json", requestBodySchema, (result) => {
+      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+    }),
+    (c) => {
+      const parameters = c.req.valid("param");
+      const body = c.req.valid("json");
+      const updated = c.get("database").get<CategoriesTable>(sql`
+        update categories set name = ${body.name}
+        where id = ${parameters.id}
+        returning *
+      `);
+
+      if (!updated) {
+        throw new HTTPException(404, { message: "Category not found" });
+      }
+
+      return c.json({ data: updated });
     },
-    body: {
-      $id: "update-category-name-request-body",
-      type: "object",
-      properties: { name: { type: "string", minLength: 2 } },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-} as const;
-
-type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
-type RequestBody = FromSchema<(typeof schemas)["request"]["body"]>;
-
-export const handler: RouteMiddleware = (request, response) => {
-  const parameters = request.params as RequestParameters;
-  const { body } = request as any as { body: RequestBody };
-
-  const updated = db.get<CategoriesTable>(sql`
-    update categories set name = ${body.name}
-    where id = ${parameters.id}
-    returning *
-  `);
-
-  if (!updated) {
-    response.statusCode = 404;
-
-    response.setHeader("content-type", "application/json");
-    response.end(JSON.stringify({ error: { code: "not_found", message: "Category not found" } }));
-    return;
-  }
-
-  response.statusCode = 200;
-  response.setHeader("content-type", "application/json");
-  response.end(JSON.stringify({ data: updated }));
+  );
 };

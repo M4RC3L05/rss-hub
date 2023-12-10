@@ -1,37 +1,43 @@
 import config from "config";
-import { App } from "@m4rc3l05/sss";
-import { basicAuth, cors, errorMapper, requestLifeCycle } from "../../middlewares/mod.js";
+import { cors } from "hono/cors";
+import { basicAuth } from "hono/basic-auth";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { errorMapper, requestLifeCycle } from "../../middlewares/mod.js";
 import { errorMappers } from "../../errors/mod.js";
-import { makeRouter } from "./router.js";
+import { type CustomDatabase } from "../../database/mod.js";
+import { router } from "./router.js";
 
-const makeApp = async () => {
-  const app = new App();
+const makeApp = ({ database }: { database: CustomDatabase }) => {
+  const app = new Hono();
+
+  app.use("*", (c, next) => {
+    c.set("database", database);
+
+    return next();
+  });
+  app.use("*", requestLifeCycle);
+  app.use("*", cors());
+  app.use(
+    "*",
+    basicAuth({
+      username: config.get<{ name: string; pass: string }>("apps.api.basicAuth").name,
+      password: config.get<{ name: string; pass: string }>("apps.api.basicAuth").pass,
+    }),
+  );
+
+  app.notFound(() => {
+    throw new HTTPException(404, { message: "Route not found" });
+  });
 
   app.onError(
     errorMapper({
-      isJsonResponse: true,
       mappers: [errorMappers.validationErrorMapper, errorMappers.sqliteErrorMapper],
       defaultMapper: errorMappers.defaultErrorMapper,
     }),
   );
 
-  const router = await makeRouter(app);
-
-  app.use(requestLifeCycle);
-  app.use(cors);
-  app.use(
-    basicAuth({
-      jsonResponse: true,
-      user: config.get<{ name: string; pass: string }>("apps.api.basicAuth"),
-    }),
-  );
-  app.use(router.middleware());
-  app.use((_, response) => {
-    response.statusCode = 404;
-
-    response.setHeader("content-type", "application/json");
-    response.end(JSON.stringify({ error: { code: "not_found", msg: "Not found" } }));
-  });
+  router(app);
 
   return app;
 };

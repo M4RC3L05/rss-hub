@@ -56,7 +56,7 @@ const CreateFeedModal: FC<CreateFeedModelArgs> = ({ show, handleClose, category 
     void requests.feeds.createFeed({ body: { name, url, categoryId: category.id } }).then(() => {
       handleClose();
       void mutate(
-        (key) => typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+        (key) => typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
       );
     });
   };

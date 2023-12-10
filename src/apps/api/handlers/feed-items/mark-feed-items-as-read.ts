@@ -8,7 +8,7 @@ import { RequestValidationError } from "../../../../errors/mod.js";
 
 const requestBodySchema = z.union([
   z.object({ id: z.string() }).strict(),
-  z.object({ feedId: z.string().uuid(), frm: z.string() }).strict(),
+  z.object({ feedId: z.string().uuid(), from: z.string() }).strict(),
 ]);
 
 export const handler = (router: Hono) => {
@@ -22,9 +22,7 @@ export const handler = (router: Hono) => {
       let parsedCursor: { rowId: number; createdAt: string } | undefined;
 
       if ("from" in data) {
-        const [rowId, createdAt] = Buffer.from(data.from as string, "base64url")
-          .toString("utf8")
-          .split("@@");
+        const [rowId, createdAt] = Buffer.from(data.from, "base64url").toString("utf8").split("@@");
         parsedCursor = { createdAt, rowId: Number(rowId) };
       }
 

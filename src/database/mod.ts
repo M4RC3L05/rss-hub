@@ -15,7 +15,7 @@ const toCamelCase = <T>(data: unknown) => {
   return data as T;
 };
 
-class CustomDatabase extends Database {
+export class CustomDatabase extends Database {
   override get<T>(query: Query, options: Options = {}): T | undefined {
     if (!this.open) return;
 
@@ -29,12 +29,13 @@ class CustomDatabase extends Database {
   }
 }
 
-export const db = new CustomDatabase(config.get("database.path"), {
-  verbose(message, ...args) {
-    log.debug({ sql: message, args }, "Running sql");
-  },
-})
-  .execute(sql`pragma journal_mode = WAL`)
-  .execute(sql`pragma busy_timeout = 5000`)
-  .execute(sql`pragma foreign_keys = ON`)
-  .function("uuid_v4", () => randomUUID());
+export const makeDatabase = () =>
+  new CustomDatabase(config.get("database.path"), {
+    verbose(message, ...args) {
+      log.debug({ sql: message, args }, "Running sql");
+    },
+  })
+    .execute(sql`pragma journal_mode = WAL`)
+    .execute(sql`pragma busy_timeout = 5000`)
+    .execute(sql`pragma foreign_keys = ON`)
+    .function("uuid_v4", () => randomUUID());

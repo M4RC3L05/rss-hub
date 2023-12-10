@@ -1,12 +1,13 @@
-import createHttpError from "http-errors";
-import { SqliteError } from "better-sqlite3";
+import { HTTPException } from "hono/http-exception";
 
 const sqliteErrorMapper = (error: unknown) => {
-  if (!(error instanceof SqliteError)) return;
+  if ((error as any)?.name !== "SqliteError") return;
 
-  switch (error.code) {
+  switch ((error as any).code) {
     case "SQLITE_CONSTRAINT_UNIQUE": {
-      return createHttpError(409, "Entity already exists");
+      return Object.assign(new HTTPException(409, { message: "Entity already exists" }), {
+        cause: error,
+      });
     }
 
     default:

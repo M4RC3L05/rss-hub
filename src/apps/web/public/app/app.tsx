@@ -19,7 +19,7 @@ const App: FC = () => {
     categoryIds.length > 0
       ? // eslint-disable-next-line unicorn/no-array-reduce
         `${paths.feeds.getFeeds}?${categoryIds.reduce(
-          (acc, cid, index) => `${acc}${index === 0 ? "" : "&"}categoryId[]=${cid}`,
+          (acc, cid, index) => `${acc}${index === 0 ? "" : "&"}categoryId=${cid}`,
           "",
         )}`
       : null,

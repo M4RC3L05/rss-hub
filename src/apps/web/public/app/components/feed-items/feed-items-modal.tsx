@@ -229,7 +229,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
                   void mutate(
                     (key) =>
                       typeof key === "string" &&
-                      key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+                      key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
                   );
                 });
             }}

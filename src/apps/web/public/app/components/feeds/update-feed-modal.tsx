@@ -67,8 +67,7 @@ const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({ show, handleClose, toUpdate 
       .then(() => {
         handleClose();
         void mutate(
-          (key) =>
-            typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId[]=`),
+          (key) => typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
         );
       });
   };

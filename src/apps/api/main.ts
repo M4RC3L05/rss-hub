@@ -1,44 +1,50 @@
-import http from "node:http";
-import { promisify } from "node:util";
-import { type AddressInfo } from "node:net";
 import process from "node:process";
 import config from "config";
+import { createAdaptorServer } from "@hono/node-server";
 import { makeLogger } from "../../common/logger/mod.js";
 import { addHook } from "../../common/utils/process-utils.js";
-import { db } from "../../database/mod.js";
+import { makeDatabase } from "../../database/mod.js";
 import makeApp from "./app.js";
 
-const log = makeLogger("api");
-const app = await makeApp();
+addHook({
+  name: "api",
+  async handler() {
+    if (server) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          server.close((error) => {
+            if (error) reject(error);
+            else resolve();
+          });
+        });
+
+        log.info("Server closed");
+      } catch (error) {
+        log.error(error, "Error while closing server");
+      }
+    }
+
+    if (database && database.open) {
+      database.close();
+
+      log.info("DB Closed");
+    }
+  },
+});
 
 const { port, host } = config.get<{ port: number; host: string }>("apps.api");
-const server = http.createServer(app.handle());
-const pClose = promisify<void>(server.close).bind(server);
+const log = makeLogger("api");
 
-server.listen(port, host, () => {
-  const addr = server.address() as AddressInfo;
-  log.info(`Listening on ${addr.address}:${addr.port}`);
+const database = makeDatabase();
+const app = makeApp({ database });
+const server = createAdaptorServer(app);
+
+server.listen({ port, hostname: host }, () => {
+  log.info(`Listening on ${host}:${port}`);
 
   if (typeof process.send === "function") {
     log.info("Sending ready signal");
 
     process.send("ready");
   }
-});
-
-server.addListener("close", () => {
-  log.info("Server closed");
-});
-
-addHook({
-  name: "api",
-  async handler() {
-    await pClose().catch((error) => {
-      log.error(error, "Could not close server");
-    });
-    log.info("Server closed");
-
-    db.close();
-    log.info("DB Closed");
-  },
 });

@@ -4,12 +4,12 @@ import sql from "@leafac/sqlite";
 import { stdSerializers } from "pino";
 import { type FeedsTable } from "../../database/types/mod.js";
 import { makeLogger } from "../../common/logger/mod.js";
-import { db } from "../../database/mod.js";
+import { type CustomDatabase } from "../../database/mod.js";
 import { feedService } from "../../services/mod.js";
 
 const log = makeLogger("feed-synchronizer-runner");
 
-const runner = async (signal: AbortSignal) => {
+const runner = async ({ signal, db }: { signal?: AbortSignal; db: CustomDatabase }) => {
   const feeds = db.all<FeedsTable>(sql`select * from feeds`);
 
   log.info("Synching begin");
@@ -20,7 +20,7 @@ const runner = async (signal: AbortSignal) => {
     try {
       const { faildCount, failedReasons, successCount, totalCount } = await feedService.syncFeed(
         feed,
-        { signal },
+        { signal, database: db },
       );
 
       log.info(
@@ -41,7 +41,7 @@ const runner = async (signal: AbortSignal) => {
       log.info({ feed }, `Synching synced ${feed.url}`);
     }
 
-    if (signal.aborted) {
+    if (signal?.aborted) {
       break;
     }
   }

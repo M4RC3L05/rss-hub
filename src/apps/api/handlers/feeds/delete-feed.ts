@@ -1,37 +1,32 @@
 import sql from "@leafac/sqlite";
-import { type FromSchema } from "json-schema-to-ts";
-import { type RouteMiddleware } from "@m4rc3l05/sss";
-import { db } from "../../../../database/mod.js";
+import { type Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { makeLogger } from "../../../../common/logger/mod.js";
+import { RequestValidationError } from "../../../../errors/mod.js";
 
-export const schemas = {
-  request: {
-    params: {
-      $id: "delete-feed-request-params",
-      type: "object",
-      properties: { id: { type: "string", format: "uuid" } },
-      required: ["id"],
-      additionalProperties: false,
-    },
-  },
-} as const;
-
-type RequestParameters = FromSchema<(typeof schemas)["request"]["params"]>;
+const requestParametersSchema = z.object({ id: z.string().uuid() }).strict();
 
 const log = makeLogger("delete-feed-handler");
 
-export const handler: RouteMiddleware = async (request, response) => {
-  const parameters = request.params as RequestParameters;
+export const handler = (router: Hono) => {
+  router.delete(
+    "/api/feeds/:id",
+    zValidator("param", requestParametersSchema, (result) => {
+      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+    }),
+    (c) => {
+      const parameters = c.req.valid("param");
+      const { changes } = c.get("database").run(sql`
+        delete from feeds
+        where id = ${parameters.id}
+      `);
 
-  const { changes } = db.run(sql`
-    delete from feeds
-    where id = ${parameters.id}
-  `);
+      if (changes === 0) {
+        log.warn({ feedId: parameters.id }, "No feed was deleted");
+      }
 
-  if (changes === 0) {
-    log.warn({ feedId: parameters.id }, "No feed was deleted");
-  }
-
-  response.statusCode = 204;
-  response.end();
+      return c.body(null, 204);
+    },
+  );
 };

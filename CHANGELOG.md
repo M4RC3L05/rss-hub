@@ -1,3 +1,7 @@
+### v4.19.2 (2023-12-16)
+
+- [Use correct http verb for checking feed url](https://github.com/M4RC3L05/rss-hub/commit/eca831d1022852aa32f5a93785f078afbbd7cb2a)
+
 ### v4.19.1 (2023-12-10)
 
 - [Fix endpoint to mark all\/single items as read](https://github.com/M4RC3L05/rss-hub/commit/0c505e901ffedc3edacfd5d8924706047429c0c8)

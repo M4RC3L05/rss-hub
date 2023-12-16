@@ -15,7 +15,7 @@ const requestBodySchema = z
 const log = makeLogger("validate-feed-url-handler");
 
 export const handler = (router: Hono) => {
-  router.get(
+  router.post(
     "/api/feeds/url",
     zValidator("json", requestBodySchema, (result) => {
       if (!result.success) throw new RequestValidationError({ request: { body: result.error } });

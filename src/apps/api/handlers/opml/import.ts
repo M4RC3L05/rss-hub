@@ -1,5 +1,5 @@
 import sql from "@leafac/sqlite";
-import { castArray, compact, get } from "lodash-es";
+import { castArray, get } from "lodash-es";
 import { decodeXML } from "entities";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -27,8 +27,14 @@ export const handler = (router: Hono) => {
     const parsed = (await xmlParser.parse(await file.text())) as Record<string, unknown>;
     const feedsToSync: string[] = [];
 
+    console.log("ooooooo", parsed);
+
     c.get("database").executeTransaction(() => {
-      for (const category of castArray(get(parsed, "opml.body.outline"))) {
+      const categories = castArray(get(parsed, "opml.body.outline")).filter(
+        (value) => value !== null && value !== undefined,
+      );
+
+      for (const category of categories) {
         const categoryName = get(category as { "@_text": string }, "@_text");
         let categoryStored = c
           .get("database")
@@ -40,7 +46,11 @@ export const handler = (router: Hono) => {
             .get(sql`insert into categories (name) values (${categoryName}) returning *`);
         }
 
-        for (const feed of compact(castArray(get(category as { outline: unknown }, "outline")))) {
+        const feeds = castArray(get(category as { outline: unknown }, "outline")).filter(
+          (value) => value !== null && value !== undefined,
+        );
+
+        for (const feed of feeds) {
           const feedName = decodeXML(get(feed as { "@_text": string }, "@_text"));
           const feedUrl = decodeXML(
             get(feed as { "@_xmlUrl": string }, "@_xmlUrl") ??

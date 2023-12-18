@@ -1,3 +1,8 @@
+### v4.19.3 (2023-12-18)
+
+- [Prevent an error if opml file is empty](https://github.com/M4RC3L05/rss-hub/commit/4b474b49e49930745e84327f9d818b7311443219)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/7750e5cb89851f5b1b04a0c8c77ff1c751fd1e23)
+
 ### v4.19.2 (2023-12-16)
 
 - [Use correct http verb for checking feed url](https://github.com/M4RC3L05/rss-hub/commit/eca831d1022852aa32f5a93785f078afbbd7cb2a)

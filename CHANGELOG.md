@@ -1,3 +1,10 @@
+### v4.19.4 (2023-12-27)
+
+- [Throw error when no content type is provided for a given feed](https://github.com/M4RC3L05/rss-hub/commit/5e5381bf12535c77be469a93f6bf992db24cf921)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/b330fdce687cb452e57a5ca94c691bcc759897c6)
+- [Use biome for lint and formatting](https://github.com/M4RC3L05/rss-hub/commit/833bfb6d5ba3b00439c31e4be97cbcf94fdc2b97)
+- [Prevent an error if opml file is empty](https://github.com/M4RC3L05/rss-hub/commit/ff2b36d94f41703979bedc85e1cd58e954dd79fe)
+
 ### v4.19.3 (2023-12-18)
 
 - [Prevent an error if opml file is empty](https://github.com/M4RC3L05/rss-hub/commit/4b474b49e49930745e84327f9d818b7311443219)

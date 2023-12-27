@@ -1,3 +1,7 @@
+### v4.19.5 (2023-12-27)
+
+- [Improve feed item link resolver](https://github.com/M4RC3L05/rss-hub/commit/f226f42ec9290b669a58ea1406584c75377e0b8c)
+
 ### v4.19.4 (2023-12-27)
 
 - [Throw error when no content type is provided for a given feed](https://github.com/M4RC3L05/rss-hub/commit/5e5381bf12535c77be469a93f6bf992db24cf921)

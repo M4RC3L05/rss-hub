@@ -82,11 +82,14 @@ export const resolveFeedItemGuid = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedItemLink = (feed: Record<string, unknown>) => {
-  const searchKeys = ["link", "link.@_href", "atom:link", "a10:link"];
+  const searchKeys = ["id", "link", "link.@_href", "atom:link", "a10:link"];
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))
-    .find((v) => typeof v === "string" && v.trim().length > 0)
+    .filter((v) => typeof v === "string" && v.trim().length > 0)
+    .map((v) => (v as string).trim())
+    .filter((v) => v.startsWith("http") || v.startsWith("https"))
+    .first()
     .value() as string | undefined;
 };
 

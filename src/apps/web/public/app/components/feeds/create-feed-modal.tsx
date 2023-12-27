@@ -1,7 +1,7 @@
-import { type FC, useEffect, useState } from "react";
+import { type FC, useCallback, useEffect, useState } from "react";
+import { Alert, Button, Form, Modal } from "react-bootstrap";
 import { useSWRConfig } from "swr";
 import { useDebounce } from "usehooks-ts";
-import { Button, Modal, Form, Alert } from "react-bootstrap";
 import { type CategoriesTable } from "../../../../../../database/types/mod.js";
 import requests, { paths } from "../../common/api.js";
 
@@ -11,7 +11,11 @@ type CreateFeedModelArgs = {
   handleClose: () => unknown;
 };
 
-const CreateFeedModal: FC<CreateFeedModelArgs> = ({ show, handleClose, category }) => {
+const CreateFeedModal: FC<CreateFeedModelArgs> = ({
+  show,
+  handleClose,
+  category,
+}) => {
   const [canInteract, setCanInteract] = useState(false);
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -21,7 +25,7 @@ const CreateFeedModal: FC<CreateFeedModelArgs> = ({ show, handleClose, category 
   const debouncedUrl = useDebounce(url, 200);
   const [checkingUrl, setCheckingUrl] = useState(false);
 
-  const checkForFeed = async (url: string) => {
+  const checkForFeed = useCallback(async (url: string) => {
     if (url.length <= 0) {
       setError(undefined);
       setValidUrl(false);
@@ -44,21 +48,25 @@ const CreateFeedModal: FC<CreateFeedModelArgs> = ({ show, handleClose, category 
     } finally {
       setCheckingUrl(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    void checkForFeed(url);
-  }, [debouncedUrl]);
+    checkForFeed(debouncedUrl);
+  }, [debouncedUrl, checkForFeed]);
 
   const submit = async () => {
     if (!canInteract || Boolean(error) || !validUrl) return;
 
-    void requests.feeds.createFeed({ body: { name, url, categoryId: category.id } }).then(() => {
-      handleClose();
-      void mutate(
-        (key) => typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
-      );
-    });
+    void requests.feeds
+      .createFeed({ body: { name, url, categoryId: category.id } })
+      .then(() => {
+        handleClose();
+        void mutate(
+          (key) =>
+            typeof key === "string" &&
+            key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
+        );
+      });
   };
 
   const cancel = () => {

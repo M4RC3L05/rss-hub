@@ -20,7 +20,7 @@ addHook({
       log.info("Job closed");
     }
 
-    if (db && db.open) {
+    if (db?.open) {
       db.close();
       log.info("DB Closed");
     }
@@ -34,13 +34,13 @@ log.info({ nextAt: job.nextAt() }, "Registered feeds-synchronizer");
 
 for await (const signal of job.start()) {
   try {
-    log.info(`Running feeds-synchronizer`);
+    log.info("Running feeds-synchronizer");
 
     await runner({ signal, db });
   } catch (error) {
-    log.error(error, `Error running feeds-synchronizer task`);
+    log.error(error, "Error running feeds-synchronizer task");
   } finally {
-    log.info(`feeds-synchronizer completed`);
+    log.info("feeds-synchronizer completed");
     log.info(`Next at ${job.nextAt()}`);
   }
 }

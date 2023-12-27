@@ -1,6 +1,6 @@
 import process from "node:process";
-import config from "config";
 import { createAdaptorServer } from "@hono/node-server";
+import config from "config";
 import { makeLogger } from "../../common/logger/mod.js";
 import { addHook } from "../../common/utils/process-utils.js";
 import { makeDatabase } from "../../database/mod.js";
@@ -24,7 +24,7 @@ addHook({
       }
     }
 
-    if (database && database.open) {
+    if (database?.open) {
       database.close();
 
       log.info("DB Closed");

@@ -1,5 +1,5 @@
 import { type FC, useState } from "react";
-import { ListGroupItem, Image as BSImage, Badge } from "react-bootstrap";
+import { Badge, Image as BSImage, ListGroupItem } from "react-bootstrap";
 import { type FeedsTable } from "../../../../../../database/types/mod.js";
 import FeedItemsModal from "../feed-items/feed-items-modal.js";
 
@@ -31,9 +31,9 @@ const FeedListItem: FC<FeedListItemArgs> = ({ feed }) => {
           style={{ width: "16px", height: "16px" }}
           roundedCircle
         />
-        <span className="mx-1"></span>
+        <span className="mx-1" />
         {feed.name}
-        <div className="me-auto"></div>
+        <div className="me-auto" />
         <Badge bg="primary" pill>
           {" "}
           {feed.unreadCount}{" "}

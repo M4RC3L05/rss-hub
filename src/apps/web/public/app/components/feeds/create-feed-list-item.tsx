@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { type FC, useState } from "react";
 import { ListGroupItem } from "react-bootstrap";
 import { type CategoriesTable } from "../../../../../../database/types/mod.js";
 import CreateFeedModal from "./create-feed-modal.js";
@@ -28,7 +28,7 @@ const CreateFeedListItem: FC<CreateFeedListItemArgs> = ({ category }) => {
           setShowCreateModal(true);
         }}
       >
-        <i className="bi bi-plus-lg"></i>
+        <i className="bi bi-plus-lg" />
       </ListGroupItem>
     </>
   );

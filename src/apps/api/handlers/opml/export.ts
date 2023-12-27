@@ -23,10 +23,10 @@ export const handler = (router: Hono) => {
         doc += `<outline text="${text}" type="rss" xmlUrl="${xmlUrl}"/>`;
       }
 
-      doc += `</outline>`;
+      doc += "</outline>";
     }
 
-    doc += `</body></opml>`;
+    doc += "</body></opml>";
 
     return c.body(doc.trim(), 200, {
       "content-type": "text/x-opml",

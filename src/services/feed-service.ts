@@ -1,22 +1,27 @@
 import { createHash } from "node:crypto";
-import * as _ from "lodash-es";
 import sql from "@leafac/sqlite";
 import * as entities from "entities";
-import { type FeedsTable } from "../database/types/mod.js";
+import * as _ from "lodash-es";
 import { request } from "../common/utils/fetch-utils.js";
-import { feedResolvers } from "../resolvers/mod.js";
 import { xmlBuilder, xmlParser } from "../common/utils/xml-utils.js";
 import { type CustomDatabase } from "../database/mod.js";
+import { type FeedsTable } from "../database/types/mod.js";
+import { feedResolvers } from "../resolvers/mod.js";
 
 export class FeedService {
-  async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal; database: CustomDatabase }) {
+  async syncFeed(
+    feed: FeedsTable,
+    options: { signal?: AbortSignal; database: CustomDatabase },
+  ) {
     let data;
 
     try {
       data = await this.#extractRawFeed(feed.url, options);
       data = this.toObject(data);
     } catch (error) {
-      throw new Error(`Could not get/parse feed "${feed.url}"`, { cause: error });
+      throw new Error(`Could not get/parse feed "${feed.url}"`, {
+        cause: error,
+      });
     }
 
     if (options?.signal?.aborted) {
@@ -26,7 +31,9 @@ export class FeedService {
     const feedPage = feedResolvers.resolveFeed(data);
 
     if (!feedPage) {
-      throw new Error(`Could not get feed for feed ${feed.url}`, { cause: data });
+      throw new Error(`Could not get feed for feed ${feed.url}`, {
+        cause: data,
+      });
     }
 
     if (options?.signal?.aborted) {
@@ -36,7 +43,9 @@ export class FeedService {
     const feedItems = feedResolvers.resolveFeedItems(feedPage);
 
     if (!feedItems) {
-      throw new Error(`No feed items for feed "${feed.url}"`, { cause: feedPage });
+      throw new Error(`No feed items for feed "${feed.url}"`, {
+        cause: feedPage,
+      });
     }
 
     if (options?.signal?.aborted) {
@@ -44,11 +53,17 @@ export class FeedService {
     }
 
     const status = await Promise.allSettled(
-      feedItems.map(async (entry) => this.#syncFeedEntry(entry, feed.id, options?.database)),
+      feedItems.map(async (entry) =>
+        this.#syncFeedEntry(entry, feed.id, options?.database),
+      ),
     );
     const totalCount = status.length;
-    const successCount = status.filter(({ status }) => status === "fulfilled").length;
-    const faildCount = status.filter(({ status }) => status === "rejected").length;
+    const successCount = status.filter(
+      ({ status }) => status === "fulfilled",
+    ).length;
+    const faildCount = status.filter(
+      ({ status }) => status === "rejected",
+    ).length;
     const failedReasons = status
       .filter(({ status }) => status === "rejected")
       .map((data) => (data as PromiseRejectedResult).reason as unknown);
@@ -61,7 +76,10 @@ export class FeedService {
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
-    const rawFeed = await this.#extractRawFeed(url, options as Omit<typeof options, "database">);
+    const rawFeed = await this.#extractRawFeed(
+      url,
+      options as Omit<typeof options, "database">,
+    );
     const parsed = this.toObject(rawFeed);
 
     if (!feedResolvers.resolveFeed(parsed)) {
@@ -72,7 +90,12 @@ export class FeedService {
   }
 
   getFeedTitle(raw: Record<string, unknown>) {
-    const feed = feedResolvers.resolveFeed(raw)!;
+    const feed = feedResolvers.resolveFeed(raw);
+
+    if (!feed) {
+      throw new Error("Could not get feed title.");
+    }
+
     return feedResolvers.resolveFeedTitle(feed);
   }
 
@@ -82,7 +105,15 @@ export class FeedService {
 
       if (!response.ok) {
         throw new Error(`Error fetching feed ${url}`, {
-          cause: { response: _.pick(response, ["headers", "status", "statusText", "type", "url"]) },
+          cause: {
+            response: _.pick(response, [
+              "headers",
+              "status",
+              "statusText",
+              "type",
+              "url",
+            ]),
+          },
         });
       }
 
@@ -90,7 +121,7 @@ export class FeedService {
         throw new Error("No content type header in repsonse");
       }
 
-      const contentType = response.headers.get("content-type")!;
+      const contentType = response.headers.get("content-type");
       const validContentTypes = [
         "application/xml",
         "application/rss+xml",
@@ -100,15 +131,18 @@ export class FeedService {
         "text/html",
       ];
 
-      if (!validContentTypes.some((ct) => contentType.includes(ct))) {
-        throw new Error(
-          `Not a valid content type header of ${response.headers.get("content-type") ?? ""}`,
-          {
-            cause: {
-              response: _.pick(response, ["headers", "status", "statusText", "type", "url"]),
-            },
+      if (validContentTypes.includes(contentType ?? "")) {
+        throw new Error(`Not a valid content type header of "${contentType}"`, {
+          cause: {
+            response: _.pick(response, [
+              "headers",
+              "status",
+              "statusText",
+              "type",
+              "url",
+            ]),
           },
-        );
+        });
       }
 
       return await response.text();
@@ -143,16 +177,24 @@ export class FeedService {
     }
 
     const toInsert = {
-      id: id ?? createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),
+      id:
+        id ??
+        createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),
       feedId,
       raw: JSON.stringify(feedItem),
       content: content ?? "",
       img: feedImage ?? null,
-      createdAt: pubDate?.toISOString() ?? updatedAt?.toISOString() ?? new Date().toISOString(),
+      createdAt:
+        pubDate?.toISOString() ??
+        updatedAt?.toISOString() ??
+        new Date().toISOString(),
       title: title ?? "",
       enclosure: JSON.stringify(enclosures),
       link: link ?? null,
-      updatedAt: updatedAt?.toISOString() ?? pubDate?.toISOString() ?? new Date().toISOString(),
+      updatedAt:
+        updatedAt?.toISOString() ??
+        pubDate?.toISOString() ??
+        new Date().toISOString(),
     };
 
     datababse.run(
@@ -160,18 +202,20 @@ export class FeedService {
         insert into
           feed_items(id, feed_id, raw, content, img, created_at, title, enclosure, link, updated_at)
         values
-          (${toInsert.id}, ${toInsert.feedId}, ${toInsert.raw}, ${toInsert.content}, ${
-            toInsert.img
-          }, ${toInsert.createdAt}, ${toInsert.title}, ${toInsert.enclosure}, ${toInsert.link}, ${
-            toInsert.updatedAt
-          })
+          (${toInsert.id}, ${toInsert.feedId}, ${toInsert.raw}, ${
+            toInsert.content
+          }, ${toInsert.img}, ${toInsert.createdAt}, ${toInsert.title}, ${
+            toInsert.enclosure
+          }, ${toInsert.link}, ${toInsert.updatedAt})
         on conflict
           (id, feed_id)
         do update set
           content = $${content ? sql`${toInsert.content}` : sql`content`},
           img = $${feedImage ? sql`${toInsert.img}` : sql`img`},
           title = $${title ? sql`${toInsert.title}` : sql`title`},
-          enclosure = $${enclosures.length > 0 ? sql`${toInsert.enclosure}` : sql`enclosure`},
+          enclosure = $${
+            enclosures.length > 0 ? sql`${toInsert.enclosure}` : sql`enclosure`
+          },
           link = $${link ? sql`${toInsert.link}` : sql`link`},
           updated_at = ${toInsert.updatedAt}
       `,

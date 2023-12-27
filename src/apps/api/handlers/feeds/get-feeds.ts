@@ -1,20 +1,26 @@
-import sql from "@leafac/sqlite";
-import { groupBy } from "lodash-es";
-import { type Hono } from "hono";
-import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import sql from "@leafac/sqlite";
+import { type Hono } from "hono";
+import { groupBy } from "lodash-es";
+import { z } from "zod";
 import { type FeedsTable } from "../../../../database/types/mod.js";
 import { RequestValidationError } from "../../../../errors/mod.js";
 
 const requestQuerySchema = z
-  .object({ categoryId: z.union([z.string().uuid(), z.array(z.string().uuid()).optional()]) })
+  .object({
+    categoryId: z.union([
+      z.string().uuid(),
+      z.array(z.string().uuid()).optional(),
+    ]),
+  })
   .strict();
 
 export const handler = (router: Hono) => {
   router.get(
     "/api/feeds",
     zValidator("query", requestQuerySchema, (result) => {
-      if (!result.success) throw new RequestValidationError({ request: { query: result.error } });
+      if (!result.success)
+        throw new RequestValidationError({ request: { query: result.error } });
     }),
     (c) => {
       const query = c.req.valid("query");
@@ -27,12 +33,11 @@ export const handler = (router: Hono) => {
             ? sql`where f.category_id in ($${(Array.isArray(query.categoryId)
                 ? query.categoryId
                 : [query.categoryId]
-              )
-                // eslint-disable-next-line unicorn/no-array-reduce
-                .reduce(
-                  (acc, cid, index) => sql`$${acc}$${index <= 0 ? sql`` : sql`,`}${cid}`,
-                  sql``,
-                )})`
+              ).reduce(
+                (acc, cid, index) =>
+                  sql`$${acc}$${index <= 0 ? sql`` : sql`,`}${cid}`,
+                sql``,
+              )})`
             : sql``
         }
         group by f.id

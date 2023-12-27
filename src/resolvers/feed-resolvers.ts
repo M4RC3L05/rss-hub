@@ -1,7 +1,7 @@
-import mime from "mime-types";
-import * as _ from "lodash-es";
-import { parse } from "node-html-parser";
 import { type XMLBuilder } from "fast-xml-parser";
+import * as _ from "lodash-es";
+import mime from "mime-types";
+import { parse } from "node-html-parser";
 
 /**
  * Feed resolvers.
@@ -17,7 +17,13 @@ export const resolveFeed = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedTitle = (feed: Record<string, unknown>) => {
-  const searchKeys = ["channel.title", "title", "title.#text", "atom:title", "a10:title"];
+  const searchKeys = [
+    "channel.title",
+    "title",
+    "title.#text",
+    "atom:title",
+    "a10:title",
+  ];
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k))
@@ -26,11 +32,21 @@ export const resolveFeedTitle = (feed: Record<string, unknown>) => {
 };
 
 export const resolveFeedItems = (feed: Record<string, unknown>) => {
-  const searchKeys = ["channel.item", "channel.items", "item", "items", "entry"];
+  const searchKeys = [
+    "channel.item",
+    "channel.items",
+    "item",
+    "items",
+    "entry",
+  ];
 
   return _.chain(searchKeys)
-    .map((k) => (Array.isArray(_.get(feed, k)) ? _.get(feed, k) : [_.get(feed, k)]))
-    .map((v) => (v as unknown[]).filter((item) => item !== null && item !== undefined))
+    .map((k) =>
+      Array.isArray(_.get(feed, k)) ? _.get(feed, k) : [_.get(feed, k)],
+    )
+    .map((v) =>
+      (v as unknown[]).filter((item) => item !== null && item !== undefined),
+    )
     .find((v) => !_.isEmpty(v))
     .value() as Array<Record<string, unknown>> | undefined;
 };
@@ -54,7 +70,10 @@ export const resolveFeedItemGuid = (feed: Record<string, unknown>) => {
 
   const value = _.chain(searchKeys)
     .map((k) => _.get(feed, k))
-    .find((v) => (typeof v === "string" && v.trim().length > 0) || typeof v === "number")
+    .find(
+      (v) =>
+        (typeof v === "string" && v.trim().length > 0) || typeof v === "number",
+    )
     .value() as string | number | undefined;
 
   if (!value) return;
@@ -82,14 +101,20 @@ export const resolveFeedItemTitle = (feed: Record<string, unknown>) => {
   )?.replace(/&\S*;/g, "");
 };
 
-export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {
+export const resolveFeedItemEnclosures = (feed: Record<string, unknown>) => {
   const searchKeys = ["enclosure"];
 
   const standard = _.chain(searchKeys)
     .map((k) => _.get(feed, k) as Record<string, unknown>)
     .filter((v) => _.isPlainObject(v))
-    .map((v) => ({ url: _.get(v, "@_url") as string, type: _.get(v, "@_type") as string }))
-    .filter((v) => _.has(v, "url") && typeof v.url === "string" && v.url.trim().length > 0)
+    .map((v) => ({
+      url: _.get(v, "@_url") as string,
+      type: _.get(v, "@_type") as string,
+    }))
+    .filter(
+      (v) =>
+        _.has(v, "url") && typeof v.url === "string" && v.url.trim().length > 0,
+    )
     .value() as Array<{ url: string; type?: string }>;
 
   if (standard.length > 0) return standard;
@@ -116,7 +141,7 @@ export const resolveFeedItemEnclosures = (feed: Record<string, any>) => {
 
 export const resolveFeedItemImage = (
   resolveFeedItemContent: (arg: Record<string, unknown>) => string | undefined,
-  feed: Record<string, any>,
+  feed: Record<string, unknown>,
 ) => {
   const enclosures = resolveFeedItemEnclosures(feed);
 
@@ -138,7 +163,9 @@ export const resolveFeedItemImage = (
     (_.get(feed, "media:content.@_medium") === "image" ||
       _.includes(_.get(feed, "media:content.@_type") as string, "image") ||
       _.includes(_.get(feed, "media:content.@_type") as string, "img") ||
-      ["jpeg", "jpg", "gif", "png", "webp"].includes(_.get(feed, "media:content.@_url") as string))
+      ["jpeg", "jpg", "gif", "png", "webp"].includes(
+        _.get(feed, "media:content.@_url") as string,
+      ))
   ) {
     return _.get(feed, "media:content.@_url") as string;
   }
@@ -175,12 +202,19 @@ export const resolveFeedItemImage = (
 
   const imgFromLink = resolveFeedItemLink(feed);
 
-  if (["jpeg", "jpg", "gif", "png", "webp"].includes(imgFromLink?.split(".")?.at(-1) ?? "")) {
+  if (
+    ["jpeg", "jpg", "gif", "png", "webp"].includes(
+      imgFromLink?.split(".")?.at(-1) ?? "",
+    )
+  ) {
     return imgFromLink;
   }
 };
 
-export const resolveFeedItemContent = (builder: XMLBuilder, feed: Record<string, any>) => {
+export const resolveFeedItemContent = (
+  builder: XMLBuilder,
+  feed: Record<string, unknown>,
+) => {
   const searchKeys = [
     "content",
     "content.#text",
@@ -199,14 +233,18 @@ export const resolveFeedItemContent = (builder: XMLBuilder, feed: Record<string,
   const xhtmlContent = _.get(feed, "content.@_type") === "xhtml";
   const contentObject = _.isPlainObject(_.get(feed, "content"));
   const parsedXhtml =
-    contentObject && xhtmlContent ? (builder.build(_.pick(feed, "content")) as string) : undefined;
+    contentObject && xhtmlContent
+      ? (builder.build(_.pick(feed, "content")) as string)
+      : undefined;
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k) as unknown)
     .unshift(parsedXhtml)
     .map((v) =>
       Array.isArray(v)
-        ? v.filter((x) => typeof x === "string" && x.trim().length > 0).join("\n")
+        ? v
+            .filter((x) => typeof x === "string" && x.trim().length > 0)
+            .join("\n")
         : v,
     )
     .find((v) => typeof v === "string" && v.trim().length > 0)
@@ -219,11 +257,10 @@ export const formatFeedItemContent = (content?: string) => {
   const dom = parse(content);
 
   for (const element of dom.querySelectorAll("iframe")) {
-    const wrapper = parse(`<div class="iframe-container">${element.toString()}</div>`)
-      .childNodes[0];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const wrapper = parse(
+      `<div class="iframe-container">${element.toString()}</div>`,
+    ).childNodes[0];
+    // @ts-ignore
     element.insertAdjacentHTML("beforebegin", wrapper.outerHTML);
     element.remove();
   }

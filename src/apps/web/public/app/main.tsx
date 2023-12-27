@@ -1,8 +1,8 @@
-import { SWRConfig } from "swr";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { makeRequester } from "./common/api.js";
+import { SWRConfig } from "swr";
 import App from "./app.js";
+import { makeRequester } from "./common/api.js";
 
 const Root = () => {
   return (
@@ -12,8 +12,14 @@ const Root = () => {
   );
 };
 
-createRoot(document.querySelector("#app")!).render(
-  <StrictMode>
-    <Root />
-  </StrictMode>,
-);
+const appEl = document.querySelector("#app");
+
+if (appEl) {
+  createRoot(appEl).render(
+    <StrictMode>
+      <Root />
+    </StrictMode>,
+  );
+} else {
+  throw new Error("No element with id `app` exists.");
+}

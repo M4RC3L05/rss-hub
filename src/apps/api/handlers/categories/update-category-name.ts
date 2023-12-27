@@ -1,8 +1,8 @@
+import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { zValidator } from "@hono/zod-validator";
 import { type CategoriesTable } from "../../../../database/types/mod.js";
 import { RequestValidationError } from "../../../../errors/mod.js";
 
@@ -13,10 +13,12 @@ export const handler = (router: Hono) => {
   router.patch(
     "/api/categories/:id",
     zValidator("param", requestParametersSchema, (result) => {
-      if (!result.success) throw new RequestValidationError({ request: { params: result.error } });
+      if (!result.success)
+        throw new RequestValidationError({ request: { params: result.error } });
     }),
     zValidator("json", requestBodySchema, (result) => {
-      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+      if (!result.success)
+        throw new RequestValidationError({ request: { body: result.error } });
     }),
     (c) => {
       const parameters = c.req.valid("param");

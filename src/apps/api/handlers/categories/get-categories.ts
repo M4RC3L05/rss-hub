@@ -4,7 +4,9 @@ import { type CategoriesTable } from "../../../../database/types/mod.js";
 
 export const handler = (router: Hono) => {
   router.get("/api/categories", (c) => {
-    const categories = c.get("database").all<CategoriesTable & { feedCount: number }>(sql`
+    const categories = c
+      .get("database")
+      .all<CategoriesTable & { feedCount: number }>(sql`
       select c.*, count(f.id) as "feedCount"
       from categories c
       left join feeds f on c.id = f.category_id

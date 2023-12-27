@@ -1,8 +1,11 @@
-import { type FC, useState, useEffect } from "react";
+import { type FC, useCallback, useEffect, useState } from "react";
+import { Alert, Button, Form, Modal } from "react-bootstrap";
 import useSWR, { useSWRConfig } from "swr";
 import { useDebounce } from "usehooks-ts";
-import { Alert, Button, Form, Modal } from "react-bootstrap";
-import { type CategoriesTable, type FeedsTable } from "../../../../../../database/types/mod.js";
+import {
+  type CategoriesTable,
+  type FeedsTable,
+} from "../../../../../../database/types/mod.js";
 import requests, { paths } from "../../common/api.js";
 
 type UpdateFeedModalArgs = {
@@ -11,7 +14,11 @@ type UpdateFeedModalArgs = {
   handleClose: () => unknown;
 };
 
-const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({ show, handleClose, toUpdate }) => {
+const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({
+  show,
+  handleClose,
+  toUpdate,
+}) => {
   const [canInteract, setCanInteract] = useState(false);
   const [name, setName] = useState(toUpdate?.name);
   const [url, setUrl] = useState(toUpdate?.url);
@@ -20,19 +27,21 @@ const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({ show, handleClose, toUpdate 
   const [validUrl, setValidUrl] = useState(true);
   const debouncedUrl = useDebounce(url, 200);
   const [checkingUrl, setCheckingUrl] = useState(false);
-  const [selectedCategory, setSeletectedCategory] = useState(toUpdate.categoryId);
-  const { data: categories } = useSWR<CategoriesTable[]>(paths.categories.getCategories);
+  const [selectedCategory, setSeletectedCategory] = useState(
+    toUpdate.categoryId,
+  );
+  const { data: categories } = useSWR<CategoriesTable[]>(
+    paths.categories.getCategories,
+  );
 
   useEffect(() => {
     if (canInteract) {
       setName(toUpdate?.name);
       setUrl(toUpdate?.url);
     }
-  }, [canInteract]);
+  }, [canInteract, toUpdate]);
 
-  const checkForFeed = async (url: string) => {
-    if (!canInteract) return;
-
+  const checkForFeed = useCallback(async (url: string) => {
     setError(undefined);
     setValidUrl(false);
     setCheckingUrl(true);
@@ -53,21 +62,28 @@ const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({ show, handleClose, toUpdate 
     } finally {
       setCheckingUrl(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    void checkForFeed(url);
-  }, [debouncedUrl]);
+    if (!canInteract) return;
+
+    checkForFeed(debouncedUrl);
+  }, [debouncedUrl, checkForFeed, canInteract]);
 
   const submit = async () => {
     if (!canInteract || Boolean(error) || !validUrl) return;
 
     void requests.feeds
-      .updateFeed({ body: { name, url, categoryId: selectedCategory }, id: toUpdate.id })
+      .updateFeed({
+        body: { name, url, categoryId: selectedCategory },
+        id: toUpdate.id,
+      })
       .then(() => {
         handleClose();
         void mutate(
-          (key) => typeof key === "string" && key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
+          (key) =>
+            typeof key === "string" &&
+            key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
         );
       });
   };

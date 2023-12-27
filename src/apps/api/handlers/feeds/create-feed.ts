@@ -1,13 +1,13 @@
+import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
-import { stdSerializers } from "pino";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { zValidator } from "@hono/zod-validator";
+import { stdSerializers } from "pino";
 import { z } from "zod";
-import { type FeedsTable } from "../../../../database/types/mod.js";
 import { makeLogger } from "../../../../common/logger/mod.js";
-import { feedService } from "../../../../services/mod.js";
+import { type FeedsTable } from "../../../../database/types/mod.js";
 import { RequestValidationError } from "../../../../errors/mod.js";
+import { feedService } from "../../../../services/mod.js";
 
 const requestBodySchema = z
   .object({
@@ -23,7 +23,8 @@ export const handler = (router: Hono) => {
   router.post(
     "/api/feeds",
     zValidator("json", requestBodySchema, (result) => {
-      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+      if (!result.success)
+        throw new RequestValidationError({ request: { body: result.error } });
     }),
     (c) => {
       const data = c.req.valid("json");
@@ -38,12 +39,17 @@ export const handler = (router: Hono) => {
       }
 
       feedService
-        .syncFeed(feed, { database: c.get("database"), signal: c.req.raw.signal })
+        .syncFeed(feed, {
+          database: c.get("database"),
+          signal: c.req.raw.signal,
+        })
         .then(({ faildCount, failedReasons, successCount, totalCount }) => {
           log.info(
             {
               failedReasons: failedReasons.map((reason) =>
-                reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+                reason instanceof Error
+                  ? stdSerializers.errWithCause(reason)
+                  : reason,
               ),
               faildCount,
               successCount,

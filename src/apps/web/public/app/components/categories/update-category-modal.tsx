@@ -1,8 +1,8 @@
-import { type ChangeEvent, useState, type FC } from "react";
-import { useSWRConfig } from "swr";
+import { type ChangeEvent, type FC, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import requests, { paths } from "../../common/api.js";
+import { useSWRConfig } from "swr";
 import { type CategoriesTable } from "../../../../../../database/types/mod.js";
+import requests, { paths } from "../../common/api.js";
 
 type UpdateCategoryModelArgs = {
   show: boolean;
@@ -10,7 +10,11 @@ type UpdateCategoryModelArgs = {
   handleClose: () => unknown;
 };
 
-const UpdateCategoryModel: FC<UpdateCategoryModelArgs> = ({ show, handleClose, toUpdate }) => {
+const UpdateCategoryModel: FC<UpdateCategoryModelArgs> = ({
+  show,
+  handleClose,
+  toUpdate,
+}) => {
   const [canInteract, setCanInteract] = useState(false);
   const [name, setName] = useState(toUpdate.name);
   const { mutate } = useSWRConfig();
@@ -18,10 +22,12 @@ const UpdateCategoryModel: FC<UpdateCategoryModelArgs> = ({ show, handleClose, t
   const submit = () => {
     if (!canInteract) return;
 
-    void requests.categories.updateCategoryName({ body: { name }, id: toUpdate.id }).then(() => {
-      handleClose();
-      void mutate(paths.categories.getCategories);
-    });
+    void requests.categories
+      .updateCategoryName({ body: { name }, id: toUpdate.id })
+      .then(() => {
+        handleClose();
+        void mutate(paths.categories.getCategories);
+      });
   };
 
   const cancel = () => {

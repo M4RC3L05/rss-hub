@@ -1,8 +1,8 @@
-import { Button, Modal } from "react-bootstrap";
 import { type FC, useState } from "react";
+import { Button, Modal } from "react-bootstrap";
 import { useSWRConfig } from "swr";
-import requests, { paths } from "../../common/api.js";
 import { type CategoriesTable } from "../../../../../../database/types/mod.js";
+import requests, { paths } from "../../common/api.js";
 
 type DeleteCategoryModalArgs = {
   show: boolean;
@@ -10,14 +10,19 @@ type DeleteCategoryModalArgs = {
   handleClose: () => unknown;
 };
 
-const DeleteCategoryModal: FC<DeleteCategoryModalArgs> = ({ show, handleClose, toDelete }) => {
+const DeleteCategoryModal: FC<DeleteCategoryModalArgs> = ({
+  show,
+  handleClose,
+  toDelete,
+}) => {
   const [canInteract, setCanInteract] = useState(false);
   const { mutate } = useSWRConfig();
 
   const submit = () => {
     if (!canInteract) return;
+    if (!toDelete) return;
 
-    void requests.categories.deleteCategory({ id: toDelete!.id }).then(() => {
+    void requests.categories.deleteCategory({ id: toDelete.id }).then(() => {
       handleClose();
       void mutate(paths.categories.getCategories);
     });
@@ -44,10 +49,14 @@ const DeleteCategoryModal: FC<DeleteCategoryModalArgs> = ({ show, handleClose, t
       </Modal.Header>
       <Modal.Body>
         <p>
-          Are you sure you to delete the category <code>{toDelete?.name}</code> with<span> </span>
+          Are you sure you to delete the category <code>{toDelete?.name}</code>{" "}
+          with<span> </span>
           {toDelete?.feedCount} feed(s)?
         </p>
-        <p>This operation will delete all the feed items for all the feeds this category has.</p>
+        <p>
+          This operation will delete all the feed items for all the feeds this
+          category has.
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={submit}>

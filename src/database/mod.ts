@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import sql, { Database, type Options, type Query } from "@leafac/sqlite";
-import { camelCase, isObject, mapKeys } from "lodash-es";
 import config from "config";
+import { camelCase, isObject, mapKeys } from "lodash-es";
 import { makeLogger } from "../common/logger/mod.js";
 
 const log = makeLogger("database");

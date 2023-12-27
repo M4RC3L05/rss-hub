@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  "*.{js,jsx,ts,tsx,mjs}": "xo",
+  "*.{js,jsx,ts,tsx,mjs}": "biome lint",
   "*.{ts,tsx}": () => "tsc -p tsconfig.json",
 };

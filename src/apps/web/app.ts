@@ -1,11 +1,11 @@
-import process from "node:process";
 import { statSync } from "node:fs";
 import path from "node:path";
+import process from "node:process";
+import { serveStatic } from "@hono/node-server/serve-static";
 import config from "config";
-import fetch from "node-fetch";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
-import { serveStatic } from "@hono/node-server/serve-static";
+import fetch from "node-fetch";
 import { requestLifeCycle } from "../../middlewares/mod.js";
 
 const makeApp = () => {
@@ -15,8 +15,10 @@ const makeApp = () => {
   app.use(
     "*",
     basicAuth({
-      username: config.get<{ name: string; pass: string }>("apps.web.basicAuth").name,
-      password: config.get<{ name: string; pass: string }>("apps.web.basicAuth").pass,
+      username: config.get<{ name: string; pass: string }>("apps.web.basicAuth")
+        .name,
+      password: config.get<{ name: string; pass: string }>("apps.web.basicAuth")
+        .pass,
     }),
   );
   app.use("*", async (c, next) => {
@@ -38,6 +40,7 @@ const makeApp = () => {
 
     return c.stream(
       async (stream) => {
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         for await (const chunk of response.body!) {
           await stream.write(chunk);
         }
@@ -66,8 +69,12 @@ const makeApp = () => {
         }
       };
 
-      const tsxPath = path.resolve(`./src/apps/web/public${c.req.path.replace(".js", ".tsx")}`);
-      const tsPath = path.resolve(`./src/apps/web/public${c.req.path.replace(".js", ".ts")}`);
+      const tsxPath = path.resolve(
+        `./src/apps/web/public${c.req.path.replace(".js", ".tsx")}`,
+      );
+      const tsPath = path.resolve(
+        `./src/apps/web/public${c.req.path.replace(".js", ".ts")}`,
+      );
 
       let data: Awaited<ReturnType<typeof swc.transformFile>> | undefined;
 
@@ -81,7 +88,9 @@ const makeApp = () => {
 
       if (!data) return next();
 
-      return c.text(data?.code, 200, { "content-type": "application/javascript" });
+      return c.text(data?.code, 200, {
+        "content-type": "application/javascript",
+      });
     });
   }
 

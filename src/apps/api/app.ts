@@ -1,11 +1,11 @@
 import config from "config";
-import { cors } from "hono/cors";
-import { basicAuth } from "hono/basic-auth";
 import { Hono } from "hono";
+import { basicAuth } from "hono/basic-auth";
+import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { errorMapper, requestLifeCycle } from "../../middlewares/mod.js";
-import { errorMappers } from "../../errors/mod.js";
 import { type CustomDatabase } from "../../database/mod.js";
+import { errorMappers } from "../../errors/mod.js";
+import { errorMapper, requestLifeCycle } from "../../middlewares/mod.js";
 import { router } from "./router.js";
 
 const makeApp = ({ database }: { database: CustomDatabase }) => {
@@ -21,8 +21,10 @@ const makeApp = ({ database }: { database: CustomDatabase }) => {
   app.use(
     "*",
     basicAuth({
-      username: config.get<{ name: string; pass: string }>("apps.api.basicAuth").name,
-      password: config.get<{ name: string; pass: string }>("apps.api.basicAuth").pass,
+      username: config.get<{ name: string; pass: string }>("apps.api.basicAuth")
+        .name,
+      password: config.get<{ name: string; pass: string }>("apps.api.basicAuth")
+        .pass,
     }),
   );
 
@@ -32,7 +34,10 @@ const makeApp = ({ database }: { database: CustomDatabase }) => {
 
   app.onError(
     errorMapper({
-      mappers: [errorMappers.validationErrorMapper, errorMappers.sqliteErrorMapper],
+      mappers: [
+        errorMappers.validationErrorMapper,
+        errorMappers.sqliteErrorMapper,
+      ],
       defaultMapper: errorMappers.defaultErrorMapper,
     }),
   );

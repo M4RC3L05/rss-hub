@@ -27,7 +27,9 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
     if (
       enclosure.type?.includes("image") ??
       enclosure.type?.includes("img") ??
-      [".png", ".jpg", ".jpeg", ".gif"].some((end) => enclosure.url.endsWith(end))
+      [".png", ".jpg", ".jpeg", ".gif"].some((end) =>
+        enclosure.url.endsWith(end),
+      )
     ) {
       return `<img src="${enclosure.url}" />`;
     }
@@ -45,18 +47,20 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
 
   const uncheckRead = Boolean(feedItem.readedAt) && (
     <>
-      <span className="mx-2"></span>
+      <span className="mx-2" />
       <Button
         variant="secundary"
         size="sm"
         onClick={async () =>
-          requests.feedItems.markFeedItemAsUnread({ body: { id: feedItem.id } }).then(() => {
-            unreadRef.current = true;
-            mutate();
-          })
+          requests.feedItems
+            .markFeedItemAsUnread({ body: { id: feedItem.id } })
+            .then(() => {
+              unreadRef.current = true;
+              mutate();
+            })
         }
       >
-        <i className="bi bi-circle-fill"></i>
+        <i className="bi bi-circle-fill" />
       </Button>
     </>
   );
@@ -79,7 +83,10 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>{feedItem.title}</Modal.Title>
+        {/* @ts-ignore */}
+        <Modal.Title style={{ wordWrap: "anywhere" }}>
+          {feedItem.title}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="w-100 h-100 overflow-x-hidden overflow-y-auto render-feed-item-container">
@@ -88,6 +95,7 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
               <Col>
                 <div
                   className="w-100 h-100"
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: This is ok
                   dangerouslySetInnerHTML={{
                     __html: `
                       <div>
@@ -98,7 +106,11 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
                       <hr />
                       ${
                         feedItem.enclosure
-                          ? `${(JSON.parse(feedItem.enclosure) as FeedItemEnclosure[])
+                          ? `${(
+                              JSON.parse(
+                                feedItem.enclosure,
+                              ) as FeedItemEnclosure[]
+                            )
                               .map((enclosure) => enclosureToHtml(enclosure))
                               .join("")}<hr/>`
                           : ""
@@ -106,15 +118,20 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
                       ${feedItem.content}
                     `,
                   }}
-                ></div>
+                />
               </Col>
             </Row>
           </Container>
         </div>
       </Modal.Body>
       <Modal.Footer className="justify-content-start">
-        <Button variant="primary" size="sm" href={feedItem.link} target="__blank">
-          <i className="bi bi-box-arrow-up-right"></i>
+        <Button
+          variant="primary"
+          size="sm"
+          href={feedItem.link}
+          target="__blank"
+        >
+          <i className="bi bi-box-arrow-up-right" />
         </Button>
         {uncheckRead}
       </Modal.Footer>

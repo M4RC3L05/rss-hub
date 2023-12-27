@@ -1,6 +1,6 @@
-import { useState, type ChangeEvent, type FC } from "react";
-import { useSWRConfig } from "swr";
+import { type ChangeEvent, type FC, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { useSWRConfig } from "swr";
 import requests, { paths } from "../../common/api.js";
 
 type CreateCategoryModelArgs = {
@@ -8,7 +8,10 @@ type CreateCategoryModelArgs = {
   handleClose: () => unknown;
 };
 
-const CreateCategoryModel: FC<CreateCategoryModelArgs> = ({ show, handleClose }) => {
+const CreateCategoryModel: FC<CreateCategoryModelArgs> = ({
+  show,
+  handleClose,
+}) => {
   const [canInteract, setCanInteract] = useState(false);
   const [name, setName] = useState("");
   const { mutate } = useSWRConfig();

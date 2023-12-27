@@ -1,11 +1,11 @@
 import sql from "@leafac/sqlite";
-import { castArray, get } from "lodash-es";
 import { decodeXML } from "entities";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { type FeedsTable } from "../../../../database/types/mod.js";
+import { castArray, get } from "lodash-es";
 import { makeLogger } from "../../../../common/logger/mod.js";
 import { xmlParser } from "../../../../common/utils/xml-utils.js";
+import { type FeedsTable } from "../../../../database/types/mod.js";
 import { feedService } from "../../../../services/mod.js";
 
 const log = makeLogger("opml-import-handler");
@@ -24,7 +24,10 @@ export const handler = (router: Hono) => {
       });
     }
 
-    const parsed = (await xmlParser.parse(await file.text())) as Record<string, unknown>;
+    const parsed = (await xmlParser.parse(await file.text())) as Record<
+      string,
+      unknown
+    >;
     const feedsToSync: string[] = [];
 
     c.get("database").executeTransaction(() => {
@@ -36,20 +39,26 @@ export const handler = (router: Hono) => {
         const categoryName = get(category as { "@_text": string }, "@_text");
         let categoryStored = c
           .get("database")
-          .get(sql`select * from categories where name = ${categoryName} limit 1`);
+          .get(
+            sql`select * from categories where name = ${categoryName} limit 1`,
+          );
 
         if (!categoryStored) {
           categoryStored = c
             .get("database")
-            .get(sql`insert into categories (name) values (${categoryName}) returning *`);
+            .get(
+              sql`insert into categories (name) values (${categoryName}) returning *`,
+            );
         }
 
-        const feeds = castArray(get(category as { outline: unknown }, "outline")).filter(
-          (value) => value !== null && value !== undefined,
-        );
+        const feeds = castArray(
+          get(category as { outline: unknown }, "outline"),
+        ).filter((value) => value !== null && value !== undefined);
 
         for (const feed of feeds) {
-          const feedName = decodeXML(get(feed as { "@_text": string }, "@_text"));
+          const feedName = decodeXML(
+            get(feed as { "@_text": string }, "@_text"),
+          );
           const feedUrl = decodeXML(
             get(feed as { "@_xmlUrl": string }, "@_xmlUrl") ??
               get(feed as { "@_htmlUrl": string }, "@_htmlUrl"),
@@ -65,7 +74,9 @@ export const handler = (router: Hono) => {
                 insert into feeds
                   (name, url, category_id)
                 values
-                  (${feedName}, ${feedUrl}, ${(categoryStored as { id: string }).id})
+                  (${feedName}, ${feedUrl}, ${
+                    (categoryStored as { id: string }).id
+                  })
                 returning *
               `,
             );
@@ -90,7 +101,10 @@ export const handler = (router: Hono) => {
           feeds.map(async (feed) => ({
             feed,
             stats: await feedService
-              .syncFeed(feed, { signal: c.req.raw.signal, database: c.get("database") })
+              .syncFeed(feed, {
+                signal: c.req.raw.signal,
+                database: c.get("database"),
+              })
               .catch((error: unknown) => error),
           })),
         )

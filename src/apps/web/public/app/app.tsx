@@ -1,25 +1,34 @@
-import { useMemo, type FC, useRef, useEffect, useCallback } from "react";
-import useSWR from "swr";
 import Masonry from "masonry-layout";
+import { type FC, useCallback, useEffect, useMemo, useRef } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { type FeedsTable, type CategoriesTable } from "../../../../database/types/mod.js";
+import useSWR from "swr";
+import {
+  type CategoriesTable,
+  type FeedsTable,
+} from "../../../../database/types/mod.js";
 import { paths } from "./common/api.js";
-import { CreateCategoryItem, CategoryItem } from "./components/categories/mod.js";
+import {
+  CategoryItem,
+  CreateCategoryItem,
+} from "./components/categories/mod.js";
 
 const App: FC = () => {
-  const { data: categories } = useSWR<Array<CategoriesTable & { feedCount: number }>>(
-    paths.categories.getCategories,
+  const { data: categories } = useSWR<
+    Array<CategoriesTable & { feedCount: number }>
+  >(paths.categories.getCategories);
+  const categoryIds = useMemo(
+    () => categories?.map(({ id }) => id) ?? [],
+    [categories],
   );
-  const categoryIds = useMemo(() => categories?.map(({ id }) => id) ?? [], [categories]);
   const {
     data: feeds,
     isLoading,
     isValidating,
   } = useSWR<Record<string, Array<FeedsTable & { unreadCount: number }>>>(
     categoryIds.length > 0
-      ? // eslint-disable-next-line unicorn/no-array-reduce
-        `${paths.feeds.getFeeds}?${categoryIds.reduce(
-          (acc, cid, index) => `${acc}${index === 0 ? "" : "&"}categoryId=${cid}`,
+      ? `${paths.feeds.getFeeds}?${categoryIds.reduce(
+          (acc, cid, index) =>
+            `${acc}${index === 0 ? "" : "&"}categoryId=${cid}`,
           "",
         )}`
       : null,
@@ -29,8 +38,8 @@ const App: FC = () => {
   const masonryRef = useRef<Masonry>();
 
   useEffect(() => {
-    if (!masonryRef.current) {
-      masonryRef.current = new Masonry(rowRef.current!, {
+    if (!masonryRef.current && rowRef.current) {
+      masonryRef.current = new Masonry(rowRef.current, {
         percentPosition: true,
         initLayout: false,
         itemSelector: ".mesonry-item",
@@ -39,8 +48,10 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    masonryRef.current?.reloadItems?.();
-    masonryRef.current?.layout?.();
+    if (categories && categories?.length >= 0) {
+      masonryRef.current?.reloadItems?.();
+      masonryRef.current?.layout?.();
+    }
   }, [categories]);
 
   useEffect(() => {

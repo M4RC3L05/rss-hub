@@ -1,6 +1,6 @@
+import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { makeLogger } from "../../../../common/logger/mod.js";
 import { RequestValidationError } from "../../../../errors/mod.js";
@@ -17,7 +17,8 @@ export const handler = (router: Hono) => {
   router.delete(
     "/api/categories/:id",
     zValidator("param", requestParametersSchema, (result) => {
-      if (!result.success) throw new RequestValidationError({ request: { params: result.error } });
+      if (!result.success)
+        throw new RequestValidationError({ request: { params: result.error } });
     }),
     (c) => {
       const parameters = c.req.valid("param");

@@ -1,6 +1,6 @@
 import process from "node:process";
-import config from "config";
 import { createAdaptorServer, serve } from "@hono/node-server";
+import config from "config";
 import { makeLogger } from "../../common/logger/mod.js";
 import { addHook } from "../../common/utils/process-utils.js";
 import makeApp from "./app.js";

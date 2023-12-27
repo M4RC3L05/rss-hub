@@ -1,6 +1,6 @@
-import { useState, type FC } from "react";
-import { useSWRConfig } from "swr";
+import { type FC, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { useSWRConfig } from "swr";
 import requests, { paths } from "../../common/api.js";
 
 type ImportOpmlModalArgs = {
@@ -24,7 +24,8 @@ const ImportOpmlModal: FC<ImportOpmlModalArgs> = ({ show, handleClose }) => {
       handleClose();
       void mutate(paths.categories.getCategories);
       void mutate(
-        (key) => typeof key === "string" && key.startsWith(paths.feeds.getFeeds),
+        (key) =>
+          typeof key === "string" && key.startsWith(paths.feeds.getFeeds),
         undefined,
         {
           revalidate: true,
@@ -69,7 +70,9 @@ const ImportOpmlModal: FC<ImportOpmlModalArgs> = ({ show, handleClose }) => {
               autoFocus
               type="file"
               onChange={(event) => {
-                setOpml((event.target as any as { files: File[] }).files[0]);
+                setOpml(
+                  (event.target as unknown as { files: File[] }).files[0],
+                );
               }}
             />
           </Form.Group>

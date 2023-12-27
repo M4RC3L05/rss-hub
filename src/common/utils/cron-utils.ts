@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { setTimeout } from "node:timers/promises";
 import cronParser from "cron-parser";
 
@@ -46,17 +45,17 @@ export class Cron {
     this.#dateContainer.setMilliseconds(0);
 
     return (
-      // @ts-expect-error, eslint-disable-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.#when.fields.second.includes(this.#dateContainer.getSeconds()) &&
-      // @ts-expect-error, eslint-disable-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.#when.fields.minute.includes(this.#dateContainer.getMinutes()) &&
-      // @ts-expect-error, eslint-disable-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.#when.fields.hour.includes(this.#dateContainer.getHours()) &&
-      // @ts-expect-error, eslint-disable-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.#when.fields.dayOfMonth.includes(this.#dateContainer.getDate()) &&
-      // @ts-expect-error, eslint-disable-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.#when.fields.month.includes(this.#dateContainer.getMonth()) &&
-      // @ts-expect-error, eslint-disable-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.#when.fields.dayOfWeek.includes(this.#dateContainer.getDay())
     );
   }
@@ -79,7 +78,10 @@ export class Cron {
 
   async *#work() {
     for await (const at of this.#ticker()) {
-      if (this.#checkTime(at * 1000) && (!this.#lastProcessAt || at !== this.#lastProcessAt)) {
+      if (
+        this.#checkTime(at * 1000) &&
+        (!this.#lastProcessAt || at !== this.#lastProcessAt)
+      ) {
         this.#lastProcessAt = at;
 
         yield this.#abortController.signal;

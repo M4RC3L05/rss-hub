@@ -10,7 +10,11 @@ const FeedItemPlaceholder = () => (
         <Placeholder as={Card.Title} animation="wave">
           <Placeholder xs={6} />
         </Placeholder>
-        <Placeholder as={Card.Subtitle} className="mb-2 text-muted" animation="wave">
+        <Placeholder
+          as={Card.Subtitle}
+          className="mb-2 text-muted"
+          animation="wave"
+        >
           <Placeholder xs={4} />
         </Placeholder>
         <br />

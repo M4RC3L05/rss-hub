@@ -1,15 +1,17 @@
-/* eslint-disable no-await-in-loop */
-import * as _ from "lodash-es";
 import sql from "@leafac/sqlite";
+import * as _ from "lodash-es";
 import { stdSerializers } from "pino";
-import { type FeedsTable } from "../../database/types/mod.js";
 import { makeLogger } from "../../common/logger/mod.js";
 import { type CustomDatabase } from "../../database/mod.js";
+import { type FeedsTable } from "../../database/types/mod.js";
 import { feedService } from "../../services/mod.js";
 
 const log = makeLogger("feed-synchronizer-runner");
 
-const runner = async ({ signal, db }: { signal?: AbortSignal; db: CustomDatabase }) => {
+const runner = async ({
+  signal,
+  db,
+}: { signal?: AbortSignal; db: CustomDatabase }) => {
   const feeds = db.all<FeedsTable>(sql`select * from feeds`);
 
   log.info("Synching begin");
@@ -18,15 +20,15 @@ const runner = async ({ signal, db }: { signal?: AbortSignal; db: CustomDatabase
     log.info({ feed }, `Synching feed ${feed.url}`);
 
     try {
-      const { faildCount, failedReasons, successCount, totalCount } = await feedService.syncFeed(
-        feed,
-        { signal, database: db },
-      );
+      const { faildCount, failedReasons, successCount, totalCount } =
+        await feedService.syncFeed(feed, { signal, database: db });
 
       log.info(
         {
           failedReasons: failedReasons.map((reason) =>
-            reason instanceof Error ? stdSerializers.errWithCause(reason) : reason,
+            reason instanceof Error
+              ? stdSerializers.errWithCause(reason)
+              : reason,
           ),
           faildCount,
           successCount,
@@ -46,7 +48,7 @@ const runner = async ({ signal, db }: { signal?: AbortSignal; db: CustomDatabase
     }
   }
 
-  log.info(`Synching ended`);
+  log.info("Synching ended");
 };
 
 export default runner;

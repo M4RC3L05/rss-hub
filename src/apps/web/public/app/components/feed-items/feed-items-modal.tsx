@@ -1,13 +1,23 @@
-import { useState, type FC, useRef, useEffect, useLayoutEffect, type RefObject } from "react";
+import {
+  type FC,
+  type RefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { Button, Col, Image as BSImage, Modal, Row } from "react-bootstrap";
 import { useSWRConfig } from "swr";
 import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
-import { Modal, Image as BSImage, Col, Row, Button } from "react-bootstrap";
-import { type FeedItemsTable, type FeedsTable } from "../../../../../../database/types/mod.js";
-import UpdateFeedModal from "../feeds/update-feed-modal.js";
-import DeleteFeedModal from "../feeds/delete-feed-modal.js";
+import {
+  type FeedItemsTable,
+  type FeedsTable,
+} from "../../../../../../database/types/mod.js";
 import requests, { paths } from "../../common/api.js";
-import FeedItem from "./feed-item.js";
+import DeleteFeedModal from "../feeds/delete-feed-modal.js";
+import UpdateFeedModal from "../feeds/update-feed-modal.js";
 import FeedItemPlaceholder from "./feed-item-placeholder.js";
+import FeedItem from "./feed-item.js";
 
 const getKey =
   ({
@@ -18,7 +28,10 @@ const getKey =
     fetch: boolean;
     showAll: boolean;
     feedId: string;
-  }): SWRInfiniteKeyLoader<{ data: FeedItemsTable[]; pagination: { nextCursor: string } }> =>
+  }): SWRInfiniteKeyLoader<{
+    data: FeedItemsTable[];
+    pagination: { nextCursor: string };
+  }> =>
   (pageIndex, previousPageData) => {
     if (pageIndex === 0)
       return fetch
@@ -31,7 +44,9 @@ const getKey =
 
     return fetch
       ? showAll
-        ? `${paths.feedItems.getFeedItems}?feedId=${feedId}&nextCursor=${encodeURIComponent(
+        ? `${
+            paths.feedItems.getFeedItems
+          }?feedId=${feedId}&nextCursor=${encodeURIComponent(
             previousPageData.pagination.nextCursor,
           )}&limit=10`
         : `${
@@ -48,7 +63,11 @@ type FeedItemsModalArgs = {
   handleClose: () => unknown;
 };
 
-const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => {
+const FeedItemsModal: FC<FeedItemsModalArgs> = ({
+  show,
+  handleClose,
+  feed,
+}) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const wasDeletedRef = useRef(false);
@@ -62,28 +81,24 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
     setSize,
     isLoading,
     isValidating,
-  } = useSWRInfinite<{ data: FeedItemsTable[]; pagination: { nextCursor: string } }>(
-    getKey({ showAll, fetch, feedId: feed.id }),
-  );
+  } = useSWRInfinite<{
+    data: FeedItemsTable[];
+    pagination: { nextCursor: string };
+  }>(getKey({ showAll, fetch, feedId: feed.id }));
   const ref = useRef<HTMLDivElement>();
+  const nextCursor = data?.at(-1)?.pagination.nextCursor;
 
   useEffect(() => {
-    if (
-      fetch &&
-      progress >= 80 &&
-      !isLoading &&
-      !isValidating &&
-      Boolean(data?.at(-1)?.pagination.nextCursor)
-    ) {
-      void setSize((s) => s + 1);
+    if (fetch && progress >= 80 && !isLoading && !isValidating && nextCursor) {
+      setSize((s) => s + 1);
     }
-  }, [progress, setSize, fetch, isLoading, data?.at(-1)?.pagination.nextCursor]);
+  }, [isValidating, progress, setSize, fetch, isLoading, nextCursor]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This is ok
   useLayoutEffect(() => {
-    const container = ref.current;
-    const listener = ref.current;
-
     const onScroll = () => {
+      const container = ref.current;
+
       if (!container) return;
 
       const { scrollTop, scrollHeight, clientHeight } = container;
@@ -94,10 +109,10 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
       setProgress(verticalProgress);
     };
 
-    listener?.addEventListener("scroll", onScroll);
+    ref.current?.addEventListener("scroll", onScroll);
 
     return () => {
-      listener?.removeEventListener("scroll", onScroll);
+      ref.current?.removeEventListener("scroll", onScroll);
     };
   }, [ref.current]);
 
@@ -135,14 +150,19 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
           setFetch(false);
 
           void mutate(
-            (key) => typeof key === "string" && key.startsWith(paths.feedItems.getFeedItems),
+            (key) =>
+              typeof key === "string" &&
+              key.startsWith(paths.feedItems.getFeedItems),
             undefined,
             { revalidate: false },
           );
 
           if (wasDeletedRef.current) {
             wasDeletedRef.current = false;
-            void mutate((key) => typeof key === "string" && key.startsWith(paths.feeds.getFeeds));
+            void mutate(
+              (key) =>
+                typeof key === "string" && key.startsWith(paths.feeds.getFeeds),
+            );
           }
         }}
         centered
@@ -150,17 +170,20 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
         <Modal.Header closeButton>
           <Modal.Title className="d-flex align-items-center">
             <BSImage
-              src={`https://icons.duckduckgo.com/ip3/${new URL(feed.url).host}.ico`}
+              src={`https://icons.duckduckgo.com/ip3/${
+                new URL(feed.url).host
+              }.ico`}
               style={{ width: "32px", height: "32px" }}
               roundedCircle
             />
-            <span className="mx-1"></span>
-            <span className="w-100" style={{ wordWrap: "anywhere" as any as undefined }}>
+            <span className="mx-1" />
+            {/* @ts-ignore */}
+            <span className="w-100" style={{ wordWrap: "anywhere" }}>
               {feed.name}
             </span>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body ref={ref as any as RefObject<HTMLDivElement>}>
+        <Modal.Body ref={ref as RefObject<HTMLDivElement>}>
           <Row xs={1} lg={2} className="g-4">
             {(data ?? []).flatMap(({ data: feedItems }) =>
               feedItems.map((feedItem) => (
@@ -172,7 +195,9 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
                         (key) =>
                           typeof key === "string" &&
                           (key.startsWith(paths.feeds.getFeeds) ||
-                            key.startsWith(`${paths.feedItems.getFeedItems}?feedId=${feed.id}`)),
+                            key.startsWith(
+                              `${paths.feedItems.getFeedItems}?feedId=${feed.id}`,
+                            )),
                       );
                     }}
                     feedItem={feedItem}
@@ -196,9 +221,9 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
               setShowUpdateModal(true);
             }}
           >
-            <i className="bi bi-pencil-square"></i>
+            <i className="bi bi-pencil-square" />
           </Button>
-          <span className="mx-1"></span>
+          <span className="mx-1" />
           <Button
             variant="danger"
             size="sm"
@@ -206,21 +231,23 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
               setShowDeleteModal(true);
             }}
           >
-            <i className="bi bi-trash-fill"></i>
+            <i className="bi bi-trash-fill" />
           </Button>
-          <span className="mx-1"></span>
+          <span className="mx-1" />
           <Button
             variant="success"
             size="sm"
             onClick={() => {
+              if (!data) return;
+
               void requests.feedItems
                 .markFeedItemsAsRead({
                   body: {
                     feedId: feed.id,
                     from: btoa(
-                      `${(data![0].data[0] as any as { rowid: number }).rowid}@@${
-                        data![0].data[0].createdAt
-                      }`,
+                      `${
+                        (data[0].data[0] as unknown as { rowid: number }).rowid
+                      }@@${data[0].data[0].createdAt}`,
                     ),
                   },
                 })
@@ -234,9 +261,9 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
                 });
             }}
           >
-            <i className="bi bi-check2-all"></i>
+            <i className="bi bi-check2-all" />
           </Button>
-          <span className="mx-1"></span>
+          <span className="mx-1" />
           <Button
             variant="secundary"
             size="sm"
@@ -245,9 +272,9 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({ show, handleClose, feed }) => 
             }}
           >
             {showAll ? (
-              <i className="bi bi-eye-fill"></i>
+              <i className="bi bi-eye-fill" />
             ) : (
-              <i className="bi bi-eye-slash-fill"></i>
+              <i className="bi bi-eye-slash-fill" />
             )}
           </Button>
         </Modal.Footer>

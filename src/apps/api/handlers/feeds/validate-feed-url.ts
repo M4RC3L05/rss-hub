@@ -1,10 +1,10 @@
-import { type Hono } from "hono";
-import { z } from "zod";
-import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
-import { feedService } from "../../../../services/mod.js";
+import { type Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { makeLogger } from "../../../../common/logger/mod.js";
 import { RequestValidationError } from "../../../../errors/mod.js";
+import { feedService } from "../../../../services/mod.js";
 
 const requestBodySchema = z
   .object({
@@ -18,7 +18,8 @@ export const handler = (router: Hono) => {
   router.post(
     "/api/feeds/url",
     zValidator("json", requestBodySchema, (result) => {
-      if (!result.success) throw new RequestValidationError({ request: { body: result.error } });
+      if (!result.success)
+        throw new RequestValidationError({ request: { body: result.error } });
     }),
     async (c) => {
       try {

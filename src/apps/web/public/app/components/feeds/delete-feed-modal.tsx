@@ -1,7 +1,7 @@
 import { type FC, useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import requests from "../../common/api.js";
 import { type FeedsTable } from "../../../../../../database/types/mod.js";
+import requests from "../../common/api.js";
 
 type DeleteFeedModalArgs = {
   show: boolean;
@@ -9,7 +9,11 @@ type DeleteFeedModalArgs = {
   toDelete: Pick<FeedsTable, "id" | "name">;
 };
 
-const DeleteFeedModal: FC<DeleteFeedModalArgs> = ({ show, handleClose, toDelete }) => {
+const DeleteFeedModal: FC<DeleteFeedModalArgs> = ({
+  show,
+  handleClose,
+  toDelete,
+}) => {
   const [canInteract, setCanInteract] = useState(false);
   const okRef = useRef(false);
 

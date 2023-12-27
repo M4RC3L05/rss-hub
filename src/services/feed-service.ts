@@ -131,7 +131,11 @@ export class FeedService {
         "text/html",
       ];
 
-      if (validContentTypes.includes(contentType ?? "")) {
+      if (!contentType) {
+        throw new Error(`No content type provided for feed "${url}"`);
+      }
+
+      if (!validContentTypes.some((ct) => contentType.includes(ct))) {
         throw new Error(`Not a valid content type header of "${contentType}"`, {
           cause: {
             response: _.pick(response, [

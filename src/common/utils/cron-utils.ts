@@ -46,17 +46,18 @@ export class Cron {
 
     return (
       // @ts-ignore
-      this.#when.fields.second.includes(this.#dateContainer.getSeconds()) &&
+      this.#when.fields.second.includes(this.#dateContainer.getUTCSeconds()) &&
       // @ts-ignore
-      this.#when.fields.minute.includes(this.#dateContainer.getMinutes()) &&
+      this.#when.fields.minute.includes(this.#dateContainer.getUTCMinutes()) &&
       // @ts-ignore
-      this.#when.fields.hour.includes(this.#dateContainer.getHours()) &&
+      this.#when.fields.hour.includes(this.#dateContainer.getUTCHours()) &&
       // @ts-ignore
-      this.#when.fields.dayOfMonth.includes(this.#dateContainer.getDate()) &&
+      this.#when.fields.dayOfMonth.includes(this.#dateContainer.getUTCDate()) &&
       // @ts-ignore
-      this.#when.fields.month.includes(this.#dateContainer.getMonth()) &&
+      // We must add 1 to the month value as it starts from 0 and the cron starts from 1.
+      this.#when.fields.month.includes(this.#dateContainer.getUTCMonth() + 1) &&
       // @ts-ignore
-      this.#when.fields.dayOfWeek.includes(this.#dateContainer.getDay())
+      this.#when.fields.dayOfWeek.includes(this.#dateContainer.getUTCDay())
     );
   }
 

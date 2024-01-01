@@ -1,3 +1,9 @@
+### v4.19.6 (2024-01-01)
+
+- [Fix cron wrong month](https://github.com/M4RC3L05/rss-hub/commit/c60c127b5a9f0984856cb350ebec17656acb58e6)
+- [Biome organize imports](https://github.com/M4RC3L05/rss-hub/commit/b94d0ca8a9dcb3c748884c80c3bce0d236ffdc3d)
+- [Use check on lint staged for biome](https://github.com/M4RC3L05/rss-hub/commit/a72b61ff02ab692b6cd218e340aa72aa5bfc767c)
+
 ### v4.19.5 (2023-12-27)
 
 - [Improve feed item link resolver](https://github.com/M4RC3L05/rss-hub/commit/f226f42ec9290b669a58ea1406584c75377e0b8c)

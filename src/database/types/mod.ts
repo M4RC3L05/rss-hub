@@ -25,5 +25,6 @@ export type FeedItemsTable = {
   feedId: string;
   createdAt: string;
   updatedAt: string;
-  readedAt: string;
+  readedAt?: string;
+  bookmarkedAt?: string;
 };

@@ -1,6 +1,7 @@
 import { type FC, useState } from "react";
-import { Badge, Card } from "react-bootstrap";
+import { Badge, Button, Card } from "react-bootstrap";
 import { type FeedItemsTable } from "../../../../../../database/types/mod.js";
+import requests from "../../common/api.js";
 import FeedItemContentModal from "./feed-item-content-modal.js";
 
 type FeedItemArgs = {
@@ -34,10 +35,40 @@ const FeedItem: FC<FeedItemArgs> = ({ feedItem, mutate }) => {
             {new Date(feedItem.createdAt).toLocaleString()}
             <br />
             <br />
+            {feedItem.bookmarkedAt && (
+              <>
+                <Badge bg="light" text="dark">
+                  Bookmarked
+                </Badge>
+                <span className="mx-1" />
+              </>
+            )}
+
             <Badge bg={feedItem.readedAt ? "success" : "info"}>
               {feedItem.readedAt ? "Read" : "Unread"}
             </Badge>
           </Card.Subtitle>
+          <Button
+            variant={feedItem.bookmarkedAt ? "danger" : "primary"}
+            onClick={(e) => {
+              e.stopPropagation();
+
+              (feedItem.bookmarkedAt
+                ? requests.feedItems.unbookmarkFeedItem({ id: feedItem.id })
+                : requests.feedItems.bookmarkFeedItem({ id: feedItem.id })
+              ).then(() => {
+                mutate();
+              });
+            }}
+          >
+            <i
+              className={
+                feedItem.bookmarkedAt
+                  ? "bi bi-bookmark-x-fill"
+                  : "bi bi-bookmark-plus-fill"
+              }
+            />
+          </Button>
         </Card.Body>
       </Card>
     </>

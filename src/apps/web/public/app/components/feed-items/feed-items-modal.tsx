@@ -6,7 +6,14 @@ import {
   useRef,
   useState,
 } from "react";
-import { Button, Col, Image as BSImage, Modal, Row } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  Col,
+  Image as BSImage,
+  Modal,
+  Row,
+} from "react-bootstrap";
 import { useSWRConfig } from "swr";
 import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
 import {
@@ -23,38 +30,34 @@ const getKey =
   ({
     fetch,
     showAll,
+    showBookmarked,
     feedId,
   }: {
     fetch: boolean;
     showAll: boolean;
     feedId: string;
+    showBookmarked: boolean;
   }): SWRInfiniteKeyLoader<{
     data: FeedItemsTable[];
     pagination: { nextCursor: string };
   }> =>
   (pageIndex, previousPageData) => {
-    if (pageIndex === 0)
-      return fetch
-        ? showAll
-          ? `${paths.feedItems.getFeedItems}?feedId=${feedId}&limit=10`
-          : `${paths.feedItems.getFeedItems}?feedId=${feedId}&unread=true&limit=10`
-        : null;
+    let url = `${paths.feedItems.getFeedItems}?feedId=${feedId}&limit=10`;
+
+    if (!showAll) url += "&unread=true";
+    if (showBookmarked) url += "&bookmarked=true";
+
+    if (pageIndex === 0) {
+      return fetch ? url : null;
+    }
 
     if (!previousPageData?.pagination.nextCursor) return null;
 
-    return fetch
-      ? showAll
-        ? `${
-            paths.feedItems.getFeedItems
-          }?feedId=${feedId}&nextCursor=${encodeURIComponent(
-            previousPageData.pagination.nextCursor,
-          )}&limit=10`
-        : `${
-            paths.feedItems.getFeedItems
-          }?feedId=${feedId}&unread=true&nextCursor=${encodeURIComponent(
-            previousPageData.pagination.nextCursor,
-          )}&limit=10`
-      : null;
+    url += `&nextCursor=${encodeURIComponent(
+      previousPageData.pagination.nextCursor,
+    )}`;
+
+    return fetch ? url : null;
   };
 
 type FeedItemsModalArgs = {
@@ -74,6 +77,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
   const { mutate } = useSWRConfig();
   const [fetch, setFetch] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [showBookmarked, setShowBookmarked] = useState(false);
   const [progress, setProgress] = useState(0);
   const {
     data,
@@ -84,7 +88,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
   } = useSWRInfinite<{
     data: FeedItemsTable[];
     pagination: { nextCursor: string };
-  }>(getKey({ showAll, fetch, feedId: feed.id }));
+  }>(getKey({ showAll, fetch, showBookmarked, feedId: feed.id }));
   const ref = useRef<HTMLDivElement>();
   const nextCursor = data?.at(-1)?.pagination.nextCursor;
 
@@ -149,7 +153,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
         onExited={() => {
           setFetch(false);
 
-          void mutate(
+          mutate(
             (key) =>
               typeof key === "string" &&
               key.startsWith(paths.feedItems.getFeedItems),
@@ -159,7 +163,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
 
           if (wasDeletedRef.current) {
             wasDeletedRef.current = false;
-            void mutate(
+            mutate(
               (key) =>
                 typeof key === "string" && key.startsWith(paths.feeds.getFeeds),
             );
@@ -190,8 +194,8 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
                 <Col key={feedItem.id}>
                   <FeedItem
                     mutate={() => {
-                      void feedItemsMutate();
-                      void mutate(
+                      feedItemsMutate();
+                      mutate(
                         (key) =>
                           typeof key === "string" &&
                           (key.startsWith(paths.feeds.getFeeds) ||
@@ -240,7 +244,7 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
             onClick={() => {
               if (!data) return;
 
-              void requests.feedItems
+              requests.feedItems
                 .markFeedItemsAsRead({
                   body: {
                     feedId: feed.id,
@@ -252,8 +256,8 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
                   },
                 })
                 .then(() => {
-                  void feedItemsMutate();
-                  void mutate(
+                  feedItemsMutate();
+                  mutate(
                     (key) =>
                       typeof key === "string" &&
                       key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
@@ -263,19 +267,33 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
           >
             <i className="bi bi-check2-all" />
           </Button>
-          <span className="mx-1" />
+          <span className="mx-auto" />
           <Button
-            variant="secundary"
+            variant={showAll ? "warning" : "secondary"}
             size="sm"
             onClick={() => {
               setShowAll((previous) => !previous);
             }}
           >
-            {showAll ? (
-              <i className="bi bi-eye-fill" />
-            ) : (
-              <i className="bi bi-eye-slash-fill" />
-            )}
+            <i
+              className={showAll ? "bi bi-eye-fill" : "bi bi-eye-slash-fill"}
+            />
+          </Button>
+          <span className="mx-1" />
+          <Button
+            variant={showBookmarked ? "warning" : "secondary"}
+            size="sm"
+            onClick={() => {
+              setShowBookmarked((previous) => !previous);
+            }}
+          >
+            <i
+              className={
+                showBookmarked
+                  ? "bi bi-bookmark-fill"
+                  : "bi bi-bookmark-dash-fill"
+              }
+            />
           </Button>
         </Modal.Footer>
       </Modal>

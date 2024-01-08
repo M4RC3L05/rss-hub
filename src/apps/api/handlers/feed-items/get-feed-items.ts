@@ -8,6 +8,7 @@ import { RequestValidationError } from "../../../../errors/mod.js";
 
 const requestQuerySchema = z
   .object({
+    bookmarked: z.string().optional(),
     feedId: z.string().uuid(),
     unread: z.string().optional(),
     nextCursor: z.string().optional(),
@@ -45,6 +46,11 @@ export const handler = (router: Hono) => {
             (
               feed_id = ${query.feedId}
               $${"unread" in query ? sql`and readed_at is null` : sql``}
+              $${
+                "bookmarked" in query
+                  ? sql`and bookmarked_at is not null`
+                  : sql``
+              }
             )
             $${
               parsedCursor

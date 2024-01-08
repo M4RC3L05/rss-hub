@@ -29,21 +29,19 @@ const CreateCategoryItem: FC<CreateCategoryItemArgs> = ({ category }) => {
           <Card.Body className="d-flex flex-direction-row justify-content-around">
             {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
             <h1
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", margin: 0 }}
               onClick={() => {
                 setShowCreateModal(true);
               }}
-              className="text-center"
             >
               <i className="bi bi-plus-square" />
             </h1>
             {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
             <h1
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", margin: 0 }}
               onClick={() => {
                 setShowImportModal(true);
               }}
-              className="text-center"
             >
               <i className="bi bi-file-earmark-arrow-up" />
             </h1>
@@ -53,7 +51,7 @@ const CreateCategoryItem: FC<CreateCategoryItemArgs> = ({ category }) => {
               style={{ color: "inherit" }}
               rel="noreferrer"
             >
-              <h1 style={{ cursor: "pointer" }} className="text-center">
+              <h1 style={{ cursor: "pointer", margin: 0 }}>
                 <i className="bi bi-file-earmark-arrow-down" />
               </h1>
             </a>

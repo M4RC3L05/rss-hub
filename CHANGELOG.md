@@ -1,3 +1,10 @@
+### v4.20.0 (2024-01-08)
+
+- [Update migrator docker image dbmate version](https://github.com/M4RC3L05/rss-hub/commit/f7508248ed952e74396c87d4e8a3a87110130ca6)
+- [Remove unnecessary voids](https://github.com/M4RC3L05/rss-hub/commit/bbf84fb37fc413ea476daf846168b07b0c8b5581)
+- [Alow to bookmark feed items](https://github.com/M4RC3L05/rss-hub/commit/95191a140147a4c319cef97e6edcd9320c42afed)
+- [Fix center of action icons](https://github.com/M4RC3L05/rss-hub/commit/fbe8845cfe88121ec98010a3a7737e50524b6ec7)
+
 ### v4.19.6 (2024-01-01)
 
 - [Fix cron wrong month](https://github.com/M4RC3L05/rss-hub/commit/c60c127b5a9f0984856cb350ebec17656acb58e6)

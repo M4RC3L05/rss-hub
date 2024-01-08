@@ -57,11 +57,11 @@ const CreateFeedModal: FC<CreateFeedModelArgs> = ({
   const submit = async () => {
     if (!canInteract || Boolean(error) || !validUrl) return;
 
-    void requests.feeds
+    requests.feeds
       .createFeed({ body: { name, url, categoryId: category.id } })
       .then(() => {
         handleClose();
-        void mutate(
+        mutate(
           (key) =>
             typeof key === "string" &&
             key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
@@ -97,7 +97,7 @@ const CreateFeedModal: FC<CreateFeedModelArgs> = ({
         <Form
           onSubmit={(event) => {
             event.preventDefault();
-            void submit();
+            submit();
           }}
         >
           <Form.Group className="mb-3">

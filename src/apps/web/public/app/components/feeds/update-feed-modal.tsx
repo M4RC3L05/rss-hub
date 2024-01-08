@@ -73,14 +73,14 @@ const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({
   const submit = async () => {
     if (!canInteract || Boolean(error) || !validUrl) return;
 
-    void requests.feeds
+    requests.feeds
       .updateFeed({
         body: { name, url, categoryId: selectedCategory },
         id: toUpdate.id,
       })
       .then(() => {
         handleClose();
-        void mutate(
+        mutate(
           (key) =>
             typeof key === "string" &&
             key.startsWith(`${paths.feeds.getFeeds}?categoryId=`),
@@ -115,7 +115,7 @@ const UpdateFeedModal: FC<UpdateFeedModalArgs> = ({
         <Form
           onSubmit={(event) => {
             event.preventDefault();
-            void submit();
+            submit();
           }}
         >
           <Form.Group className="mb-3">

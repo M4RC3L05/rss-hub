@@ -22,11 +22,11 @@ const UpdateCategoryModel: FC<UpdateCategoryModelArgs> = ({
   const submit = () => {
     if (!canInteract) return;
 
-    void requests.categories
+    requests.categories
       .updateCategoryName({ body: { name }, id: toUpdate.id })
       .then(() => {
         handleClose();
-        void mutate(paths.categories.getCategories);
+        mutate(paths.categories.getCategories);
       });
   };
 

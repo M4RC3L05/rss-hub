@@ -22,9 +22,9 @@ const DeleteCategoryModal: FC<DeleteCategoryModalArgs> = ({
     if (!canInteract) return;
     if (!toDelete) return;
 
-    void requests.categories.deleteCategory({ id: toDelete.id }).then(() => {
+    requests.categories.deleteCategory({ id: toDelete.id }).then(() => {
       handleClose();
-      void mutate(paths.categories.getCategories);
+      mutate(paths.categories.getCategories);
     });
   };
 

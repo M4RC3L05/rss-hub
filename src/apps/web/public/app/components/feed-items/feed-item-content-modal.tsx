@@ -76,7 +76,7 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
           return;
         }
 
-        void requests.feedItems
+        requests.feedItems
           .markFeedItemsAsRead({ body: { id: feedItem.id } })
           .then(() => mutate());
       }}

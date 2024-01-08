@@ -20,7 +20,7 @@ const DeleteFeedModal: FC<DeleteFeedModalArgs> = ({
   const submit = () => {
     if (!canInteract) return;
 
-    void requests.feeds.deleteFeed({ id: toDelete.id }).then(() => {
+    requests.feeds.deleteFeed({ id: toDelete.id }).then(() => {
       okRef.current = true;
       handleClose({ deleted: true });
     });

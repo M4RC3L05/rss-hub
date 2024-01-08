@@ -20,10 +20,10 @@ const ImportOpmlModal: FC<ImportOpmlModalArgs> = ({ show, handleClose }) => {
     const formData = new FormData();
     formData.set("opml", opml);
 
-    void requests.opml.importOpml({ body: formData }).then(() => {
+    requests.opml.importOpml({ body: formData }).then(() => {
       handleClose();
-      void mutate(paths.categories.getCategories);
-      void mutate(
+      mutate(paths.categories.getCategories);
+      mutate(
         (key) =>
           typeof key === "string" && key.startsWith(paths.feeds.getFeeds),
         undefined,

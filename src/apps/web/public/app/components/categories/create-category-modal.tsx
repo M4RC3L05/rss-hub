@@ -19,9 +19,9 @@ const CreateCategoryModel: FC<CreateCategoryModelArgs> = ({
   const submit = () => {
     if (!canInteract) return;
 
-    void requests.categories.createCategory({ body: { name } }).then(() => {
+    requests.categories.createCategory({ body: { name } }).then(() => {
       handleClose();
-      void mutate(paths.categories.getCategories);
+      mutate(paths.categories.getCategories);
     });
   };
 

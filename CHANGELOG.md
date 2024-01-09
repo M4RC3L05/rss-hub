@@ -1,3 +1,7 @@
+### v4.21.0 (2024-01-09)
+
+- [Improve read\/unread and bookmark\/unbookmark](https://github.com/M4RC3L05/rss-hub/commit/b3ba4258927581719db0cf3546aae295d24b5c3a)
+
 ### v4.20.0 (2024-01-08)
 
 - [Update migrator docker image dbmate version](https://github.com/M4RC3L05/rss-hub/commit/f7508248ed952e74396c87d4e8a3a87110130ca6)

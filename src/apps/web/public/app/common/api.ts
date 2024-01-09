@@ -22,8 +22,8 @@ export const paths = {
     getFeedItems: `${config.api.url}/api/feed-items`,
     markFeedItemAsRead: `${config.api.url}/api/feed-items/readed`,
     markFeedItemAsUnread: `${config.api.url}/api/feed-items/unread`,
-    bookmarkFeedItem: `${config.api.url}/api/feed-items/:id/bookmark`,
-    unbookmarkFeedItem: `${config.api.url}/api/feed-items/:id/unbookmark`,
+    bookmarkFeedItem: `${config.api.url}/api/feed-items/bookmark`,
+    unbookmarkFeedItem: `${config.api.url}/api/feed-items/unbookmark`,
   },
   opml: {
     exportOpml: `${config.api.url}/api/opml/export`,
@@ -199,33 +199,35 @@ const requests = {
 
     bookmarkFeedItem: async ({
       cancel,
-      id,
+      body,
     }: {
       cancel?: AbortSignal;
-      id: string;
+      body: Record<string, unknown>;
     }) =>
-      makeRequester<unknown>(
-        paths.feedItems.bookmarkFeedItem.replaceAll(":id", id),
-        {
-          signal: cancel,
-          method: "PATCH",
+      makeRequester<unknown>(paths.feedItems.bookmarkFeedItem, {
+        signal: cancel,
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: {
+          "content-type": "application/json",
         },
-      ),
+      }),
 
     unbookmarkFeedItem: async ({
       cancel,
-      id,
+      body,
     }: {
       cancel?: AbortSignal;
-      id: string;
+      body: Record<string, unknown>;
     }) =>
-      makeRequester<unknown>(
-        paths.feedItems.unbookmarkFeedItem.replaceAll(":id", id),
-        {
-          signal: cancel,
-          method: "PATCH",
+      makeRequester<unknown>(paths.feedItems.unbookmarkFeedItem, {
+        signal: cancel,
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: {
+          "content-type": "application/json",
         },
-      ),
+      }),
   },
   opml: {
     importOpml: async ({

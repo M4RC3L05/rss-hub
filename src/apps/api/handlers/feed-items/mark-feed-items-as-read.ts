@@ -7,7 +7,7 @@ import { z } from "zod";
 import { RequestValidationError } from "../../../../errors/mod.js";
 
 const requestBodySchema = z.union([
-  z.object({ id: z.string() }).strict(),
+  z.object({ id: z.string(), feedId: z.string().uuid() }).strict(),
   z.object({ feedId: z.string().uuid(), from: z.string() }).strict(),
 ]);
 
@@ -34,9 +34,13 @@ export const handler = (router: Hono) => {
           update feed_items set
             readed_at = ${new Date().toISOString()}
           where
-            $${"id" in data ? sql`id = ${data.id}` : sql``}
             $${
-              "feedId" in data
+              "id" in data
+                ? sql`id = ${data.id} and feed_id = ${data.feedId}`
+                : sql``
+            }
+            $${
+              "from" in data
                 ? sql`
                   feed_id = ${data.feedId}
                   and

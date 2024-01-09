@@ -5,7 +5,9 @@ import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { RequestValidationError } from "../../../../errors/mod.js";
 
-const requestBodySchema = z.object({ id: z.string() }).strict();
+const requestBodySchema = z
+  .object({ id: z.string(), feedId: z.string().uuid() })
+  .strict();
 
 export const handler = (router: Hono) => {
   router.patch(
@@ -21,7 +23,11 @@ export const handler = (router: Hono) => {
           readed_at = null
         where
           readed_at is not null
-          $${"id" in data ? sql`and id = ${data.id}` : sql``}
+          $${
+            "id" in data
+              ? sql`and id = ${data.id} and feed_id = ${data.feedId}`
+              : sql``
+          }
       `);
 
       if (result.changes <= 0) {

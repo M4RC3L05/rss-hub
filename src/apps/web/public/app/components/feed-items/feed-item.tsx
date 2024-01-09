@@ -31,7 +31,7 @@ const FeedItem: FC<FeedItemArgs> = ({ feedItem, mutate }) => {
         <Card.Img variant="top" src={feedItem.img} />
         <Card.Body>
           <Card.Title>{feedItem.title}</Card.Title>
-          <Card.Subtitle className="mb-2 text-muted">
+          <Card.Subtitle className="mb-4 text-muted">
             {new Date(feedItem.createdAt).toLocaleString()}
             <br />
             <br />
@@ -54,8 +54,12 @@ const FeedItem: FC<FeedItemArgs> = ({ feedItem, mutate }) => {
               e.stopPropagation();
 
               (feedItem.bookmarkedAt
-                ? requests.feedItems.unbookmarkFeedItem({ id: feedItem.id })
-                : requests.feedItems.bookmarkFeedItem({ id: feedItem.id })
+                ? requests.feedItems.unbookmarkFeedItem({
+                    body: { id: feedItem.id, feedId: feedItem.feedId },
+                  })
+                : requests.feedItems.bookmarkFeedItem({
+                    body: { id: feedItem.id, feedId: feedItem.feedId },
+                  })
               ).then(() => {
                 mutate();
               });
@@ -66,6 +70,30 @@ const FeedItem: FC<FeedItemArgs> = ({ feedItem, mutate }) => {
                 feedItem.bookmarkedAt
                   ? "bi bi-bookmark-x-fill"
                   : "bi bi-bookmark-plus-fill"
+              }
+            />
+          </Button>
+          <span className="mx-1" />
+          <Button
+            variant={feedItem.readedAt ? "danger" : "primary"}
+            onClick={(e) => {
+              e.stopPropagation();
+
+              (feedItem.readedAt
+                ? requests.feedItems.markFeedItemAsUnread({
+                    body: { id: feedItem.id, feedId: feedItem.feedId },
+                  })
+                : requests.feedItems.markFeedItemsAsRead({
+                    body: { id: feedItem.id, feedId: feedItem.feedId },
+                  })
+              ).then(() => {
+                mutate();
+              });
+            }}
+          >
+            <i
+              className={
+                feedItem.readedAt ? "bi bi-eye-slash-fill" : "bi bi-eye-fill"
               }
             />
           </Button>

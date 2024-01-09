@@ -47,20 +47,21 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
 
   const uncheckRead = Boolean(feedItem.readedAt) && (
     <>
-      <span className="mx-2" />
       <Button
-        variant="secundary"
+        variant="danger"
         size="sm"
-        onClick={async () =>
+        onClick={() => {
           requests.feedItems
-            .markFeedItemAsUnread({ body: { id: feedItem.id } })
+            .markFeedItemAsUnread({
+              body: { id: feedItem.id, feedId: feedItem.feedId },
+            })
             .then(() => {
               unreadRef.current = true;
               mutate();
-            })
-        }
+            });
+        }}
       >
-        <i className="bi bi-circle-fill" />
+        <i className={"bi bi-eye-slash-fill"} />
       </Button>
     </>
   );
@@ -76,9 +77,13 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
           return;
         }
 
-        requests.feedItems
-          .markFeedItemsAsRead({ body: { id: feedItem.id } })
-          .then(() => mutate());
+        if (!feedItem.readedAt) {
+          requests.feedItems
+            .markFeedItemsAsRead({
+              body: { id: feedItem.id, feedId: feedItem.feedId },
+            })
+            .then(() => mutate());
+        }
       }}
       centered
     >
@@ -133,6 +138,32 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
         >
           <i className="bi bi-box-arrow-up-right" />
         </Button>
+        <span className="mx-1" />
+        <Button
+          variant={feedItem.bookmarkedAt ? "danger" : "primary"}
+          size="sm"
+          onClick={() => {
+            (feedItem.bookmarkedAt
+              ? requests.feedItems.unbookmarkFeedItem({
+                  body: { id: feedItem.id, feedId: feedItem.feedId },
+                })
+              : requests.feedItems.bookmarkFeedItem({
+                  body: { id: feedItem.id, feedId: feedItem.feedId },
+                })
+            ).then(() => {
+              mutate();
+            });
+          }}
+        >
+          <i
+            className={
+              feedItem.bookmarkedAt
+                ? "bi bi-bookmark-x-fill"
+                : "bi bi-bookmark-check-fill"
+            }
+          />
+        </Button>
+        <span className="mx-1" />
         {uncheckRead}
       </Modal.Footer>
     </Modal>

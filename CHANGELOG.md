@@ -1,3 +1,8 @@
+### v4.22.0 (2024-01-13)
+
+- [Improve readed and bookmarked toggles](https://github.com/M4RC3L05/rss-hub/commit/3088d9855c0cd384bdb9eea7a7232d05536d3921)
+- [Show bookmarked counter to feed](https://github.com/M4RC3L05/rss-hub/commit/e6fca0a95423253584880023bd5a25c26645c487)
+
 ### v4.21.0 (2024-01-09)
 
 - [Improve read\/unread and bookmark\/unbookmark](https://github.com/M4RC3L05/rss-hub/commit/b3ba4258927581719db0cf3546aae295d24b5c3a)

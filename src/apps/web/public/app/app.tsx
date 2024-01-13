@@ -24,7 +24,12 @@ const App: FC = () => {
     data: feeds,
     isLoading,
     isValidating,
-  } = useSWR<Record<string, Array<FeedsTable & { unreadCount: number }>>>(
+  } = useSWR<
+    Record<
+      string,
+      Array<FeedsTable & { unreadCount: number; bookmarkedCount: number }>
+    >
+  >(
     categoryIds.length > 0
       ? `${paths.feeds.getFeeds}?${categoryIds.reduce(
           (acc, cid, index) =>
@@ -74,7 +79,9 @@ const App: FC = () => {
       feeds = [],
     }: {
       category: CategoriesTable & { feedCount: number };
-      feeds: Array<FeedsTable & { unreadCount: number }>;
+      feeds: Array<
+        FeedsTable & { unreadCount: number; bookmarkedCount: number }
+      >;
     }) => <CategoryItem category={category} feeds={feeds} key={category.id} />,
     [],
   );

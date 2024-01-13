@@ -10,7 +10,7 @@ import UpdateCategoryModel from "./update-category-modal.js";
 
 type CategoryItemArgs = {
   category: CategoriesTable & { feedCount: number };
-  feeds: Array<FeedsTable & { unreadCount: number }>;
+  feeds: Array<FeedsTable & { unreadCount: number; bookmarkedCount: number }>;
 };
 
 const CategoryItem: FC<CategoryItemArgs> = ({ category, feeds }) => {

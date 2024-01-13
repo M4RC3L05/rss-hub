@@ -4,7 +4,7 @@ import { type FeedsTable } from "../../../../../../database/types/mod.js";
 import FeedItemsModal from "../feed-items/feed-items-modal.js";
 
 type FeedListItemArgs = {
-  feed: FeedsTable & { unreadCount: number };
+  feed: FeedsTable & { unreadCount: number; bookmarkedCount: number };
 };
 
 const FeedListItem: FC<FeedListItemArgs> = ({ feed }) => {
@@ -32,11 +32,17 @@ const FeedListItem: FC<FeedListItemArgs> = ({ feed }) => {
           roundedCircle
         />
         <span className="mx-1" />
-        {feed.name}
+        {/* @ts-ignore */}
+        <p style={{ wordWrap: "anywhere" }} className="mb-0">
+          {feed.name}
+        </p>
         <div className="me-auto" />
         <Badge bg="primary" pill>
-          {" "}
-          {feed.unreadCount}{" "}
+          {feed.unreadCount}
+        </Badge>
+        <span className="mx-1" />
+        <Badge bg="light" text="dark" pill className="mx-1">
+          {feed.bookmarkedCount}
         </Badge>
       </ListGroupItem>
     </>

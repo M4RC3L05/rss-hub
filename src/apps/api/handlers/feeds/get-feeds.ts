@@ -25,9 +25,12 @@ export const handler = (router: Hono) => {
     (c) => {
       const query = c.req.valid("query");
       const feeds = c.get("database").all<FeedsTable>(sql`
-        select f.*, count(fi.id) as "unreadCount"
+        select
+          f.*,
+          count(case when fi.readed_at is null then 1 end) as unread_count,
+          count(case when fi.bookmarked_at is not null then 1 end) as bookmarked_count
         from feeds f
-        left join feed_items fi on f.id = fi.feed_id and fi.readed_at is null
+        left join feed_items fi on f.id = fi.feed_id
         $${
           query.categoryId
             ? sql`where f.category_id in ($${(Array.isArray(query.categoryId)

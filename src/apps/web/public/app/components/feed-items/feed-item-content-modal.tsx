@@ -1,4 +1,4 @@
-import { type FC, useRef } from "react";
+import { type FC, useRef, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { type FeedItemsTable } from "../../../../../../database/types/mod.js";
 import requests from "../../common/api.js";
@@ -6,7 +6,7 @@ import requests from "../../common/api.js";
 type FeedItemContentModalArgs = {
   feedItem: FeedItemsTable;
   show: boolean;
-  handleClose: () => unknown;
+  handleClose: (shouldMutate?: boolean) => unknown;
   mutate: () => unknown;
 };
 
@@ -21,7 +21,14 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
   handleClose,
   mutate,
 }) => {
-  const unreadRef = useRef(false);
+  const [readedRef, setReadedRef] = useState(false);
+  const [bookmarkedRef, setBookmarkedRef] = useState(false);
+  const [readedState, setReadedState] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [bookmarkedState, setBookmarkedState] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const enclosureToHtml = (enclosure: FeedItemEnclosure) => {
     if (
@@ -45,45 +52,31 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
     return "";
   };
 
-  const uncheckRead = Boolean(feedItem.readedAt) && (
-    <>
-      <Button
-        variant="danger"
-        size="sm"
-        onClick={() => {
-          requests.feedItems
-            .markFeedItemAsUnread({
-              body: { id: feedItem.id, feedId: feedItem.feedId },
-            })
-            .then(() => {
-              unreadRef.current = true;
-              mutate();
-            });
-        }}
-      >
-        <i className={"bi bi-eye-slash-fill"} />
-      </Button>
-    </>
-  );
+  const bookmarked =
+    bookmarkedRef && typeof bookmarkedState === "boolean"
+      ? bookmarkedState
+      : !!feedItem.bookmarkedAt;
+  const readed =
+    readedRef && typeof readedState === "boolean"
+      ? readedState
+      : !!feedItem.readedAt;
 
   return (
     <Modal
       show={show}
-      onHide={handleClose}
+      onHide={() => handleClose(readedRef || bookmarkedRef)}
       fullscreen
       onExit={() => {
-        if (unreadRef.current) {
-          unreadRef.current = false;
-          return;
-        }
-
-        if (!feedItem.readedAt) {
+        if (!readed && !readedRef) {
           requests.feedItems
             .markFeedItemsAsRead({
               body: { id: feedItem.id, feedId: feedItem.feedId },
             })
             .then(() => mutate());
         }
+
+        setReadedRef(false);
+        setBookmarkedRef(false);
       }}
       centered
     >
@@ -140,10 +133,10 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
         </Button>
         <span className="mx-1" />
         <Button
-          variant={feedItem.bookmarkedAt ? "danger" : "primary"}
+          variant={bookmarked ? "danger" : "primary"}
           size="sm"
           onClick={() => {
-            (feedItem.bookmarkedAt
+            (bookmarked
               ? requests.feedItems.unbookmarkFeedItem({
                   body: { id: feedItem.id, feedId: feedItem.feedId },
                 })
@@ -151,20 +144,37 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
                   body: { id: feedItem.id, feedId: feedItem.feedId },
                 })
             ).then(() => {
-              mutate();
+              setBookmarkedRef(true);
+              setBookmarkedState(!bookmarked);
             });
           }}
         >
           <i
             className={
-              feedItem.bookmarkedAt
-                ? "bi bi-bookmark-x-fill"
-                : "bi bi-bookmark-check-fill"
+              bookmarked ? "bi bi-bookmark-x-fill" : "bi bi-bookmark-check-fill"
             }
           />
         </Button>
         <span className="mx-1" />
-        {uncheckRead}
+        <Button
+          variant={readed ? "danger" : "primary"}
+          size="sm"
+          onClick={() => {
+            (readed
+              ? requests.feedItems.markFeedItemAsUnread({
+                  body: { id: feedItem.id, feedId: feedItem.feedId },
+                })
+              : requests.feedItems.markFeedItemsAsRead({
+                  body: { id: feedItem.id, feedId: feedItem.feedId },
+                })
+            ).then(() => {
+              setReadedRef(true);
+              setReadedState(!readed);
+            });
+          }}
+        >
+          <i className={readed ? "bi bi-eye-slash-fill" : "bi bi-eye-fill"} />
+        </Button>
       </Modal.Footer>
     </Modal>
   );

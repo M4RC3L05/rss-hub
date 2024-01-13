@@ -6,14 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  Badge,
-  Button,
-  Col,
-  Image as BSImage,
-  Modal,
-  Row,
-} from "react-bootstrap";
+import { Button, Col, Image as BSImage, Modal, Row } from "react-bootstrap";
 import { useSWRConfig } from "swr";
 import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
 import {

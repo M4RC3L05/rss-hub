@@ -18,7 +18,8 @@ const FeedItem: FC<FeedItemArgs> = ({ feedItem, mutate }) => {
         show={showDetailModal}
         feedItem={feedItem}
         mutate={mutate}
-        handleClose={() => {
+        handleClose={(shouldMutate) => {
+          if (shouldMutate) mutate();
           setShowDetailModal(false);
         }}
       />

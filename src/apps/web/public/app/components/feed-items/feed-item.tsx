@@ -50,6 +50,16 @@ const FeedItem: FC<FeedItemArgs> = ({ feedItem, mutate }) => {
             </Badge>
           </Card.Subtitle>
           <Button
+            variant="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(feedItem.link, "_blank");
+            }}
+          >
+            <i className="bi bi-box-arrow-up-right" />
+          </Button>
+          <span className="mx-1" />
+          <Button
             variant={feedItem.bookmarkedAt ? "danger" : "primary"}
             onClick={(e) => {
               e.stopPropagation();

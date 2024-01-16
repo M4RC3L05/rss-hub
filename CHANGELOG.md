@@ -1,3 +1,7 @@
+### v4.23.0 (2024-01-16)
+
+- [Add link button to feed item card](https://github.com/M4RC3L05/rss-hub/commit/8dabf3393cb0d403d0aa930f461d39d8724ea1c0)
+
 ### v4.22.0 (2024-01-13)
 
 - [Improve readed and bookmarked toggles](https://github.com/M4RC3L05/rss-hub/commit/3088d9855c0cd384bdb9eea7a7232d05536d3921)

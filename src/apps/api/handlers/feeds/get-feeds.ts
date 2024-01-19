@@ -3,8 +3,8 @@ import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
 import { groupBy } from "lodash-es";
 import { z } from "zod";
-import { type FeedsTable } from "../../../../database/types/mod.js";
-import { RequestValidationError } from "../../../../errors/mod.js";
+import { type FeedsTable } from "#src/database/types/mod.js";
+import { RequestValidationError } from "#src/errors/mod.js";
 
 const requestQuerySchema = z
   .object({

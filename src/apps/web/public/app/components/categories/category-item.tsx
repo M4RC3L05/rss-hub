@@ -3,7 +3,7 @@ import { Card, Col, ListGroup } from "react-bootstrap";
 import {
   type CategoriesTable,
   type FeedsTable,
-} from "../../../../../../database/types/mod.js";
+} from "#src/database/types/mod.js";
 import { CreateFeedListItem, FeedListItem } from "../feeds/mod.js";
 import DeleteCategoryModal from "./delete-category-modal.js";
 import UpdateCategoryModel from "./update-category-modal.js";

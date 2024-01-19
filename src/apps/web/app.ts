@@ -6,7 +6,7 @@ import config from "config";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import fetch from "node-fetch";
-import { requestLifeCycle } from "../../middlewares/mod.js";
+import { requestLifeCycle } from "#src/middlewares/mod.js";
 
 const makeApp = () => {
   const app = new Hono();

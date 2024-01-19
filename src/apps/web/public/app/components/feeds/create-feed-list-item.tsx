@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import { ListGroupItem } from "react-bootstrap";
-import { type CategoriesTable } from "../../../../../../database/types/mod.js";
+import { type CategoriesTable } from "#src/database/types/mod.js";
 import CreateFeedModal from "./create-feed-modal.js";
 
 type CreateFeedListItemArgs = {

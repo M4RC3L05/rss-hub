@@ -1,6 +1,6 @@
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
-import { type CategoriesTable } from "../../../../database/types/mod.js";
+import { CategoriesTable } from "#src/database/types/mod.js";
 
 export const handler = (router: Hono) => {
   router.get("/api/categories", (c) => {

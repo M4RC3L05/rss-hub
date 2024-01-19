@@ -1,9 +1,9 @@
 import process from "node:process";
 import { createAdaptorServer } from "@hono/node-server";
 import config from "config";
-import { makeLogger } from "../../common/logger/mod.js";
-import { addHook } from "../../common/utils/process-utils.js";
-import { makeDatabase } from "../../database/mod.js";
+import { makeLogger } from "#src/common/logger/mod.js";
+import { addHook } from "#src/common/utils/process-utils.js";
+import { makeDatabase } from "#src/database/mod.js";
 import makeApp from "./app.js";
 
 addHook({

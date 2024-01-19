@@ -2,9 +2,9 @@ import { zValidator } from "@hono/zod-validator";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { makeLogger } from "../../../../common/logger/mod.js";
-import { RequestValidationError } from "../../../../errors/mod.js";
-import { feedService } from "../../../../services/mod.js";
+import { makeLogger } from "#src/common/logger/mod.js";
+import { RequestValidationError } from "#src/errors/mod.js";
+import { feedService } from "#src/services/mod.js";
 
 const requestBodySchema = z
   .object({

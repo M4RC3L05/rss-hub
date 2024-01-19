@@ -9,7 +9,10 @@
     "strict": true,
     "noImplicitOverride": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "#src/*": ["./src/*"]
+    }
   },
   "exclude": [
     "node_modules/**/*"

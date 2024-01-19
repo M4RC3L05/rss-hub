@@ -3,10 +3,10 @@ import { decodeXML } from "entities";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { castArray, get } from "lodash-es";
-import { makeLogger } from "../../../../common/logger/mod.js";
-import { xmlParser } from "../../../../common/utils/xml-utils.js";
-import { type FeedsTable } from "../../../../database/types/mod.js";
-import { feedService } from "../../../../services/mod.js";
+import { makeLogger } from "#src/common/logger/mod.js";
+import { xmlParser } from "#src/common/utils/xml-utils.js";
+import { type FeedsTable } from "#src/database/types/mod.js";
+import { feedService } from "#src/services/mod.js";
 
 const log = makeLogger("opml-import-handler");
 

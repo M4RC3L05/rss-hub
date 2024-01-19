@@ -1,6 +1,6 @@
 import { type FC, useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { type FeedsTable } from "../../../../../../database/types/mod.js";
+import { type FeedsTable } from "#src/database/types/mod.js";
 import requests from "../../common/api.js";
 
 type DeleteFeedModalArgs = {

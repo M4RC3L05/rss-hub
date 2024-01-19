@@ -1,7 +1,7 @@
 import { type ChangeEvent, type FC, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useSWRConfig } from "swr";
-import { type CategoriesTable } from "../../../../../../database/types/mod.js";
+import { type CategoriesTable } from "#src/database/types/mod.js";
 import requests, { paths } from "../../common/api.js";
 
 type UpdateCategoryModelArgs = {

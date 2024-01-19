@@ -3,9 +3,9 @@ import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { type CustomDatabase } from "../../database/mod.js";
-import { errorMappers } from "../../errors/mod.js";
-import { errorMapper, requestLifeCycle } from "../../middlewares/mod.js";
+import { CustomDatabase } from "#src/database/mod.js";
+import { errorMappers } from "#src/errors/mod.js";
+import { errorMapper, requestLifeCycle } from "#src/middlewares/mod.js";
 import { router } from "./router.js";
 
 const makeApp = ({ database }: { database: CustomDatabase }) => {

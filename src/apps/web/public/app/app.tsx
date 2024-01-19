@@ -5,7 +5,7 @@ import useSWR from "swr";
 import {
   type CategoriesTable,
   type FeedsTable,
-} from "../../../../database/types/mod.js";
+} from "#src/database/types/mod.js";
 import { paths } from "./common/api.js";
 import {
   CategoryItem,

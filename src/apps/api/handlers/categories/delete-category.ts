@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
 import { z } from "zod";
-import { makeLogger } from "../../../../common/logger/mod.js";
-import { RequestValidationError } from "../../../../errors/mod.js";
+import { makeLogger } from "#src/common/logger/mod.js";
+import { RequestValidationError } from "#src/errors/mod.js";
 
 const requestParametersSchema = z
   .object({

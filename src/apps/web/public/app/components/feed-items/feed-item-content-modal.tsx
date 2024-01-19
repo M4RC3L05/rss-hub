@@ -1,6 +1,6 @@
-import { type FC, useRef, useState } from "react";
+import { type FC, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import { type FeedItemsTable } from "../../../../../../database/types/mod.js";
+import { type FeedItemsTable } from "#src/database/types/mod.js";
 import requests from "../../common/api.js";
 
 type FeedItemContentModalArgs = {

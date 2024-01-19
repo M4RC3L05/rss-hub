@@ -4,7 +4,9 @@
     "source.organizeImports.biome": "explicit"
   },
   "javascript.preferences.importModuleSpecifierEnding": "js",
+  "javascript.preferences.importModuleSpecifier": "shortest",
   "typescript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifier": "shortest",
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome",
   },

@@ -3,8 +3,8 @@ import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
 import { z } from "zod";
-import { type FeedItemsTable } from "../../../../database/types/mod.js";
-import { RequestValidationError } from "../../../../errors/mod.js";
+import { type FeedItemsTable } from "#src/database/types/mod.js";
+import { RequestValidationError } from "#src/errors/mod.js";
 
 const requestQuerySchema = z
   .object({

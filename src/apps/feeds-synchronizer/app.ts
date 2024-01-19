@@ -1,10 +1,10 @@
 import sql from "@leafac/sqlite";
 import * as _ from "lodash-es";
 import { stdSerializers } from "pino";
-import { makeLogger } from "../../common/logger/mod.js";
-import { type CustomDatabase } from "../../database/mod.js";
-import { type FeedsTable } from "../../database/types/mod.js";
-import { feedService } from "../../services/mod.js";
+import { makeLogger } from "#src/common/logger/mod.js";
+import { type CustomDatabase } from "#src/database/mod.js";
+import { type FeedsTable } from "#src/database/types/mod.js";
+import { feedService } from "#src/services/mod.js";
 
 const log = makeLogger("feed-synchronizer-runner");
 

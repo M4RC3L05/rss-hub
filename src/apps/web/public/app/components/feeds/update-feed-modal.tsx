@@ -5,7 +5,7 @@ import { useDebounce } from "usehooks-ts";
 import {
   type CategoriesTable,
   type FeedsTable,
-} from "../../../../../../database/types/mod.js";
+} from "#src/database/types/mod.js";
 import requests, { paths } from "../../common/api.js";
 
 type UpdateFeedModalArgs = {

@@ -1,8 +1,8 @@
 import config from "config";
-import { makeLogger } from "../../common/logger/mod.js";
-import { Cron } from "../../common/utils/cron-utils.js";
-import { addHook } from "../../common/utils/process-utils.js";
-import { makeDatabase } from "../../database/mod.js";
+import { makeLogger } from "#src/common/logger/mod.js";
+import { Cron } from "#src/common/utils/cron-utils.js";
+import { addHook } from "#src/common/utils/process-utils.js";
+import { makeDatabase } from "#src/database/mod.js";
 import runner from "./app.js";
 
 const { cron } = config.get<{

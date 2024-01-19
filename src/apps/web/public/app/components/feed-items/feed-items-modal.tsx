@@ -12,7 +12,7 @@ import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
 import {
   type FeedItemsTable,
   type FeedsTable,
-} from "../../../../../../database/types/mod.js";
+} from "#src/database/types/mod.js";
 import requests, { paths } from "../../common/api.js";
 import DeleteFeedModal from "../feeds/delete-feed-modal.js";
 import UpdateFeedModal from "../feeds/update-feed-modal.js";

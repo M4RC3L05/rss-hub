@@ -1,7 +1,7 @@
 import {
   type CategoriesTable,
   type FeedsTable,
-} from "../../../../../database/types/mod.js";
+} from "#src/database/types/mod.js";
 import config from "./config.js";
 
 export const paths = {

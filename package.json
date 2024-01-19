@@ -7,7 +7,9 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "imports": {},
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "engines": {
     "node": ">=20.x.x"
   },

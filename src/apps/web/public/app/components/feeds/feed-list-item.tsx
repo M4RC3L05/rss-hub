@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import { Badge, Image as BSImage, ListGroupItem } from "react-bootstrap";
-import { type FeedsTable } from "../../../../../../database/types/mod.js";
+import { type FeedsTable } from "#src/database/types/mod.js";
 import FeedItemsModal from "../feed-items/feed-items-modal.js";
 
 type FeedListItemArgs = {

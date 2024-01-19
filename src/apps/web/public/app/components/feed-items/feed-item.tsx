@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import { Badge, Button, Card } from "react-bootstrap";
-import { type FeedItemsTable } from "../../../../../../database/types/mod.js";
+import { type FeedItemsTable } from "#src/database/types/mod.js";
 import requests from "../../common/api.js";
 import FeedItemContentModal from "./feed-item-content-modal.js";
 

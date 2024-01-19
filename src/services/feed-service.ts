@@ -13,11 +13,11 @@ export class FeedService {
     feed: FeedsTable,
     options: { signal?: AbortSignal; database: CustomDatabase },
   ) {
-    let data;
+    let data: Record<string, unknown> | undefined;
 
     try {
-      data = await this.#extractRawFeed(feed.url, options);
-      data = this.toObject(data);
+      const extracted = await this.#extractRawFeed(feed.url, options);
+      data = this.toObject(extracted);
     } catch (error) {
       throw new Error(`Could not get/parse feed "${feed.url}"`, {
         cause: error,

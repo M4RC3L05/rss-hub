@@ -1,3 +1,8 @@
+### v4.24.0 (2024-01-19)
+
+- [Cleanup import paths](https://github.com/M4RC3L05/rss-hub/commit/f121c4df76dbabe7abfcfeb7485dd99d23998bef)
+- [Update deps](https://github.com/M4RC3L05/rss-hub/commit/b21797e4c42672d9eb8296748a4de7f85808cd42)
+
 ### v4.23.0 (2024-01-16)
 
 - [Add link button to feed item card](https://github.com/M4RC3L05/rss-hub/commit/8dabf3393cb0d403d0aa930f461d39d8724ea1c0)

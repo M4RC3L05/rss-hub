@@ -23,8 +23,7 @@
     "db:reset": "rm -rf ./data/app.db && npm run db:migrate",
     "db:seed": "sqlite3 ./data/app.db \".read ./src/database/seed.sql\"",
     "db:migrate": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema migrate",
-    "version": "offline-github-changelog --next=${npm_new_version} | sed -e '/Release v.*/d;s/ (\\[.*\\]\\(.*\\))//gm' > CHANGELOG.md && git add CHANGELOG.md",
-    "postinstall": "patch-package || :"
+    "version": "offline-github-changelog --next=${npm_new_version} | sed -e '/Release v.*/d;s/ (\\[.*\\]\\(.*\\))//gm' > CHANGELOG.md && git add CHANGELOG.md"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
@@ -42,7 +41,6 @@
     "lint-staged": "15.2.0",
     "masonry-layout": "4.2.2",
     "offline-github-changelog": "3.1.0",
-    "patch-package": "8.0.0",
     "pino-pretty": "10.3.1",
     "react": "18.2.0",
     "react-bootstrap": "2.10.0",

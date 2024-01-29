@@ -1,3 +1,9 @@
+### v4.25.0 (2024-01-29)
+
+- [Set max commits to changelog generator](https://github.com/M4RC3L05/rss-hub/commit/1cf610cb430f075f9c4b290cd2c3be94fc10dbb5)
+- [Remove patch-package](https://github.com/M4RC3L05/rss-hub/commit/18541e9a2b31e024ef180749272924751d3459ff)
+- [Update deps](https://github.com/M4RC3L05/rss-hub/commit/c6a1caf009526e61e38ea281a150900f58e29790)
+
 ### v4.24.0 (2024-01-19)
 
 - [Cleanup import paths](https://github.com/M4RC3L05/rss-hub/commit/f121c4df76dbabe7abfcfeb7485dd99d23998bef)

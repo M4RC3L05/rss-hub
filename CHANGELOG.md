@@ -1,3 +1,7 @@
+### v4.25.1 (2024-01-29)
+
+- [Fix docker image](https://github.com/M4RC3L05/rss-hub/commit/4be79c132d55be88b3a02f62d3edec5f760dc4cb)
+
 ### v4.25.0 (2024-01-29)
 
 - [Set max commits to changelog generator](https://github.com/M4RC3L05/rss-hub/commit/1cf610cb430f075f9c4b290cd2c3be94fc10dbb5)

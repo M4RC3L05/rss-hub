@@ -81,9 +81,21 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
   } = useSWRInfinite<{
     data: FeedItemsTable[];
     pagination: { nextCursor: string };
-  }>(getKey({ showAll, fetch, showBookmarked, feedId: feed.id }));
+  }>(getKey({ showAll, fetch, showBookmarked, feedId: feed.id }), null, {
+    revalidateOnMount: false,
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateFirstPage: false,
+  });
   const ref = useRef<HTMLDivElement>();
   const nextCursor = data?.at(-1)?.pagination.nextCursor;
+
+  useEffect(() => {
+    if (show) {
+      feedItemsMutate();
+    }
+  }, [show, feedItemsMutate]);
 
   useEffect(() => {
     if (fetch && progress >= 80 && !isLoading && !isValidating && nextCursor) {

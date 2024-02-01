@@ -1,3 +1,9 @@
+### v4.25.2 (2024-02-01)
+
+- [Fix infinite cursor feed items modal](https://github.com/M4RC3L05/rss-hub/commit/d8297323d677be36a808368abc91a67ea59b461c)
+- [Update stream form hono to use nono deprecated api](https://github.com/M4RC3L05/rss-hub/commit/e7d3db6024b333c1f88e95c4f957f11023347636)
+- [Fix typos](https://github.com/M4RC3L05/rss-hub/commit/4256a91bc4442049e4a55e63cd5a27ca461252f1)
+
 ### v4.25.1 (2024-01-29)
 
 - [Fix docker image](https://github.com/M4RC3L05/rss-hub/commit/4be79c132d55be88b3a02f62d3edec5f760dc4cb)

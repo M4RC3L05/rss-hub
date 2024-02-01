@@ -118,7 +118,7 @@ export class FeedService {
       }
 
       if (!response.headers.has("content-type")) {
-        throw new Error("No content type header in repsonse");
+        throw new Error("No content type header in response");
       }
 
       const contentType = response.headers.get("content-type");

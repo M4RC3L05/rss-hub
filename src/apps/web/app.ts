@@ -5,6 +5,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import config from "config";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
+import { stream } from "hono/streaming";
 import fetch from "node-fetch";
 import { requestLifeCycle } from "#src/middlewares/mod.js";
 
@@ -38,18 +39,18 @@ const makeApp = () => {
     response.headers.delete("content-encoding");
     response.headers.delete("content-length");
 
-    return c.stream(
-      async (stream) => {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        for await (const chunk of response.body!) {
-          await stream.write(chunk);
-        }
-      },
-      {
-        headers: Object.fromEntries(response.headers.entries()),
-        status: response.status,
-      },
-    );
+    for (const [key, value] of response.headers.entries()) {
+      c.header(key, value);
+    }
+
+    c.status(response.status);
+
+    return stream(c, async (stream) => {
+      // biome-ignore lint/style/noNonNullAssertion: We should always have a body
+      for await (const chunk of response.body!) {
+        await stream.write(chunk);
+      }
+    });
   });
 
   if (process.env.NODE_ENV !== "production") {

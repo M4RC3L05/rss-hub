@@ -1,3 +1,7 @@
+### v4.26.0 (2024-02-02)
+
+- [Full feed item page extrator and display using \`@mozilla\/readability\`](https://github.com/M4RC3L05/rss-hub/commit/88b055a2b09326e5560f25296d4d45127949209b)
+
 ### v4.25.2 (2024-02-01)
 
 - [Fix infinite cursor feed items modal](https://github.com/M4RC3L05/rss-hub/commit/d8297323d677be36a808368abc91a67ea59b461c)

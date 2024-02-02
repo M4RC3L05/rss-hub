@@ -1,7 +1,8 @@
+import { Readability } from "@mozilla/readability";
 import { type FC, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { type FeedItemsTable } from "#src/database/types/mod.js";
-import requests from "../../common/api.js";
+import requests, { makeRequester, paths } from "../../common/api.js";
 
 type FeedItemContentModalArgs = {
   feedItem: FeedItemsTable;
@@ -29,6 +30,8 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
   const [bookmarkedState, setBookmarkedState] = useState<boolean | undefined>(
     undefined,
   );
+  const [fullPageContent, setFullPageContent] = useState<string | undefined>();
+  const [parsedMode, setParsedMode] = useState<boolean>(false);
 
   const enclosureToHtml = (enclosure: FeedItemEnclosure) => {
     if (
@@ -113,7 +116,7 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
                               .join("")}<hr/>`
                           : ""
                       }
-                      ${feedItem.content}
+                      ${parsedMode ? fullPageContent : feedItem.content}
                     `,
                   }}
                 />
@@ -174,6 +177,51 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
           }}
         >
           <i className={readed ? "bi bi-eye-slash-fill" : "bi bi-eye-fill"} />
+        </Button>
+        <span className="mx-auto" />
+        <Button
+          variant={parsedMode ? "warning" : "secondary"}
+          onClick={() => {
+            setParsedMode((prev) => !prev);
+
+            if (fullPageContent) {
+              return;
+            }
+
+            setFullPageContent(
+              '<p class="text-info">Extracting feed item content</p>',
+            );
+
+            const url = new URL(paths.feedItems.extractFeedItemContents);
+            url.searchParams.set("id", feedItem.id);
+            url.searchParams.set("feedId", feedItem.feedId);
+
+            makeRequester<string>(url.toString())
+              .then((data) => {
+                const dom = new DOMParser().parseFromString(data, "text/html");
+
+                for (const element of dom.querySelectorAll("a")) {
+                  element.setAttribute("target", "_blank");
+                }
+
+                const content = new Readability(dom).parse()?.content;
+
+                setFullPageContent(() =>
+                  content && content.trim().length > 0
+                    ? content
+                    : '<p class="text-danger">No content to show</p>',
+                );
+              })
+              .catch(() => {
+                setFullPageContent(
+                  '<p class="text-danger">Unable to extract feed item content</p>',
+                );
+              });
+          }}
+        >
+          <i
+            className={parsedMode ? "bi bi-file-code-fill" : "bi bi-file-fill"}
+          />
         </Button>
       </Modal.Footer>
     </Modal>

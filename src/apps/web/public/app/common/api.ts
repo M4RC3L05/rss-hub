@@ -24,6 +24,7 @@ export const paths = {
     markFeedItemAsUnread: `${config.api.url}/api/feed-items/unread`,
     bookmarkFeedItem: `${config.api.url}/api/feed-items/bookmark`,
     unbookmarkFeedItem: `${config.api.url}/api/feed-items/unbookmark`,
+    extractFeedItemContents: `${config.api.url}/api/feed-items/extract-content`,
   },
   opml: {
     exportOpml: `${config.api.url}/api/opml/export`,

@@ -1,5 +1,6 @@
 import { type Hono } from "hono";
 import * as bookmarkFeedItem from "./bookmark-feed-item.js";
+import * as extractFeedItemContent from "./extract-feed-item-content.js";
 import * as getFeedItems from "./get-feed-items.js";
 import * as markFeedItemsAsRead from "./mark-feed-items-as-read.js";
 import * as markFeedItemsAsUnread from "./mark-feed-items-as-unread.js";
@@ -11,4 +12,5 @@ export const handler = (router: Hono) => {
   markFeedItemsAsUnread.handler(router);
   bookmarkFeedItem.handler(router);
   unbookmarkFeedItem.handler(router);
+  extractFeedItemContent.handler(router);
 };

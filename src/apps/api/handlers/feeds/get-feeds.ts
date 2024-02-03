@@ -1,7 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
-import { groupBy } from "lodash-es";
 import { z } from "zod";
 import { type FeedsTable } from "#src/database/types/mod.js";
 import { RequestValidationError } from "#src/errors/mod.js";
@@ -47,7 +46,7 @@ export const handler = (router: Hono) => {
         order by f.name collate nocase asc
       `);
 
-      return c.json({ data: groupBy(feeds, "categoryId") });
+      return c.json({ data: feeds });
     },
   );
 };

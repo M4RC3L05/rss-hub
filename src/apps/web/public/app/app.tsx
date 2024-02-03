@@ -25,10 +25,7 @@ const App: FC = () => {
     isLoading,
     isValidating,
   } = useSWR<
-    Record<
-      string,
-      Array<FeedsTable & { unreadCount: number; bookmarkedCount: number }>
-    >
+    Array<FeedsTable & { unreadCount: number; bookmarkedCount: number }>
   >(
     categoryIds.length > 0
       ? `${paths.feeds.getFeeds}?${categoryIds.reduce(
@@ -97,7 +94,12 @@ const App: FC = () => {
       <Row ref={rowRef}>
         <CreateCategoryItem />
         {(categories ?? []).map((category) =>
-          renderCategoryItem({ category, feeds: feeds?.[category.id] ?? [] }),
+          renderCategoryItem({
+            category,
+            feeds: (feeds ?? []).filter(
+              ({ categoryId }) => categoryId === category.id,
+            ),
+          }),
         )}
       </Row>
     </Container>

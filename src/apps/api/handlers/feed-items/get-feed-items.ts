@@ -69,11 +69,12 @@ export const handler = (router: Hono) => {
         );
 
       const lastItem = feedItems.at(-1);
-      const nextCursor = lastItem
-        ? Buffer.from(`${lastItem.rowid}@@${lastItem.createdAt}`).toString(
-            "base64",
-          )
-        : null;
+      const nextCursor =
+        lastItem && feedItems.length >= Number(query.limit ?? 10)
+          ? Buffer.from(`${lastItem.rowid}@@${lastItem.createdAt}`).toString(
+              "base64",
+            )
+          : null;
 
       return c.json({ data: feedItems, pagination: { nextCursor } });
     },

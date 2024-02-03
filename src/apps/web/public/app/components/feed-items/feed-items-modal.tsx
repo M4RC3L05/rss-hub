@@ -1,11 +1,4 @@
-import {
-  type FC,
-  type RefObject,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import { Button, Col, Image as BSImage, Modal, Row } from "react-bootstrap";
 import { useSWRConfig } from "swr";
 import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
@@ -13,7 +6,7 @@ import {
   type FeedItemsTable,
   type FeedsTable,
 } from "#src/database/types/mod.js";
-import requests, { paths } from "../../common/api.js";
+import requests, { makeRequester, paths } from "../../common/api.js";
 import DeleteFeedModal from "../feeds/delete-feed-modal.js";
 import UpdateFeedModal from "../feeds/update-feed-modal.js";
 import FeedItemPlaceholder from "./feed-item-placeholder.js";
@@ -71,7 +64,6 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
   const [fetch, setFetch] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [showBookmarked, setShowBookmarked] = useState(false);
-  const [progress, setProgress] = useState(0);
   const {
     data,
     mutate: feedItemsMutate,
@@ -88,42 +80,12 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
     revalidateOnReconnect: false,
     revalidateFirstPage: false,
   });
-  const ref = useRef<HTMLDivElement>();
-  const nextCursor = data?.at(-1)?.pagination.nextCursor;
 
   useEffect(() => {
     if (show) {
       feedItemsMutate();
     }
   }, [show, feedItemsMutate]);
-
-  useEffect(() => {
-    if (fetch && progress >= 80 && !isLoading && !isValidating && nextCursor) {
-      setSize((s) => s + 1);
-    }
-  }, [isValidating, progress, setSize, fetch, isLoading, nextCursor]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: This is ok
-  useLayoutEffect(() => {
-    const onScroll = () => {
-      const container = ref.current;
-
-      if (!container) return;
-
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const verticalProgress = Number(
-        ((scrollTop / (scrollHeight - clientHeight)) * 100).toFixed(2),
-      );
-
-      setProgress(verticalProgress);
-    };
-
-    ref.current?.addEventListener("scroll", onScroll);
-
-    return () => {
-      ref.current?.removeEventListener("scroll", onScroll);
-    };
-  }, [ref.current]);
 
   return (
     <>
@@ -192,27 +154,49 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
             </span>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body ref={ref as RefObject<HTMLDivElement>}>
+        <Modal.Body>
           <Row xs={1} lg={2} className="g-4">
             {(data ?? []).flatMap(({ data: feedItems }) =>
-              feedItems.map((feedItem) => (
-                <Col key={feedItem.id}>
-                  <FeedItem
-                    mutate={() => {
-                      feedItemsMutate();
-                      mutate(
-                        (key) =>
-                          typeof key === "string" &&
-                          (key.startsWith(paths.feeds.getFeeds) ||
-                            key.startsWith(
-                              `${paths.feedItems.getFeedItems}?feedId=${feed.id}`,
-                            )),
-                      );
-                    }}
-                    feedItem={feedItem}
-                  />
-                </Col>
-              )),
+              feedItems
+                .filter((feedItem) => (showAll ? true : !feedItem.readedAt))
+                .map((feedItem) => (
+                  <Col key={feedItem.id}>
+                    <FeedItem
+                      mutate={() => {
+                        makeRequester<FeedItemsTable>(
+                          paths.feedItems.getFeedItem
+                            .replace(
+                              ":feedId",
+                              encodeURIComponent(feedItem.feedId),
+                            )
+                            .replace(":id", encodeURIComponent(feedItem.id)),
+                        )
+                          .then((fiUpdated) => {
+                            feedItemsMutate(
+                              (current) =>
+                                Array.isArray(current)
+                                  ? current.map((page) => ({
+                                      ...page,
+                                      data: page.data.map((fi) =>
+                                        fi.id === fiUpdated.id ? fiUpdated : fi,
+                                      ) as FeedItemsTable[],
+                                    }))
+                                  : current,
+                              { revalidate: false },
+                            );
+                          })
+                          .catch(() => {});
+
+                        mutate(
+                          (key) =>
+                            typeof key === "string" &&
+                            key.startsWith(paths.feeds.getFeeds),
+                        );
+                      }}
+                      feedItem={feedItem}
+                    />
+                  </Col>
+                )),
             )}
             {(isLoading || isValidating) && (
               <>
@@ -220,6 +204,21 @@ const FeedItemsModal: FC<FeedItemsModalArgs> = ({
                 <FeedItemPlaceholder />
               </>
             )}
+          </Row>
+          <Row className="my-4">
+            <Col className="d-flex justify-content-center">
+              <Button
+                variant="primary"
+                onClick={() => setSize((size) => size + 1)}
+                disabled={
+                  isLoading ||
+                  isValidating ||
+                  !data?.at(-1)?.pagination?.nextCursor
+                }
+              >
+                Load More
+              </Button>
+            </Col>
           </Row>
         </Modal.Body>
         <Modal.Footer className="justify-content-start">

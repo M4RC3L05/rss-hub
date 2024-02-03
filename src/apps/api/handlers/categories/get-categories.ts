@@ -7,12 +7,12 @@ export const handler = (router: Hono) => {
     const categories = c
       .get("database")
       .all<CategoriesTable & { feedCount: number }>(sql`
-      select c.*, count(f.id) as "feedCount"
-      from categories c
-      left join feeds f on c.id = f.category_id
-      group by c.id
-      order by name collate nocase asc
-    `);
+        select c.*, count(f.id) as feed_count
+        from categories c
+        left join feeds f on c.id = f.category_id
+        group by c.id
+        order by name collate nocase asc
+      `);
 
     return c.json({ data: categories });
   });

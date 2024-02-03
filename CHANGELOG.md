@@ -1,3 +1,13 @@
+### v4.27.0 (2024-02-03)
+
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/e5e74d87f0e29082f61f88cb5bcc1bf5a0482d36)
+- [Do not group by category id on get feeds endpoint](https://github.com/M4RC3L05/rss-hub/commit/b31acb797ed85e91a8fd67543950138a216625ab)
+- [Add get feed](https://github.com/M4RC3L05/rss-hub/commit/6d4d93f69273dccf0516c90008e3dd3dda25d45c)
+- [Update feed item link content extract endpoint path](https://github.com/M4RC3L05/rss-hub/commit/904f464ea75877f2a89390f7bf7d04b9019c1d3c)
+- [Normalize \`feed\_count\`](https://github.com/M4RC3L05/rss-hub/commit/1bf6d969dda2749f1bbf151fd948284672471c3d)
+- [Mutate in place when feed item is readed](https://github.com/M4RC3L05/rss-hub/commit/091263a24d55b360388c13205eda5d0ab9bfe7db)
+- [Add bootstrap icons to dev dependencies](https://github.com/M4RC3L05/rss-hub/commit/19550360065aa50f7cbcf9f2fe7143bb5db57c05)
+
 ### v4.26.0 (2024-02-02)
 
 - [Full feed item page extrator and display using \`@mozilla\/readability\`](https://github.com/M4RC3L05/rss-hub/commit/88b055a2b09326e5560f25296d4d45127949209b)

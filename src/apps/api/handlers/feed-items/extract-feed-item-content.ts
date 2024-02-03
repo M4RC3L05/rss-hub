@@ -7,20 +7,20 @@ import { makeLogger } from "#src/common/logger/mod.js";
 import { FeedItemsTable } from "#src/database/types/mod.js";
 import { RequestValidationError } from "#src/errors/mod.js";
 
-const requestQuerySchema = z
+const requestParamsSchema = z
   .object({ id: z.string(), feedId: z.string().uuid() })
   .strict();
 const log = makeLogger("extract-feed-item-contents");
 
 export const handler = (router: Hono) => {
   router.get(
-    "/api/feed-items/extract-content",
-    zValidator("query", requestQuerySchema, (result) => {
+    "/api/feed-items/:feedId/:id/extract-content",
+    zValidator("param", requestParamsSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });
     }),
     async (c) => {
-      const data = c.req.valid("query");
+      const data = c.req.valid("param");
       const result = c.get("database").get<FeedItemsTable>(
         sql`
           select *

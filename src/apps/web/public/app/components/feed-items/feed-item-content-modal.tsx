@@ -192,11 +192,11 @@ const FeedItemContentModal: FC<FeedItemContentModalArgs> = ({
               '<p class="text-info">Extracting feed item content</p>',
             );
 
-            const url = new URL(paths.feedItems.extractFeedItemContents);
-            url.searchParams.set("id", feedItem.id);
-            url.searchParams.set("feedId", feedItem.feedId);
-
-            makeRequester<string>(url.toString())
+            makeRequester<string>(
+              paths.feedItems.extractFeedItemContents
+                .replace(":feedId", encodeURIComponent(feedItem.feedId))
+                .replace(":id", encodeURIComponent(feedItem.id)),
+            )
               .then((data) => {
                 const dom = new DOMParser().parseFromString(data, "text/html");
 

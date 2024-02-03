@@ -19,6 +19,7 @@ export const paths = {
     updateFeed: `${config.api.url}/api/feeds/:id`,
   },
   feedItems: {
+    getFeedItem: `${config.api.url}/api/feed-items/:feedId/:id`,
     getFeedItems: `${config.api.url}/api/feed-items`,
     markFeedItemAsRead: `${config.api.url}/api/feed-items/readed`,
     markFeedItemAsUnread: `${config.api.url}/api/feed-items/unread`,

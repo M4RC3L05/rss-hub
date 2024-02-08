@@ -13,7 +13,7 @@ const requestParamsSchema = z
 
 export const handler = (router: Hono) => {
   router.get(
-    "/api/feed-items/:feedId/:id",
+    "/api/feed-items/:id/:feedId",
     zValidator("param", requestParamsSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });

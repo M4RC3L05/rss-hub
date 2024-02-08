@@ -1,4 +1,3 @@
-import { Buffer } from "node:buffer";
 import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
@@ -11,8 +10,8 @@ const requestQuerySchema = z
     bookmarked: z.string().optional(),
     feedId: z.string().uuid(),
     unread: z.string().optional(),
-    nextCursor: z.string().optional(),
-    limit: z.string().optional(),
+    page: z.string().optional().default("0"),
+    limit: z.string().optional().default("10"),
   })
   .strict();
 
@@ -25,58 +24,39 @@ export const handler = (router: Hono) => {
     }),
     (c) => {
       const query = c.req.valid("query");
-      let parsedCursor: { rowId: number; createdAt: string } | undefined;
-
-      if (query.nextCursor) {
-        const [rowId, createdAt] = Buffer.from(
-          decodeURIComponent(query.nextCursor),
-          "base64",
-        )
-          .toString("utf8")
-          .split("@@");
-        parsedCursor = { createdAt, rowId: Number(rowId) };
-      }
-
+      const feedItemsQuery = sql`
+        select rowid, * from feed_items
+        where
+          feed_id = ${query.feedId}
+          $${"unread" in query ? sql`and readed_at is null` : sql``}
+          $${"bookmarked" in query ? sql`and bookmarked_at is not null` : sql``}
+        order by created_at desc, rowid desc
+      `;
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const { total } = c.get("database").get<{ total: number }>(sql`
+        select count(id) as total
+        from ($${feedItemsQuery})
+      `)!;
       const feedItems = c
         .get("database")
-        .all<FeedItemsTable & { rowid: number }>(
-          sql`
-          select rowid, * from feed_items
-          where
-            (
-              feed_id = ${query.feedId}
-              $${"unread" in query ? sql`and readed_at is null` : sql``}
-              $${
-                "bookmarked" in query
-                  ? sql`and bookmarked_at is not null`
-                  : sql``
-              }
-            )
-            $${
-              parsedCursor
-                ? sql`
-                  and (
-                    (created_at = ${parsedCursor.createdAt} and rowid < ${parsedCursor.rowId})
-                    or created_at < ${parsedCursor.createdAt}
-                  )
-                `
-                : sql``
-            }
-          order by
-            created_at desc, rowid desc
-          limit ${Number(query.limit ?? 10)}
-        `,
-        );
+        .all<FeedItemsTable & { rowid: number }>(sql`
+          $${feedItemsQuery}
+          limit ${Number(query.limit)}
+          offset ${Number(query.page) * Number(query.limit)}
+        `);
 
-      const lastItem = feedItems.at(-1);
-      const nextCursor =
-        lastItem && feedItems.length >= Number(query.limit ?? 10)
-          ? Buffer.from(`${lastItem.rowid}@@${lastItem.createdAt}`).toString(
-              "base64",
-            )
-          : null;
-
-      return c.json({ data: feedItems, pagination: { nextCursor } });
+      return c.json({
+        data: feedItems,
+        pagination: {
+          previous: Math.max(Number(query.page) - 1, 0),
+          next: Math.min(
+            Number(query.page) + 1,
+            Math.floor(total / Number(query.limit)),
+          ),
+          total,
+          limit: Number(query.limit),
+        },
+      });
     },
   );
 };

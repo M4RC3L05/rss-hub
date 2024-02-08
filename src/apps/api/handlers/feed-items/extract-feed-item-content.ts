@@ -1,20 +1,23 @@
 import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
+import { Readability } from "@mozilla/readability";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { JSDOM } from "jsdom";
+import { parse } from "node-html-parser";
 import { z } from "zod";
 import { makeLogger } from "#src/common/logger/mod.js";
 import { FeedItemsTable } from "#src/database/types/mod.js";
 import { RequestValidationError } from "#src/errors/mod.js";
 
 const requestParamsSchema = z
-  .object({ id: z.string(), feedId: z.string().uuid() })
+  .object({ id: z.string(), feedId: z.string() })
   .strict();
 const log = makeLogger("extract-feed-item-contents");
 
 export const handler = (router: Hono) => {
   router.get(
-    "/api/feed-items/:feedId/:id/extract-content",
+    "/api/feed-items/:id/:feedId/extract-content",
     zValidator("param", requestParamsSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });
@@ -31,7 +34,7 @@ export const handler = (router: Hono) => {
       );
 
       if (!result || !result?.link) {
-        throw new HTTPException(400, { message: "No feed link" });
+        return c.json({ data: "" }, 200);
       }
 
       try {
@@ -42,7 +45,15 @@ export const handler = (router: Hono) => {
           },
         }).then((response) => response.text());
 
-        return c.json({ data: pageContent }, 200);
+        const dom = new JSDOM(pageContent);
+
+        for (const element of dom.window.document.querySelectorAll("a")) {
+          element.setAttribute("target", "_blank");
+        }
+
+        const parsed = new Readability(dom.window.document).parse();
+
+        return c.json({ data: parsed?.content }, 200);
       } catch (error) {
         log.error(error, "Unable to extract feed item content");
 

@@ -11,7 +11,7 @@ export const request = async (
 ): Promise<Response> => {
   try {
     const result = await Promise.race([
-      setTimeout(8000, new Error(`Request timeout excedded for "${url}"`), {
+      setTimeout(8000, new Error(`Request timeout exceeded for "${url}"`), {
         ref: false,
       }),
       fetch(url, init),
@@ -23,7 +23,7 @@ export const request = async (
 
     return result;
   } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === "AbortError") {
+    if ((error as { name: string })?.name === "AbortError") {
       throw error;
     }
 

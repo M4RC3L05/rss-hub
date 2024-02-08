@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -23,9 +24,23 @@ export const handler = (router: Hono) => {
     }),
     async (c) => {
       try {
+        c.req.raw.signal.addEventListener("abort", () => {
+          console.log("req aborted");
+        });
+
         const data = c.req.valid("json");
-        const extracted = await feedService.verifyFeed(data.url);
+        const extracted = await feedService.verifyFeed(data.url, {
+          signal: c.req.raw.signal,
+        });
         const title = feedService.getFeedTitle(extracted);
+
+        const feed = c
+          .get("database")
+          .get(sql`select id from feeds where url = ${data.url}`);
+
+        if (feed) {
+          throw new HTTPException(409, { message: "Feed url already exists" });
+        }
 
         return c.json({ data: { title } });
       } catch (error) {

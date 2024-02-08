@@ -5,9 +5,12 @@ import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { RequestValidationError } from "#src/errors/mod.js";
 
-const requestBodySchema = z
-  .object({ id: z.string(), feedId: z.string().uuid() })
-  .strict();
+const requestBodySchema = z.union([
+  z
+    .object({ ids: z.array(z.object({ id: z.string(), feedId: z.string() })) })
+    .strict(),
+  z.object({ feedId: z.string().uuid() }).strict(),
+]);
 
 export const handler = (router: Hono) => {
   router.patch(
@@ -22,12 +25,18 @@ export const handler = (router: Hono) => {
         update feed_items set
           readed_at = null
         where
-          readed_at is not null
           $${
-            "id" in data
-              ? sql`and id = ${data.id} and feed_id = ${data.feedId}`
+            "ids" in data
+              ? data.ids
+                  .map(
+                    ({ feedId, id }) =>
+                      sql`(id = ${id} and feed_id = ${feedId})`,
+                  )
+                  .reduce((acc, curr) => sql`$${acc} or $${curr}`)
               : sql``
           }
+          $${"feedId" in data ? sql`feed_id = ${data.feedId}` : sql``}
+          and readed_at is not null
       `);
 
       if (result.changes <= 0) {

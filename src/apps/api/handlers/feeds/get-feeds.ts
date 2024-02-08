@@ -1,3 +1,4 @@
+import { setTimeout } from "node:timers/promises";
 import { zValidator } from "@hono/zod-validator";
 import sql from "@leafac/sqlite";
 import { type Hono } from "hono";
@@ -21,7 +22,7 @@ export const handler = (router: Hono) => {
       if (!result.success)
         throw new RequestValidationError({ request: { query: result.error } });
     }),
-    (c) => {
+    async (c) => {
       const query = c.req.valid("query");
       const feeds = c.get("database").all<FeedsTable>(sql`
         select

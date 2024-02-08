@@ -12,7 +12,7 @@ const log = makeLogger("opml-import-handler");
 
 export const handler = (router: Hono) => {
   router.post("/api/opml/import", async (c) => {
-    const { opml: file } = await c.req.parseBody();
+    const { file } = await c.req.parseBody();
 
     if (!file || !(file instanceof File)) {
       throw new HTTPException(422, { message: "Must provided a opml file" });

@@ -1,47 +1,37 @@
-@import url(/v130/bootstrap@5.3.2/dist/css/bootstrap.min.css);
-@import url(/v130/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css);
-@import url(./_resets.css);
-@import url(./_anims.css);
+@import url("/deps/simpledotcss/simple.min.css");
 
-.render-feed-item-container img,
-.render-feed-item-container video,
-.render-feed-item-container audio {
+#feed-item-content {
+  overflow-x: auto;
+}
+
+#feed-item-content table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#feed-item-content img,
+#feed-item-content video,
+#feed-item-content audio {
   width: 100%;
   height: auto;
 }
 
-.render-feed-item-container .iframe-container {
+#feed-item-content .iframe-container {
   position: relative;
   overflow: hidden;
   width: 100%;
 }
 
-.render-feed-item-container .iframe-container::after {
+#feed-item-content .iframe-container::after {
   display: block;
   content: "";
   padding-top: 56.25%;
 }
 
-.render-feed-item-container .iframe-container iframe {
+#feed-item-content .iframe-container iframe {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-}
-
-#init-loading {
-  flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  z-index: 9999999999;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }

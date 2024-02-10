@@ -1,3 +1,11 @@
+### v5.0.0 (2024-02-10)
+
+- [Use hono client](https://github.com/M4RC3L05/rss-hub/commit/68e9bbb00b429e257ec5819d2415624e931fd7c3)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/20244dd6e31e5906da890fc1cc66325f0a4ae089)
+- [remove jsx config](https://github.com/M4RC3L05/rss-hub/commit/c4faa8845d2a0dd1616fdccc3c1c0877047be879)
+- [Make web app be more static](https://github.com/M4RC3L05/rss-hub/commit/87c4a561baa4b79a48a47bc932f67f34d3ba4f2a)
+- [Rename process manage to shutdown manager](https://github.com/M4RC3L05/rss-hub/commit/8eac1a46fae60c224410da62114dbfd3ef18a571)
+
 ### v4.27.0 (2024-02-03)
 
 - [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/e5e74d87f0e29082f61f88cb5bcc1bf5a0482d36)

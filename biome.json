@@ -1,15 +1,31 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "formatter": {
+    "enabled": true,
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80,
     "indentStyle": "space",
     "ignore": [".vscode/*"]
   },
   "linter": {
-    "ignore": [".vscode/*"]
+    "ignore": [".vscode/*"],
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "nursery": {
+        "useGroupedTypeImport": "error",
+        "noUnusedImports": "error",
+        "useImportType": "error"
+      }
+    }
   }
 }

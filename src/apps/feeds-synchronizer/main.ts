@@ -1,34 +1,30 @@
 import config from "config";
 import { makeLogger } from "#src/common/logger/mod.js";
 import { Cron } from "#src/common/utils/cron-utils.js";
-import { addHook } from "#src/common/utils/process-utils.js";
 import { makeDatabase } from "#src/database/mod.js";
+import { ShutdownManager } from "#src/managers/mod.js";
+import { FeedService } from "#src/services/mod.js";
 import runner from "./app.js";
 
+const shutdownManager = new ShutdownManager();
 const { cron } = config.get<{
   cron: { pattern: string; tickerTimeout?: number; timezone: string };
 }>("apps.feeds-synchronizer");
 const log = makeLogger("feeds-synchronizer");
 
-addHook({
-  name: "feeds-synchronizer",
-  async handler() {
-    if (job) {
-      await job.stop().catch((error) => {
-        log.error(error, "Could not close job");
-      });
-      log.info("Job closed");
-    }
+const db = makeDatabase();
 
-    if (db?.open) {
-      db.close();
-      log.info("DB Closed");
-    }
-  },
+shutdownManager.addHook("database", () => {
+  if (db.open) {
+    db.close();
+  }
 });
 
 const job = new Cron(cron.pattern, cron.timezone, cron.tickerTimeout);
-const db = makeDatabase();
+
+shutdownManager.addHook("feeds-synchronizer", async () => {
+  await job.stop();
+});
 
 log.info({ nextAt: job.nextAt() }, "Registered feeds-synchronizer");
 
@@ -36,7 +32,7 @@ for await (const signal of job.start()) {
   try {
     log.info("Running feeds-synchronizer");
 
-    await runner({ signal, db });
+    await runner({ signal, db, feedService: new FeedService(db) });
   } catch (error) {
     log.error(error, "Error running feeds-synchronizer task");
   } finally {

@@ -1,4 +1,4 @@
-import { type Context, type Next } from "hono";
+import type { Context, Next } from "hono";
 import { makeLogger } from "../common/logger/mod.js";
 
 const log = makeLogger("request-lifecycle-middleware");

@@ -1,17 +1,17 @@
 import sql from "@leafac/sqlite";
-import * as _ from "lodash-es";
 import { stdSerializers } from "pino";
 import { makeLogger } from "#src/common/logger/mod.js";
-import { type CustomDatabase } from "#src/database/mod.js";
-import { type FeedsTable } from "#src/database/types/mod.js";
-import { feedService } from "#src/services/mod.js";
+import type { CustomDatabase } from "#src/database/mod.js";
+import type { FeedsTable } from "#src/database/types/mod.js";
+import type { FeedService } from "#src/services/mod.js";
 
 const log = makeLogger("feed-synchronizer-runner");
 
 const runner = async ({
   signal,
+  feedService,
   db,
-}: { signal?: AbortSignal; db: CustomDatabase }) => {
+}: { signal?: AbortSignal; db: CustomDatabase; feedService: FeedService }) => {
   const feeds = db.all<FeedsTable>(sql`select * from feeds`);
 
   log.info("Synching begin");
@@ -21,7 +21,7 @@ const runner = async ({
 
     try {
       const { faildCount, failedReasons, successCount, totalCount } =
-        await feedService.syncFeed(feed, { signal, database: db });
+        await feedService.syncFeed(feed, { signal });
 
       log.info(
         {

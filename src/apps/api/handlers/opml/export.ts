@@ -1,8 +1,8 @@
 import sql from "@leafac/sqlite";
 import { encodeXML } from "entities";
-import { type Hono } from "hono";
+import type { Hono } from "hono";
 
-export const handler = (router: Hono) => {
+const handler = (router: Hono) => {
   router.get("/api/opml/export", (c) => {
     let doc =
       `<?xml version="1.0" encoding="UTF-8"?><opml version="2.0"><head><title>RSS HUB feeds</title><dateCreated>${new Date().toUTCString()}</dateCreated></head><body>`.trim();
@@ -34,3 +34,5 @@ export const handler = (router: Hono) => {
     });
   });
 };
+
+export default handler;

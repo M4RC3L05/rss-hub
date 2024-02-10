@@ -1,4 +1,4 @@
-import { type Context } from "hono";
+import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { snakeCase } from "lodash-es";
 import { makeLogger } from "../common/logger/mod.js";

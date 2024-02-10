@@ -1,16 +1,20 @@
-import { type Hono } from "hono";
-import * as createFeed from "./create-feed.js";
-import * as deleteFeed from "./delete-feed.js";
-import * as getFeed from "./get-feed.js";
-import * as getFeeds from "./get-feeds.js";
-import * as updateFeed from "./update-feed.js";
-import * as validateFeedUrl from "./validate-feed-url.js";
+import type { Hono } from "hono";
+
+import { default as createFeed } from "./create.js";
+import { default as deleteFeed } from "./delete.js";
+import { default as getFeed } from "./get.js";
+import { default as getFeeds } from "./search.js";
+import { default as updateFeed } from "./update.js";
+import { default as validateFeedUrl } from "./validate-url.js";
+
+export type { CreateFeedRequestBodySchema } from "./create.js";
+export type { UpdateFeedRequestBodySchema } from "./update.js";
 
 export const handler = (router: Hono) => {
-  getFeed.handler(router);
-  getFeeds.handler(router);
-  createFeed.handler(router);
-  validateFeedUrl.handler(router);
-  updateFeed.handler(router);
-  deleteFeed.handler(router);
+  getFeed(router);
+  getFeeds(router);
+  createFeed(router);
+  validateFeedUrl(router);
+  updateFeed(router);
+  deleteFeed(router);
 };

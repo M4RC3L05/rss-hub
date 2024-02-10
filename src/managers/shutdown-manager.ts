@@ -11,7 +11,7 @@ type ShutdownHook = {
 
 const log = makeLogger("shutdown-manager");
 
-export class ShutdownManager {
+class ShutdownManager {
   #handlers: ShutdownHook[] = [];
   #signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM", "SIGABRT", "SIGUSR2"];
   #shuttingDown = false;
@@ -102,3 +102,5 @@ export class ShutdownManager {
     }
   }
 }
+
+export default ShutdownManager;

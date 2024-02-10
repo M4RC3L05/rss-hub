@@ -1,18 +1,18 @@
 import sql from "@leafac/sqlite";
 import { decodeXML } from "entities";
-import { type Hono } from "hono";
+import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { castArray, get } from "lodash-es";
+import { stdSerializers } from "pino";
 import { makeLogger } from "#src/common/logger/mod.js";
 import { xmlParser } from "#src/common/utils/xml-utils.js";
-import { type FeedsTable } from "#src/database/types/mod.js";
-import { feedService } from "#src/services/mod.js";
+import type { FeedsTable } from "#src/database/types/mod.js";
 
 const log = makeLogger("opml-import-handler");
 
-export const handler = (router: Hono) => {
+const handler = (router: Hono) => {
   router.post("/api/opml/import", async (c) => {
-    const { opml: file } = await c.req.parseBody();
+    const { file } = await c.req.parseBody();
 
     if (!file || !(file instanceof File)) {
       throw new HTTPException(422, { message: "Must provided a opml file" });
@@ -89,7 +89,7 @@ export const handler = (router: Hono) => {
       }
     });
 
-    // Defered sync inserted feeds if any
+    // Deferred sync inserted feeds if any
     if (feedsToSync.length > 0) {
       (async () => {
         log.info({ feedsToSync }, "Begin full feed sync");
@@ -97,21 +97,30 @@ export const handler = (router: Hono) => {
         const feeds = c
           .get("database")
           .all<FeedsTable>(sql`select * from feeds where id in ${feedsToSync}`);
+
         await Promise.allSettled(
-          feeds.map(async (feed) => ({
+          feeds.map(async (feed: FeedsTable) => ({
             feed,
-            stats: await feedService
-              .syncFeed(feed, {
-                signal: c.req.raw.signal,
-                database: c.get("database"),
-              })
-              .catch((error: unknown) => error),
+            stats: await c
+              .get("feedService")
+              .syncFeed(feed, { signal: c.get("shutdownManager").abortSignal }),
           })),
         )
           .then((data) => {
-            log.info({ data }, "Full feed sync completed");
+            log.info(
+              {
+                data: data.map((e) =>
+                  e.status === "rejected"
+                    ? e.reason instanceof Error
+                      ? stdSerializers.err(e.reason)
+                      : e.reason
+                    : e.value,
+                ),
+              },
+              "Full feed sync completed",
+            );
           })
-          .catch((error) => {
+          .catch((error: unknown) => {
             log.error(error, "Full feed sync error");
           });
       })();
@@ -120,3 +129,5 @@ export const handler = (router: Hono) => {
     return c.body(null, 204);
   });
 };
+
+export default handler;

@@ -1,1 +1,1 @@
-export { ShutdownManager } from "./shutdown-manager.js";
+export { default as ShutdownManager } from "./shutdown-manager.js";

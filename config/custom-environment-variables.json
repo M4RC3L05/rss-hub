@@ -21,7 +21,15 @@
         "name": "APPS_WEB_BASIC_AUTH_NAME",
         "pass": "APPS_WEB_BASIC_AUTH_PASS"
       },
-      "esmsh": "APPS_WEB_ESMSH"
+      "services": {
+        "api": {
+          "url": "APPS_WEB_SERVICES_API_URL",
+          "basicAuth": {
+            "name": "APPS_WEB_SERVICES_API_BASIC_AUTH_NAME",
+            "pass": "APPS_WEB_SERVICES_API_BASIC_AUTH_PASS"
+          }
+        }
+      }
     },
     "feeds-synchronizer": {
       "cron": {

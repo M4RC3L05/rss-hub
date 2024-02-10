@@ -1,8 +1,8 @@
-import { type Hono } from "hono";
-import * as exportOpml from "./export.js";
-import * as importOpml from "./import.js";
+import type { Hono } from "hono";
+import { default as exportOpml } from "./export.js";
+import { default as importOpml } from "./import.js";
 
 export const handler = (router: Hono) => {
-  importOpml.handler(router);
-  exportOpml.handler(router);
+  importOpml(router);
+  exportOpml(router);
 };

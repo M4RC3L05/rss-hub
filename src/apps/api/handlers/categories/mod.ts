@@ -1,12 +1,14 @@
-import { type Hono } from "hono";
-import * as createCategory from "./create-category.js";
-import * as deleteCatagory from "./delete-category.js";
-import * as getCategories from "./get-categories.js";
-import * as updateCategoryName from "./update-category-name.js";
+import type { Hono } from "hono";
+import { default as createCategory } from "./create.js";
+import { default as deleteCategory } from "./delete.js";
+import { default as getCategory } from "./get.js";
+import { default as getCategories } from "./search.js";
+import { default as updateCategory } from "./update.js";
 
 export const handler = (router: Hono) => {
-  getCategories.handler(router);
-  createCategory.handler(router);
-  updateCategoryName.handler(router);
-  deleteCatagory.handler(router);
+  getCategory(router);
+  getCategories(router);
+  createCategory(router);
+  updateCategory(router);
+  deleteCategory(router);
 };

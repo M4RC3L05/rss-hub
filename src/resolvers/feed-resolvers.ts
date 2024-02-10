@@ -1,4 +1,4 @@
-import { type XMLBuilder } from "fast-xml-parser";
+import type { XMLBuilder } from "fast-xml-parser";
 import * as _ from "lodash-es";
 import mime from "mime-types";
 import { parse } from "node-html-parser";

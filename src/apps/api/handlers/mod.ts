@@ -1,4 +1,4 @@
-import { type Hono } from "hono";
+import type { Hono } from "hono";
 import * as categoriesHandlers from "./categories/mod.js";
 import * as feedItemsHandlers from "./feed-items/mod.js";
 import * as feedsHandlers from "./feeds/mod.js";

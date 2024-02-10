@@ -5,7 +5,6 @@
     "moduleResolution": "NodeNext",
     "skipLibCheck": true,
     "noEmit": true,
-    "jsx": "react-jsx",
     "strict": true,
     "noImplicitOverride": true,
     "esModuleInterop": true,

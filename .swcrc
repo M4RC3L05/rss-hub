@@ -9,13 +9,7 @@
       "syntax": "typescript",
       "dynamicImport": true,
       "importAssertions": true,
-      "tsx": true,
       "decorators": false
-    },
-    "transform": {
-      "react": {
-        "runtime": "automatic"
-      }
     }
   }
 }

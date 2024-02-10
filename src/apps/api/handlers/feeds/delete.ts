@@ -10,8 +10,8 @@ const requestParametersSchema = z.object({ id: z.string().uuid() }).strict();
 const log = makeLogger("delete-feed-handler");
 
 const handler = (router: Hono) => {
-  router.delete(
-    "/api/feeds/:id",
+  return router.delete(
+    "/:id",
     zValidator("param", requestParametersSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });

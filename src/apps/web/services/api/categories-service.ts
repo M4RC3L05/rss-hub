@@ -1,33 +1,35 @@
-import type { CategoriesTable } from "#src/database/types/mod.js";
-import { serviceRequester } from "../common/mod.js";
+import { client } from "../common/mod.js";
 
 class CategoriesService {
-  create({ data }: { data: { name: string } }) {
-    return serviceRequester("/api/categories", {
-      method: "post",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
+  async create({ data }: { data: { name: string } }) {
+    const response = await client.api.categories.$post({ json: data });
+
+    return response.json();
+  }
+
+  async getCategories() {
+    const response = await client.api.categories.$get();
+
+    return response.json();
+  }
+
+  async getCategoryById({ id }: { id: string }) {
+    const response = await client.api.categories[":id"].$get({ param: { id } });
+
+    return response.json();
+  }
+
+  async updateCategory({ data, id }: { data: { name: string }; id: string }) {
+    const response = await client.api.categories[":id"].$patch({
+      param: { id },
+      json: data,
     });
-  }
 
-  getCategories() {
-    return serviceRequester<CategoriesTable[]>("/api/categories");
-  }
-
-  getCategoryById({ id }: { id: string }) {
-    return serviceRequester<CategoriesTable>(`/api/categories/${id}`);
-  }
-
-  updateCategory({ data, id }: { data: { name: string }; id: string }) {
-    return serviceRequester(`/api/categories/${id}`, {
-      method: "patch",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    return response.json();
   }
 
   deleteCategory({ id }: { id: string }) {
-    return serviceRequester(`/api/categories/${id}`, { method: "delete" });
+    return client.api.categories[":id"].$delete({ param: { id } });
   }
 }
 

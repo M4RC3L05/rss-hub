@@ -9,8 +9,8 @@ import { RequestValidationError } from "#src/errors/mod.js";
 const requestParametersSchema = z.object({ id: z.string().uuid() }).strict();
 
 const handler = (router: Hono) => {
-  router.get(
-    "/api/feeds/:id",
+  return router.get(
+    "/:id",
     zValidator("param", requestParametersSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });

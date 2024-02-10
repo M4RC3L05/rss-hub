@@ -1,6 +1,8 @@
 import type { Readable } from "node:stream";
-import type { Response } from "node-fetch";
-import { serviceRequester } from "../common/mod.js";
+import config from "config";
+import { client, serviceRequester } from "../common/mod.js";
+
+const { url } = config.get<{ url: string }>("apps.web.services.api");
 
 class OpmlService {
   import({
@@ -10,15 +12,16 @@ class OpmlService {
     body: Readable;
     headers: { "content-type": string; "content-length": string };
   }) {
-    return serviceRequester("/api/opml/import", {
-      body,
+    return serviceRequester(`${url}/api/opml/import`, {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      body: body as any,
       method: "post",
       headers: headers,
     });
   }
 
-  export() {
-    return serviceRequester<Response>("/api/opml/export");
+  async export() {
+    return client.api.opml.export.$get();
   }
 }
 

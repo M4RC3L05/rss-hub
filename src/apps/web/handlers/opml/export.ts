@@ -12,8 +12,8 @@ export const handler = (router: Hono) => {
     );
 
     return stream(c, async (x) => {
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      for await (const chunk of response.body!) {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      for await (const chunk of response.body as any) {
         await x.write(chunk);
       }
     });

@@ -1,47 +1,52 @@
-import type {
-  CreateFeedRequestBodySchema,
-  UpdateFeedRequestBodySchema,
-} from "#src/apps/api/handlers/feeds/mod.js";
-import type { FeedsTable } from "#src/database/types/mod.js";
-import { serviceRequester } from "../common/mod.js";
+import type { InferRequestType } from "hono";
+import { client } from "../common/mod.js";
 
 class FeedsService {
-  createFeed({ data }: { data: CreateFeedRequestBodySchema }) {
-    return serviceRequester("/api/feeds", {
-      method: "post",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
+  async createFeed({
+    data,
+  }: { data: InferRequestType<typeof client.api.feeds.$post>["json"] }) {
+    const response = await client.api.feeds.$post({ json: data });
+
+    return response.json();
+  }
+
+  async getFeedById({ id }: { id: string }) {
+    const response = await client.api.feeds[":id"].$get({ param: { id } });
+
+    return response.json();
+  }
+
+  async getFeeds() {
+    const response = await client.api.feeds.$get();
+
+    return response.json();
+  }
+
+  async editFeed({
+    id,
+    data,
+  }: {
+    id: string;
+    data: InferRequestType<(typeof client.api.feeds)[":id"]["$patch"]>["json"];
+  }) {
+    const response = await client.api.feeds[":id"].$patch({
+      param: { id },
+      json: data,
     });
+
+    return response.json();
   }
 
-  getFeedById({ id }: { id: string }) {
-    return serviceRequester<FeedsTable>(`/api/feeds/${id}`);
+  async deleteFeed({ id }: { id: string }) {
+    const response = await client.api.feeds[":id"].$delete({ param: { id } });
+
+    return response.json();
   }
 
-  getFeeds() {
-    return serviceRequester<
-      (FeedsTable & { unreadCount: number; bookmarkedCount: number })[]
-    >("/api/feeds");
-  }
+  async verifyUrl({ data }: { data: { url: string } }) {
+    const response = await client.api.feeds.url.$post({ json: data });
 
-  editFeed({ id, data }: { id: string; data: UpdateFeedRequestBodySchema }) {
-    return serviceRequester(`/api/feeds/${id}`, {
-      method: "patch",
-      body: JSON.stringify(data),
-      headers: { "content-type": "application/json" },
-    });
-  }
-
-  deleteFeed({ id }: { id: string }) {
-    return serviceRequester(`/api/feeds/${id}`, { method: "delete" });
-  }
-
-  verifyUrl({ data }: { data: { url: string } }) {
-    return serviceRequester<{ title: string }>("/api/feeds/url", {
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-      method: "post",
-    });
+    return response.json();
   }
 }
 

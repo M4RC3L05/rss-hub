@@ -15,8 +15,8 @@ const requestParamsSchema = z
 const log = makeLogger("extract-feed-item-contents");
 
 const handler = (router: Hono) => {
-  router.get(
-    "/api/feed-items/:id/:feedId/extract-content",
+  return router.get(
+    "/:id/:feedId/extract-content",
     zValidator("param", requestParamsSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });
@@ -52,7 +52,7 @@ const handler = (router: Hono) => {
 
         const parsed = new Readability(dom.window.document).parse();
 
-        return c.json({ data: parsed?.content }, 200);
+        return c.json({ data: parsed?.content ?? "" }, 200);
       } catch (error) {
         log.error(error, "Unable to extract feed item content");
 

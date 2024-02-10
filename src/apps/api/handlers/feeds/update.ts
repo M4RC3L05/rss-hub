@@ -21,8 +21,8 @@ const requestBodySchema = z
 export type UpdateFeedRequestBodySchema = z.infer<typeof requestBodySchema>;
 
 const handler = (router: Hono) => {
-  router.patch(
-    "/api/feeds/:id",
+  return router.patch(
+    "/:id",
     zValidator("param", requestParametersSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { params: result.error } });

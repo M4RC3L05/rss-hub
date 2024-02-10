@@ -16,8 +16,8 @@ const requestQuerySchema = z
   .strict();
 
 const handler = (router: Hono) => {
-  router.get(
-    "/api/feed-items",
+  return router.get(
+    "/",
     zValidator("query", requestQuerySchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { query: result.error } });

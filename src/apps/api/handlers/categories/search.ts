@@ -3,7 +3,7 @@ import type { Hono } from "hono";
 import type { CategoriesTable } from "#src/database/types/mod.js";
 
 const handler = (router: Hono) => {
-  router.get("/api/categories", (c) => {
+  return router.get("/", (c) => {
     const categories = c
       .get("database")
       .all<CategoriesTable & { feedCount: number }>(sql`

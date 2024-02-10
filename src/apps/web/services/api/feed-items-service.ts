@@ -1,8 +1,8 @@
-import type { FeedItemsTable } from "#src/database/types/mod.js";
-import { serviceRequester } from "../common/mod.js";
+import type { InferRequestType } from "hono/client";
+import { client } from "../common/mod.js";
 
 class FeedItemsService {
-  getFeedItems({
+  async getFeedItems({
     feedId,
     filters,
     pagination,
@@ -11,25 +11,35 @@ class FeedItemsService {
     filters?: { bookmarked?: boolean; unread?: boolean };
     pagination?: { limit?: number; page?: number };
   }) {
-    return serviceRequester<FeedItemsTable[]>(
-      `/api/feed-items?feedId=${feedId}${
-        filters?.unread ? "&unread=true" : ""
-      }${filters?.bookmarked ? "&bookmarked=true" : ""}${
-        pagination?.page ? `&page=${pagination.page}` : ""
-      }${pagination?.limit ? `&limit=${pagination.limit}` : ""}`,
-    );
+    const query: InferRequestType<
+      (typeof client.api)["feed-items"]["$get"]
+    >["query"] = { feedId };
+
+    if (filters?.bookmarked) query.bookmarked = "true";
+    if (filters?.unread) query.unread = "true";
+
+    if (pagination?.limit) query.limit = String(pagination.limit);
+    if (pagination?.page) query.page = String(pagination.page);
+
+    const response = await client.api["feed-items"].$get({ query });
+
+    return response.json();
   }
 
-  getFeedItemById({ feedId, id }: { feedId: string; id: string }) {
-    return serviceRequester<FeedItemsTable>(
-      `/api/feed-items/${encodeURIComponent(id)}/${feedId}`,
-    );
+  async getFeedItemById({ feedId, id }: { feedId: string; id: string }) {
+    const response = await client.api["feed-items"][":id"][":feedId"].$get({
+      param: { feedId, id: encodeURIComponent(id) },
+    });
+
+    return response.json();
   }
 
-  feedItemReadability({ feedId, id }: { feedId: string; id: string }) {
-    return serviceRequester<string>(
-      `/api/feed-items/${encodeURIComponent(id)}/${feedId}/extract-content`,
-    );
+  async feedItemReadability({ feedId, id }: { feedId: string; id: string }) {
+    const response = await client.api["feed-items"][":id"][":feedId"][
+      "extract-content"
+    ].$get({ param: { feedId, id: encodeURIComponent(id) } });
+
+    return response.json() as Promise<{ data: string }>;
   }
 
   markFeedItemAsReaded({
@@ -37,11 +47,11 @@ class FeedItemsService {
   }: {
     data: { ids: { id: string; feedId: string }[] } | { feedId: string };
   }) {
-    return serviceRequester("/api/feed-items/read", {
-      method: "patch",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    console.log("data", data);
+    return client.api["feed-items"].read.$patch(
+      { json: data },
+      { headers: { "content-type": "application/json" } },
+    );
   }
 
   markFeedItemAsUnreaded({
@@ -49,11 +59,7 @@ class FeedItemsService {
   }: {
     data: { ids: { id: string; feedId: string }[] } | { feedId: string };
   }) {
-    return serviceRequester("/api/feed-items/unread", {
-      method: "patch",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    return client.api["feed-items"].unread.$patch({ json: data });
   }
 
   markFeedItemAsBookmarked({
@@ -61,11 +67,7 @@ class FeedItemsService {
   }: {
     data: { id: string; feedId: string };
   }) {
-    return serviceRequester("/api/feed-items/bookmark", {
-      method: "patch",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    return client.api["feed-items"].bookmark.$patch({ json: data });
   }
 
   markFeedItemAsUnbookmarked({
@@ -73,11 +75,7 @@ class FeedItemsService {
   }: {
     data: { id: string; feedId: string };
   }) {
-    return serviceRequester("/api/feed-items/unbookmark", {
-      method: "patch",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    return client.api["feed-items"].unbookmark.$patch({ json: data });
   }
 }
 

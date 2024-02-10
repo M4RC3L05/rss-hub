@@ -15,8 +15,8 @@ const requestBodySchema = z.union([
 ]);
 
 const handler = (router: Hono) => {
-  router.patch(
-    "/api/feed-items/unread",
+  return router.patch(
+    "/unread",
     zValidator("json", requestBodySchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });

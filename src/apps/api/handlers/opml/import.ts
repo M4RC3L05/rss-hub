@@ -11,7 +11,7 @@ import type { FeedsTable } from "#src/database/types/mod.js";
 const log = makeLogger("opml-import-handler");
 
 const handler = (router: Hono) => {
-  router.post("/api/opml/import", async (c) => {
+  return router.post("/import", async (c) => {
     const { file } = await c.req.parseBody();
 
     if (!file || !(file instanceof File)) {
@@ -101,9 +101,9 @@ const handler = (router: Hono) => {
         await Promise.allSettled(
           feeds.map(async (feed: FeedsTable) => ({
             feed,
-            stats: await c
-              .get("feedService")
-              .syncFeed(feed, { signal: c.get("shutdownManager").abortSignal }),
+            stats: await c.get("feedService").syncFeed(feed, {
+              signal: c.get("shutdownManager").abortSignal,
+            }),
           })),
         )
           .then((data) => {

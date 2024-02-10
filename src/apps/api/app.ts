@@ -12,6 +12,8 @@ import {
 } from "#src/middlewares/mod.js";
 import { router } from "./router.js";
 
+export type Api = ReturnType<typeof makeApp>;
+
 const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
   const app = new Hono();
 
@@ -42,9 +44,7 @@ const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
     }),
   );
 
-  router(app);
-
-  return app;
+  return app.route("/api", router());
 };
 
 export default makeApp;

@@ -36,8 +36,6 @@ export const handler = (router: Hono) => {
             }
           : { feedId };
 
-        console.log("data", data);
-
         await (state === "read"
           ? c
               .get("services")

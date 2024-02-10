@@ -10,8 +10,8 @@ const requestParametersSchema = z.object({ id: z.string().uuid() }).strict();
 const requestBodySchema = z.object({ name: z.string().min(2) }).strict();
 
 const handler = (router: Hono) => {
-  router.patch(
-    "/api/categories/:id",
+  return router.patch(
+    "/:id",
     zValidator("param", requestParametersSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { params: result.error } });

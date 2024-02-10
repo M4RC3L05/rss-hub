@@ -21,8 +21,8 @@ export type CreateFeedRequestBodySchema = z.infer<typeof requestBodySchema>;
 const log = makeLogger("create-feed-handler");
 
 const handler = (router: Hono) => {
-  router.post(
-    "/api/feeds",
+  return router.post(
+    "/",
     zValidator("json", requestBodySchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });

@@ -14,8 +14,8 @@ const requestParametersSchema = z
 const log = makeLogger("delete-category-handler");
 
 const handler = (router: Hono) => {
-  router.delete(
-    "/api/categories/:id",
+  return router.delete(
+    "/:id",
     zValidator("param", requestParametersSchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { params: result.error } });

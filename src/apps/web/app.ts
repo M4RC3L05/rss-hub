@@ -4,6 +4,7 @@ import { type ContextVariableMap, Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
+import type { StatusCode } from "hono/utils/http-status";
 import { makeLogger } from "#src/common/logger/mod.js";
 import type { DeepPartial } from "#src/common/utils/types.js";
 import { requestLifeCycle, serviceRegister } from "#src/middlewares/mod.js";
@@ -88,7 +89,7 @@ const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
 
     return c.text(
       error.message ? error.message : "Something broke",
-      (error as Error & { status: number }).status ?? 500,
+      (error as Error & { status: StatusCode }).status ?? 500,
     );
   });
 

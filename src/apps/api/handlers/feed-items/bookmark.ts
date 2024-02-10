@@ -10,8 +10,8 @@ const requestBodySchema = z
   .strict();
 
 const handler = (router: Hono) => {
-  router.patch(
-    "/api/feed-items/bookmark",
+  return router.patch(
+    "/bookmark",
     zValidator("json", requestBodySchema, (result) => {
       if (!result.success)
         throw new RequestValidationError({ request: { body: result.error } });

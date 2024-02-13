@@ -1,3 +1,7 @@
+### v5.0.1 (2024-02-13)
+
+- [Fix retry fetch counter](https://github.com/M4RC3L05/rss-hub/commit/97a73f98145b8f283134fcaf4dc4131c5dc1feff)
+
 ### v5.0.0 (2024-02-10)
 
 - [Use hono client](https://github.com/M4RC3L05/rss-hub/commit/68e9bbb00b429e257ec5819d2415624e931fd7c3)

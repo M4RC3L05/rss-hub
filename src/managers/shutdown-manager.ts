@@ -53,7 +53,10 @@ class ShutdownManager {
 
   async #processSignal(signal: NodeJS.Signals) {
     if (this.#shuttingDown) {
-      log.warn("Ignoring process exit signal has the app is shutting down.");
+      log.warn(
+        { signal },
+        "Ignoring process exit signal has the app is shutting down.",
+      );
 
       return;
     }

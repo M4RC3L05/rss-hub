@@ -1,3 +1,9 @@
+### v5.1.0 (2024-02-17)
+
+- [Use @m4rc3l05\/shutdown-manager package](https://github.com/M4RC3L05/rss-hub/commit/f694fafb14c95714f3e4f0221f419e6e50f2cfcf)
+- [Use @m4rc3l05\/sqlite-tags package](https://github.com/M4RC3L05/rss-hub/commit/b59f52e65a7129b0b36fc1ee6555d0cd8525249e)
+- [Log signal on ignore](https://github.com/M4RC3L05/rss-hub/commit/69a52be86ccf9b6daaf89ca785fe9187f16cd731)
+
 ### v5.0.1 (2024-02-13)
 
 - [Fix retry fetch counter](https://github.com/M4RC3L05/rss-hub/commit/97a73f98145b8f283134fcaf4dc4131c5dc1feff)

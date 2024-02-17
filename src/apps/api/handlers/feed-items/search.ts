@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { z } from "zod";
 import type { FeedItemsTable } from "#src/database/types/mod.js";
@@ -28,19 +28,22 @@ const handler = (router: Hono) => {
         select rowid, * from feed_items
         where
           feed_id = ${query.feedId}
-          $${"unread" in query ? sql`and readed_at is null` : sql``}
-          $${"bookmarked" in query ? sql`and bookmarked_at is not null` : sql``}
+          ${sql.if("unread" in query, () => sql`and readed_at is null`)}
+          ${sql.if(
+            "bookmarked" in query,
+            () => sql`and bookmarked_at is not null`,
+          )}
         order by created_at desc, rowid desc
       `;
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
       const { total } = c.get("database").get<{ total: number }>(sql`
         select count(id) as total
-        from ($${feedItemsQuery})
+        from (${feedItemsQuery})
       `)!;
       const feedItems = c
         .get("database")
         .all<FeedItemsTable & { rowid: number }>(sql`
-          $${feedItemsQuery}
+          ${feedItemsQuery}
           limit ${Number(query.limit)}
           offset ${Number(query.page) * Number(query.limit)}
         `);

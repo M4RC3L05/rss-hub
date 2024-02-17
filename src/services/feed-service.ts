@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import * as entities from "entities";
 import * as _ from "lodash-es";
 import { request } from "../common/utils/fetch-utils.js";
@@ -200,24 +200,32 @@ class FeedService {
 
     this.#db.run(
       sql`
-        insert into
-          feed_items(id, feed_id, raw, content, img, created_at, title, enclosure, link, updated_at)
-        values
-          (${toInsert.id}, ${toInsert.feedId}, ${toInsert.raw}, ${
-            toInsert.content
-          }, ${toInsert.img}, ${toInsert.createdAt}, ${toInsert.title}, ${
-            toInsert.enclosure
-          }, ${toInsert.link}, ${toInsert.updatedAt})
-        on conflict
-          (id, feed_id)
+        insert into feed_items ${sql.insert(
+          _.mapKeys(toInsert, (__, k) => _.snakeCase(k)),
+        )}
+        on conflict (id, feed_id)
         do update set
-          content = $${content ? sql`${toInsert.content}` : sql`content`},
-          img = $${feedImage ? sql`${toInsert.img}` : sql`img`},
-          title = $${title ? sql`${toInsert.title}` : sql`title`},
-          enclosure = $${
-            enclosures.length > 0 ? sql`${toInsert.enclosure}` : sql`enclosure`
-          },
-          link = $${link ? sql`${toInsert.link}` : sql`link`},
+          content = ${sql.ternary(
+            !!content,
+            () => sql`${toInsert.content}`,
+            () => sql.id("content"),
+          )},
+          img = ${sql.ternary(
+            !!feedImage,
+            () => sql`${toInsert.img}`,
+            () => sql.id("img"),
+          )},
+          title = ${title ? sql`${toInsert.title}` : sql.id("title")},
+          enclosure = ${sql.ternary(
+            enclosures.length > 0,
+            () => sql`${toInsert.enclosure}`,
+            () => sql.id("enclosure"),
+          )},
+          link = ${sql.ternary(
+            !!link,
+            () => sql`${toInsert.link}`,
+            () => sql.id("link"),
+          )},
           updated_at = ${toInsert.updatedAt}
       `,
     );

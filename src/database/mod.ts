@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import sql, { Database, type Options, type Query } from "@leafac/sqlite";
+import { type TSqlFragment, sql } from "@m4rc3l05/sqlite-tag";
+import Database, { type Statement } from "better-sqlite3";
 import config from "config";
 import { camelCase, isObject, mapKeys } from "lodash-es";
 import { makeLogger } from "../common/logger/mod.js";
@@ -16,16 +17,44 @@ const toCamelCase = <T>(data: unknown) => {
 };
 
 export class CustomDatabase extends Database {
-  override get<T>(query: Query, options: Options = {}): T | undefined {
-    if (!this.open) return;
+  #cache = new Map<string, Statement>();
 
-    return toCamelCase<T>(super.get<T>(query, options));
+  #ensureInCache(query: string) {
+    const key = query.trim();
+
+    if (!this.#cache.has(key)) {
+      this.#cache.set(key, this.prepare(key));
+    }
+
+    return this.#cache.get(key) as Statement;
   }
 
-  override all<T>(query: Query, options: Options = {}): T[] {
-    if (!this.open) return [];
+  get<T>(query: TSqlFragment): T | undefined {
+    const prepared = this.#ensureInCache(query.query);
 
-    return toCamelCase<T[]>(super.all<T>(query, options));
+    return toCamelCase<T>(prepared.get(query.params));
+  }
+
+  all<T>(query: TSqlFragment): T[] {
+    const prepared = this.#ensureInCache(query.query);
+
+    return toCamelCase<T[]>(prepared.all(query.params));
+  }
+
+  execute(query: TSqlFragment) {
+    return this.exec(query.query);
+  }
+
+  run(query: TSqlFragment) {
+    const prepared = this.#ensureInCache(query.query);
+
+    return prepared.run(query.params);
+  }
+
+  iterate<T>(query: TSqlFragment): IterableIterator<T> {
+    const prepared = this.#ensureInCache(query.query);
+
+    return prepared.iterate(query.params) as IterableIterator<T>;
   }
 }
 

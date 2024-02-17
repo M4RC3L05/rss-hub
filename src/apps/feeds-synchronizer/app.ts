@@ -1,4 +1,4 @@
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import { stdSerializers } from "pino";
 import { makeLogger } from "#src/common/logger/mod.js";
 import type { CustomDatabase } from "#src/database/mod.js";

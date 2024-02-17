@@ -47,7 +47,6 @@ class FeedItemsService {
   }: {
     data: { ids: { id: string; feedId: string }[] } | { feedId: string };
   }) {
-    console.log("data", data);
     return client.api["feed-items"].read.$patch(
       { json: data },
       { headers: { "content-type": "application/json" } },

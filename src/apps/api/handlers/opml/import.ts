@@ -1,4 +1,4 @@
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import { decodeXML } from "entities";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -30,7 +30,7 @@ const handler = (router: Hono) => {
     >;
     const feedsToSync: string[] = [];
 
-    c.get("database").executeTransaction(() => {
+    c.get("database").transaction(() => {
       const categories = castArray(get(parsed, "opml.body.outline")).filter(
         (value) => value !== null && value !== undefined,
       );
@@ -87,7 +87,7 @@ const handler = (router: Hono) => {
           }
         }
       }
-    });
+    })();
 
     // Deferred sync inserted feeds if any
     if (feedsToSync.length > 0) {

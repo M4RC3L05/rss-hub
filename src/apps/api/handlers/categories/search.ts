@@ -1,4 +1,4 @@
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import type { CategoriesTable } from "#src/database/types/mod.js";
 

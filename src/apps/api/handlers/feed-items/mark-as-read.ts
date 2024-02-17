@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -28,17 +28,21 @@ const handler = (router: Hono) => {
           update feed_items set
             readed_at = ${new Date().toISOString()}
           where
-            $${
-              "ids" in data
-                ? data.ids
-                    .map(
-                      ({ feedId, id }) =>
-                        sql`(id = ${id} and feed_id = ${feedId})`,
-                    )
-                    .reduce((acc, curr) => sql`$${acc} or $${curr}`)
-                : sql``
-            }
-            $${"feedId" in data ? sql`feed_id = ${data.feedId}` : sql``}
+            ${sql.if(
+              "ids" in data,
+              () =>
+                sql`(${sql.join(
+                  (data as { ids: { feedId: string; id: string }[] }).ids.map(
+                    ({ feedId, id }) =>
+                      sql`(id = ${id} and feed_id = ${feedId})`,
+                  ),
+                  sql` or `,
+                )})`,
+            )}
+            ${sql.if(
+              "feedId" in data,
+              () => sql`feed_id = ${(data as { feedId: string }).feedId}`,
+            )}
             and readed_at is null
         `,
       );

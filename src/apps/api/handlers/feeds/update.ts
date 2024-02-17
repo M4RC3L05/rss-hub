@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import sql from "@leafac/sqlite";
+import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -35,12 +35,7 @@ const handler = (router: Hono) => {
       const parameters = c.req.valid("param");
       const data = c.req.valid("json");
       const feed = c.get("database").get(sql`
-        update feeds set
-          category_id = $${
-            data.categoryId ? sql`${data.categoryId}` : sql`category_id`
-          },
-          name = $${data.name ? sql`${data.name}` : sql`name`},
-          url = $${data.url ? sql`${data.url}` : sql`url`}
+        update feeds set ${sql.set(data)}
         where id = ${parameters.id}
         returning *
       `);

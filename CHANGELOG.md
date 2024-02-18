@@ -1,3 +1,7 @@
+### v5.2.0 (2024-02-18)
+
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/814ebce1573417e0b37bc9fe44614685bc3b2dd3)
+
 ### v5.1.1 (2024-02-18)
 
 - [Fix execute custom db method](https://github.com/M4RC3L05/rss-hub/commit/8f912de0e5150a5e635b4925deaad5ec5fccd09a)

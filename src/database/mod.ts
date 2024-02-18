@@ -42,7 +42,9 @@ export class CustomDatabase extends Database {
   }
 
   execute(query: TSqlFragment) {
-    return this.exec(query.query);
+    this.run(query);
+
+    return this;
   }
 
   run(query: TSqlFragment) {

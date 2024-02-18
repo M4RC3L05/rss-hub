@@ -1,3 +1,7 @@
+### v5.1.1 (2024-02-18)
+
+- [Fix execute custom db method](https://github.com/M4RC3L05/rss-hub/commit/8f912de0e5150a5e635b4925deaad5ec5fccd09a)
+
 ### v5.1.0 (2024-02-17)
 
 - [Use @m4rc3l05\/shutdown-manager package](https://github.com/M4RC3L05/rss-hub/commit/f694fafb14c95714f3e4f0221f419e6e50f2cfcf)

@@ -1,3 +1,8 @@
+### v5.3.0 (2024-02-22)
+
+- [Use @m4rc3l05\/cron package](https://github.com/M4RC3L05/rss-hub/commit/afe62dff2873a64746e2c5e07314d09e5c0cb244)
+- [Update nodejs version](https://github.com/M4RC3L05/rss-hub/commit/d16e2d365da6e6f69c5437897fab651f5aa57b06)
+
 ### v5.2.0 (2024-02-18)
 
 - [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/814ebce1573417e0b37bc9fe44614685bc3b2dd3)

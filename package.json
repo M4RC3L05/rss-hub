@@ -46,12 +46,12 @@
   "dependencies": {
     "@hono/node-server": "1.8.0",
     "@hono/zod-validator": "0.1.11",
+    "@m4rc3l05/cron": "github:M4RC3L05/cron#v0.1.0",
     "@m4rc3l05/shutdown-manager": "github:M4RC3L05/shutdown-manager#v0.0.1",
     "@m4rc3l05/sqlite-tag": "github:M4RC3L05/sqlite-tag#v0.0.1",
     "@mozilla/readability": "0.5.0",
     "better-sqlite3": "9.4.1",
     "config": "3.3.11",
-    "cron-parser": "4.9.0",
     "entities": "4.5.0",
     "fast-xml-parser": "4.3.4",
     "hono": "4.0.4",

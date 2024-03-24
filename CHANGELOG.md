@@ -1,3 +1,9 @@
+### v5.4.0 (2024-03-24)
+
+- [Fix license file name](https://github.com/M4RC3L05/rss-hub/commit/9f8da80999175ab4ae682cd5d6c6dfaad97d11d9)
+- [Update dependencies](https://github.com/M4RC3L05/rss-hub/commit/4a75ab08b1ce53933a7c701fe3b0bfbbf321c672)
+- [Update \`@m4rc3l05\/cron\` and \`@m4rc3l05\/sqlite-tag\`](https://github.com/M4RC3L05/rss-hub/commit/477967beee278c5ff661a2414b7bca772ea72a39)
+
 ### v5.3.0 (2024-02-22)
 
 - [Use @m4rc3l05\/cron package](https://github.com/M4RC3L05/rss-hub/commit/afe62dff2873a64746e2c5e07314d09e5c0cb244)

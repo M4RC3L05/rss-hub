@@ -1,3 +1,7 @@
+### v5.4.1 (2024-03-31)
+
+- [Update \`@m4rc3l05\/cron\`](https://github.com/M4RC3L05/rss-hub/commit/92eb98c53d07aef03a3d383f1e9e4e5da3ef4a45)
+
 ### v5.4.0 (2024-03-24)
 
 - [Fix license file name](https://github.com/M4RC3L05/rss-hub/commit/9f8da80999175ab4ae682cd5d6c6dfaad97d11d9)

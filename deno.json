@@ -1,0 +1,39 @@
+{
+  "name": "@m4rc3l05/rss-hub",
+  "version": "5.4.0",
+  "tasks": {
+    "api": "deno run -A --unstable-ffi --lock=deno.lock --cached-only src/apps/api/main.ts",
+    "web": "deno run -A --unstable-ffi --lock=deno.lock --cached-only src/apps/web/main.ts",
+    "feeds-synchronizer": "deno run -A --unstable-ffi --lock=deno.lock --cached-only src/apps/feeds-synchronizer/main.ts",
+    "dev:dbmate": "sudo docker run -it --rm -v \"$(pwd)/src:/src\" -v \"$(pwd)/data:/data\" -u \"$(id -u):$(id -g)\" ghcr.io/amacneil/dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema",
+    "deps:lock": "deno cache --lock=deno.lock --lock-write src/**/*.ts ./.bin/*.ts",
+    "deps": "deno cache --reload --lock=deno.lock src/**/*.ts ./.bin/*.ts"
+  },
+  "lint": {
+    "rules": {
+      "include": ["verbatim-module-syntax"]
+    }
+  },
+  "imports": {
+    "#src/": "./src/",
+    "@db/sqlite": "jsr:@db/sqlite@0.11.1",
+    "@m4rc3l05/cron": "jsr:@m4rc3l05/cron@0.1.4",
+    "@m4rc3l05/sqlite-tag": "jsr:@m4rc3l05/sqlite-tag@0.1.7",
+    "@mozilla/readability": "npm:@mozilla/readability@0.5.0",
+    "@std/async": "jsr:@std/async@0.221.0",
+    "@std/collections": "jsr:@std/collections@0.221.0",
+    "@std/encoding": "jsr:@std/encoding@0.221.0",
+    "@std/html": "jsr:@std/html@0.221.0",
+    "@std/log": "jsr:@std/log@0.221.0",
+    "@std/media-types": "jsr:@std/media-types@0.221.0",
+    "@std/streams": "jsr:@std/streams@0.221.0",
+    "@std/text": "jsr:@std/text@0.221.0",
+    "@vinejs/vine": "npm:@vinejs/vine@2.0.0",
+    "config": "npm:config@3.3.11",
+    "fast-xml-parser": "npm:fast-xml-parser@4.3.6",
+    "hono": "npm:hono@4.1.5",
+    "jsdom": "npm:jsdom@24.0.0",
+    "lodash-es": "npm:lodash-es@4.17.21",
+    "node-html-parser": "npm:node-html-parser@6.1.13"
+  }
+}

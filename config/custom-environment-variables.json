@@ -7,8 +7,8 @@
         "__format": "number"
       },
       "basicAuth": {
-        "name": "APPS_API_BASIC_AUTH_NAME",
-        "pass": "APPS_API_BASIC_AUTH_PASS"
+        "username": "APPS_API_BASIC_AUTH_USERNAME",
+        "password": "APPS_API_BASIC_AUTH_PASSWORD"
       }
     },
     "web": {
@@ -18,15 +18,15 @@
         "__format": "number"
       },
       "basicAuth": {
-        "name": "APPS_WEB_BASIC_AUTH_NAME",
-        "pass": "APPS_WEB_BASIC_AUTH_PASS"
+        "username": "APPS_WEB_BASIC_AUTH_USERNAME",
+        "password": "APPS_WEB_BASIC_AUTH_PASSWORD"
       },
       "services": {
         "api": {
           "url": "APPS_WEB_SERVICES_API_URL",
           "basicAuth": {
-            "name": "APPS_WEB_SERVICES_API_BASIC_AUTH_NAME",
-            "pass": "APPS_WEB_SERVICES_API_BASIC_AUTH_PASS"
+            "username": "APPS_WEB_SERVICES_API_BASIC_AUTH_USERNAME",
+            "password": "APPS_WEB_SERVICES_API_BASIC_AUTH_PASSWORD"
           }
         }
       }

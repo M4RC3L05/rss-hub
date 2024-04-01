@@ -1,1 +1,1 @@
-export * as feedResolvers from "./feed-resolvers.js";
+export * as feedResolvers from "#src/resolvers/feed-resolvers.ts";

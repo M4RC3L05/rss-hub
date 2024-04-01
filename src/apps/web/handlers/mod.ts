@@ -1,9 +1,9 @@
 import type { Hono } from "hono";
-import * as categoriesHandler from "./categories/mod.js";
-import * as feedItemsHandler from "./feed-items/mod.js";
-import * as feedsHandler from "./feeds/mod.js";
-import * as opmlHandlers from "./opml/mod.js";
-import * as pagesHandlers from "./pages/mod.js";
+import * as categoriesHandler from "#src/apps/web/handlers/categories/mod.ts";
+import * as feedItemsHandler from "#src/apps/web/handlers/feed-items/mod.ts";
+import * as feedsHandler from "#src/apps/web/handlers/feeds/mod.ts";
+import * as opmlHandlers from "#src/apps/web/handlers/opml/mod.ts";
+import * as pagesHandlers from "#src/apps/web/handlers/pages/mod.ts";
 
 export const handler = (router: Hono) => {
   categoriesHandler.handler(router);

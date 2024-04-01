@@ -1,35 +1,51 @@
-import { client } from "../common/mod.js";
+import { BaseService } from "#src/apps/web/services/common/mod.ts";
 
-class CategoriesService {
-  async create({ data }: { data: { name: string } }) {
-    const response = await client.api.categories.$post({ json: data });
-
-    return response.json();
-  }
-
-  async getCategories() {
-    const response = await client.api.categories.$get();
-
-    return response.json();
-  }
-
-  async getCategoryById({ id }: { id: string }) {
-    const response = await client.api.categories[":id"].$get({ param: { id } });
-
-    return response.json();
-  }
-
-  async updateCategory({ data, id }: { data: { name: string }; id: string }) {
-    const response = await client.api.categories[":id"].$patch({
-      param: { id },
-      json: data,
+class CategoriesService extends BaseService {
+  createCategory(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/categories",
+      init: {
+        body: JSON.stringify(data),
+        signal,
+        headers: { "content-type": "application/json" },
+        method: "POST",
+      },
     });
-
-    return response.json();
   }
 
-  deleteCategory({ id }: { id: string }) {
-    return client.api.categories[":id"].$delete({ param: { id } });
+  getCategories({ signal }: { signal: AbortSignal }) {
+    return this.request({ path: "/api/categories", init: { signal } });
+  }
+
+  getCategoryById({ id, signal }: { id: string; signal: AbortSignal }) {
+    return this.request({ path: `/api/categories/${id}`, init: { signal } });
+  }
+
+  updateCategory(
+    { data, id, signal }: {
+      data: Record<string, unknown>;
+      id: string;
+      signal: AbortSignal;
+    },
+  ) {
+    return this.request({
+      path: `/api/categories/${id}`,
+      init: {
+        method: "PATCH",
+        signal,
+        body: JSON.stringify(data),
+        headers: { "content-type": "application/json" },
+      },
+    });
+  }
+
+  deleteCategory({ id, signal }: { id: string; signal: AbortSignal }) {
+    return this.request({
+      path: `/api/categories/${id}`,
+      init: { method: "DELETE", signal },
+    });
   }
 }
 

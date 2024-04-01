@@ -1,10 +1,9 @@
-import { type Env, Hono } from "hono";
-import type { SchemaType } from "#src/common/utils/types.js";
-import { default as createCategory } from "./create.js";
-import { default as deleteCategory } from "./delete.js";
-import { default as getCategory } from "./get.js";
-import { default as getCategories } from "./search.js";
-import { default as updateCategory } from "./update.js";
+import { Hono } from "hono";
+import { default as createCategory } from "#src/apps/api/handlers/categories/create.ts";
+import { default as deleteCategory } from "#src/apps/api/handlers/categories/delete.ts";
+import { default as getCategory } from "#src/apps/api/handlers/categories/get.ts";
+import { default as getCategories } from "#src/apps/api/handlers/categories/search.ts";
+import { default as updateCategory } from "#src/apps/api/handlers/categories/update.ts";
 
 export const router = () => {
   let router = new Hono();
@@ -15,13 +14,5 @@ export const router = () => {
   router = updateCategory(router);
   router = deleteCategory(router);
 
-  return router as Hono<
-    Env,
-    SchemaType<ReturnType<typeof getCategory>> &
-      SchemaType<ReturnType<typeof getCategories>> &
-      SchemaType<ReturnType<typeof createCategory>> &
-      SchemaType<ReturnType<typeof updateCategory>> &
-      SchemaType<ReturnType<typeof deleteCategory>>,
-    "/"
-  >;
+  return router;
 };

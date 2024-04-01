@@ -1,32 +1,23 @@
-import { zValidator } from "@hono/zod-validator";
 import type { Hono } from "hono";
-import { z } from "zod";
-import { RequestValidationError } from "#src/errors/mod.js";
-import { feedsViews } from "../../views/mod.js";
-
-const requestFormSchema = z
-  .object({ name: z.string(), url: z.string(), categoryId: z.string() })
-  .strict();
+import { feedsViews } from "#src/apps/web/views/mod.ts";
 
 export const handler = (router: Hono) => {
   router.get("/feeds/create", async (c) => {
-    const { data: categories } = await c
-      .get("services")
-      .api.categoriesService.getCategories();
+    const { data: categories } = await c.get("services").api.categoriesService
+      .getCategories({ signal: c.req.raw.signal });
 
     return c.html(feedsViews.pages.Create({ categories }));
   });
 
   router.post(
     "/feeds/create",
-    zValidator("form", requestFormSchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
     async (c) => {
-      const data = c.req.valid("form");
+      const data = await c.req.parseBody();
 
-      await c.get("services").api.feedsService.createFeed({ data });
+      await c.get("services").api.feedsService.createFeed({
+        data,
+        signal: c.req.raw.signal,
+      });
 
       return c.text("ok");
     },

@@ -1,27 +1,32 @@
-import type { Readable } from "node:stream";
-import config from "config";
-import { client, serviceRequester } from "../common/mod.js";
+import { BaseService } from "#src/apps/web/services/common/mod.ts";
 
-const { url } = config.get<{ url: string }>("apps.web.services.api");
-
-class OpmlService {
+class OpmlService extends BaseService {
   import({
     body,
     headers,
+    signal,
   }: {
-    body: Readable;
+    body: ReadableStream;
     headers: { "content-type": string; "content-length": string };
+    signal: AbortSignal;
   }) {
-    return serviceRequester(`${url}/api/opml/import`, {
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      body: body as any,
-      method: "post",
-      headers: headers,
+    return this.request({
+      path: "/api/opml/import",
+      init: {
+        signal,
+        body: body,
+        method: "post",
+        headers: headers,
+      },
     });
   }
 
-  async export() {
-    return client.api.opml.export.$get();
+  export({ signal }: { signal: AbortSignal }) {
+    return this.request({
+      path: "/api/opml/export",
+      init: { signal },
+      sendResponse: true,
+    });
   }
 }
 

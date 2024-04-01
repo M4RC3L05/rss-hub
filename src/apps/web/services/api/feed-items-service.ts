@@ -1,19 +1,18 @@
-import type { InferRequestType } from "hono/client";
-import { client } from "../common/mod.js";
+import { BaseService } from "#src/apps/web/services/common/mod.ts";
 
-class FeedItemsService {
-  async getFeedItems({
+class FeedItemsService extends BaseService {
+  getFeedItems({
     feedId,
     filters,
     pagination,
+    signal,
   }: {
     feedId: string;
     filters?: { bookmarked?: boolean; unread?: boolean };
     pagination?: { limit?: number; page?: number };
+    signal: AbortSignal;
   }) {
-    const query: InferRequestType<
-      (typeof client.api)["feed-items"]["$get"]
-    >["query"] = { feedId };
+    const query: Record<string, string> = { feedId };
 
     if (filters?.bookmarked) query.bookmarked = "true";
     if (filters?.unread) query.unread = "true";
@@ -21,60 +20,86 @@ class FeedItemsService {
     if (pagination?.limit) query.limit = String(pagination.limit);
     if (pagination?.page) query.page = String(pagination.page);
 
-    const response = await client.api["feed-items"].$get({ query });
-
-    return response.json();
-  }
-
-  async getFeedItemById({ feedId, id }: { feedId: string; id: string }) {
-    const response = await client.api["feed-items"][":id"][":feedId"].$get({
-      param: { feedId, id: encodeURIComponent(id) },
+    return this.request({
+      path: `/api/feed-items?${new URLSearchParams(query).toString()}`,
+      init: { signal },
     });
-
-    return response.json();
   }
 
-  async feedItemReadability({ feedId, id }: { feedId: string; id: string }) {
-    const response = await client.api["feed-items"][":id"][":feedId"][
-      "extract-content"
-    ].$get({ param: { feedId, id: encodeURIComponent(id) } });
-
-    return response.json() as Promise<{ data: string }>;
+  getFeedItemById(
+    { feedId, id, signal }: { feedId: string; id: string; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: `/api/feed-items/${encodeURIComponent(id)}/${feedId}`,
+      init: { signal },
+    });
   }
 
-  markFeedItemAsReaded({
-    data,
-  }: {
-    data: { ids: { id: string; feedId: string }[] } | { feedId: string };
-  }) {
-    return client.api["feed-items"].read.$patch(
-      { json: data },
-      { headers: { "content-type": "application/json" } },
-    );
+  feedItemReadability(
+    { feedId, id, signal }: { feedId: string; id: string; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: `/api/feed-items/${
+        encodeURIComponent(id)
+      }/${feedId}/extract-content`,
+      init: { signal },
+    });
   }
 
-  markFeedItemAsUnreaded({
-    data,
-  }: {
-    data: { ids: { id: string; feedId: string }[] } | { feedId: string };
-  }) {
-    return client.api["feed-items"].unread.$patch({ json: data });
+  markFeedItemAsReaded(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/feed-items/read",
+      init: {
+        body: JSON.stringify(data),
+        method: "PATCH",
+        signal,
+        headers: { "content-type": "application/json" },
+      },
+    });
   }
 
-  markFeedItemAsBookmarked({
-    data,
-  }: {
-    data: { id: string; feedId: string };
-  }) {
-    return client.api["feed-items"].bookmark.$patch({ json: data });
+  markFeedItemAsUnreaded(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/feed-items/unread",
+      init: {
+        body: JSON.stringify(data),
+        method: "PATCH",
+        signal,
+        headers: { "content-type": "application/json" },
+      },
+    });
   }
 
-  markFeedItemAsUnbookmarked({
-    data,
-  }: {
-    data: { id: string; feedId: string };
-  }) {
-    return client.api["feed-items"].unbookmark.$patch({ json: data });
+  markFeedItemAsBookmarked(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/feed-items/bookmark",
+      init: {
+        body: JSON.stringify(data),
+        method: "PATCH",
+        signal,
+        headers: { "content-type": "application/json" },
+      },
+    });
+  }
+
+  markFeedItemAsUnbookmarked(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/feed-items/unbookmark",
+      init: {
+        body: JSON.stringify(data),
+        method: "PATCH",
+        signal,
+        headers: { "content-type": "application/json" },
+      },
+    });
   }
 }
 

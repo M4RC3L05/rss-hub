@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
 import { sql } from "@m4rc3l05/sqlite-tag";
-import * as entities from "entities";
+import * as entities from "@std/html";
 import * as _ from "lodash-es";
-import { request } from "../common/utils/fetch-utils.js";
-import { xmlBuilder, xmlParser } from "../common/utils/xml-utils.js";
-import type { CustomDatabase } from "../database/mod.js";
-import type { FeedsTable } from "../database/types/mod.js";
-import { feedResolvers } from "../resolvers/mod.js";
+import { request } from "#src/common/utils/fetch-utils.ts";
+import { xmlBuilder, xmlParser } from "#src/common/utils/xml-utils.ts";
+import type { CustomDatabase } from "../database/mod.ts";
+import type { FeedsTable } from "../database/types/mod.ts";
+import { feedResolvers } from "#src/resolvers/mod.ts";
 
 class FeedService {
   #db: CustomDatabase;
@@ -56,6 +56,7 @@ class FeedService {
     }
 
     const status = await Promise.allSettled(
+      // deno-lint-ignore require-await
       feedItems.map(async (entry) => this.#syncFeedEntry(entry, feed.id)),
     );
     const totalCount = status.length;
@@ -158,7 +159,7 @@ class FeedService {
     }
   }
 
-  async #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
+  #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
     const id = feedResolvers.resolveFeedItemGuid(feedItem);
     const enclosures = feedResolvers.resolveFeedItemEnclosures(feedItem);
     let feedImage = feedResolvers.resolveFeedItemImage(
@@ -174,58 +175,65 @@ class FeedService {
     const title = feedResolvers.resolveFeedItemTitle(feedItem);
 
     if (feedImage) {
-      feedImage = entities.decodeXML(feedImage);
+      feedImage = entities.unescape(feedImage);
     }
 
     const toInsert = {
-      id:
-        id ??
+      id: id ??
         createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),
       feedId,
       raw: JSON.stringify(feedItem),
       content: content ?? "",
       img: feedImage ?? null,
-      createdAt:
-        pubDate?.toISOString() ??
+      createdAt: pubDate?.toISOString() ??
         updatedAt?.toISOString() ??
         new Date().toISOString(),
       title: title ?? "",
       enclosure: JSON.stringify(enclosures),
       link: link ?? null,
-      updatedAt:
-        updatedAt?.toISOString() ??
+      updatedAt: updatedAt?.toISOString() ??
         pubDate?.toISOString() ??
         new Date().toISOString(),
     };
 
-    this.#db.run(
+    this.#db.execute(
       sql`
-        insert into feed_items ${sql.insert(
-          _.mapKeys(toInsert, (__, k) => _.snakeCase(k)),
-        )}
+        insert into feed_items ${
+        sql.insert(
+          _.mapKeys(toInsert, (__: unknown, k: string) => _.snakeCase(k)),
+        )
+      }
         on conflict (id, feed_id)
         do update set
-          content = ${sql.ternary(
-            !!content,
-            () => sql`${toInsert.content}`,
-            () => sql.id("content"),
-          )},
-          img = ${sql.ternary(
-            !!feedImage,
-            () => sql`${toInsert.img}`,
-            () => sql.id("img"),
-          )},
+          content = ${
+        sql.ternary(
+          !!content,
+          () => sql`${toInsert.content}`,
+          () => sql.id("content"),
+        )
+      },
+          img = ${
+        sql.ternary(
+          !!feedImage,
+          () => sql`${toInsert.img}`,
+          () => sql.id("img"),
+        )
+      },
           title = ${title ? sql`${toInsert.title}` : sql.id("title")},
-          enclosure = ${sql.ternary(
-            enclosures.length > 0,
-            () => sql`${toInsert.enclosure}`,
-            () => sql.id("enclosure"),
-          )},
-          link = ${sql.ternary(
-            !!link,
-            () => sql`${toInsert.link}`,
-            () => sql.id("link"),
-          )},
+          enclosure = ${
+        sql.ternary(
+          enclosures.length > 0,
+          () => sql`${toInsert.enclosure}`,
+          () => sql.id("enclosure"),
+        )
+      },
+          link = ${
+        sql.ternary(
+          !!link,
+          () => sql`${toInsert.link}`,
+          () => sql.id("link"),
+        )
+      },
           updated_at = ${toInsert.updatedAt}
       `,
     );

@@ -1,52 +1,65 @@
-import type { InferRequestType } from "hono";
-import { client } from "../common/mod.js";
+import { BaseService } from "#src/apps/web/services/common/mod.ts";
 
-class FeedsService {
-  async createFeed({
-    data,
-  }: { data: InferRequestType<typeof client.api.feeds.$post>["json"] }) {
-    const response = await client.api.feeds.$post({ json: data });
-
-    return response.json();
-  }
-
-  async getFeedById({ id }: { id: string }) {
-    const response = await client.api.feeds[":id"].$get({ param: { id } });
-
-    return response.json();
-  }
-
-  async getFeeds() {
-    const response = await client.api.feeds.$get();
-
-    return response.json();
-  }
-
-  async editFeed({
-    id,
-    data,
-  }: {
-    id: string;
-    data: InferRequestType<(typeof client.api.feeds)[":id"]["$patch"]>["json"];
-  }) {
-    const response = await client.api.feeds[":id"].$patch({
-      param: { id },
-      json: data,
+class FeedsService extends BaseService {
+  createFeed(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/feeds",
+      init: {
+        signal,
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "content-type": "application/json" },
+      },
     });
-
-    return response.json();
   }
 
-  async deleteFeed({ id }: { id: string }) {
-    const response = await client.api.feeds[":id"].$delete({ param: { id } });
-
-    return response.json();
+  getFeedById({ id, signal }: { id: string; signal: AbortSignal }) {
+    return this.request({ path: `/api/feeds/${id}`, init: { signal } });
   }
 
-  async verifyUrl({ data }: { data: { url: string } }) {
-    const response = await client.api.feeds.url.$post({ json: data });
+  getFeeds({ signal }: { signal: AbortSignal }) {
+    return this.request({ path: "/api/feeds", init: { signal } });
+  }
 
-    return response.json();
+  editFeed(
+    { id, data, signal }: {
+      id: string;
+      data: Record<string, unknown>;
+      signal: AbortSignal;
+    },
+  ) {
+    return this.request({
+      path: `/api/feeds/${id}`,
+      init: {
+        signal,
+        method: "PATCH",
+        body: JSON.stringify(data),
+        headers: { "content-type": "application/json" },
+      },
+    });
+  }
+
+  deleteFeed({ id, signal }: { id: string; signal: AbortSignal }) {
+    return this.request({
+      path: `/api/feeds/${id}`,
+      init: { method: "DELETE", signal },
+    });
+  }
+
+  verifyUrl(
+    { data, signal }: { data: Record<string, unknown>; signal: AbortSignal },
+  ) {
+    return this.request({
+      path: "/api/feeds/url",
+      init: {
+        signal,
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "content-type": "application/json" },
+      },
+    });
   }
 }
 

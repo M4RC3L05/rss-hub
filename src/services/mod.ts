@@ -1,1 +1,1 @@
-export { default as FeedService } from "./feed-service.js";
+export { default as FeedService } from "#src/services/feed-service.ts";

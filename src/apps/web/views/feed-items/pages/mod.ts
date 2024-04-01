@@ -1,2 +1,2 @@
-export { default as Index } from "./index.js";
-export { default as Show } from "./show.js";
+export { default as Index } from "#src/apps/web/views/feed-items/pages/index.ts";
+export { default as Show } from "#src/apps/web/views/feed-items/pages/show.ts";

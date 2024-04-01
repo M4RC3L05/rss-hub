@@ -1,14 +1,11 @@
-import { setTimeout } from "node:timers/promises";
-import fetch, { type Response } from "node-fetch";
-import { makeLogger } from "../logger/mod.js";
+import { delay } from "@std/async";
+import { makeLogger } from "#src/common/logger/mod.ts";
 
 const log = makeLogger("fetch-utils");
 
-type RequestOptions = { retryTimeout?: number; maxRetries?: number } & Record<
-  string,
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  any
->;
+type RequestOptions =
+  & { retryTimeout?: number; maxRetries?: number }
+  & Record<string, unknown>;
 
 export const request = async (
   url: Parameters<typeof fetch>[0],
@@ -24,8 +21,8 @@ export const request = async (
 
   try {
     const result = await Promise.race([
-      setTimeout(8000, new Error(`Request timeout exceeded for "${url}"`), {
-        ref: false,
+      delay(8000, { persistent: false }).then(() => {
+        throw new Error(`Request timeout exceeded for "${url}"`);
       }),
       fetch(url, init),
     ]);
@@ -48,7 +45,7 @@ export const request = async (
         `Try Nº ${normalizedOptions.retryNumber}, retrying in 2 seconds`,
       );
 
-      await setTimeout(normalizedOptions.retryTimeout, undefined, {
+      await delay(normalizedOptions.retryTimeout, {
         signal: init?.signal as AbortSignal,
       });
 

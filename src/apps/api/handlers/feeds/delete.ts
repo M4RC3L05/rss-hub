@@ -1,30 +1,27 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
-import { z } from "zod";
-import { makeLogger } from "#src/common/logger/mod.js";
-import { RequestValidationError } from "#src/errors/mod.js";
+import vine from "@vinejs/vine";
+import { makeLogger } from "#src/common/logger/mod.ts";
 
-const requestParametersSchema = z.object({ id: z.string().uuid() }).strict();
+const requestParametersSchema = vine.object({ id: vine.string().uuid() });
+const requestParametersValidator = vine.compile(requestParametersSchema);
 
 const log = makeLogger("delete-feed-handler");
 
 const handler = (router: Hono) => {
   return router.delete(
     "/:id",
-    zValidator("param", requestParametersSchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
-    (c) => {
-      const parameters = c.req.valid("param");
-      const { changes } = c.get("database").run(sql`
+    async (c) => {
+      const parameters = await requestParametersValidator.validate(
+        c.req.param(),
+      );
+      const changes = c.get("database").execute(sql`
         delete from feeds
         where id = ${parameters.id}
       `);
 
       if (changes === 0) {
-        log.warn({ feedId: parameters.id }, "No feed was deleted");
+        log.warn("No feed was deleted", { feedId: parameters.id });
       }
 
       return c.body(null, 204);

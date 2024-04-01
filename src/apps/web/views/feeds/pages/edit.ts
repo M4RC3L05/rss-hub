@@ -1,13 +1,14 @@
 import { html } from "hono/html";
-import type { CategoriesTable, FeedsTable } from "#src/database/types/mod.js";
-import { layouts } from "../../common/mod.js";
+import type { CategoriesTable, FeedsTable } from "#src/database/types/mod.ts";
+import { layouts } from "#src/apps/web/views/common/mod.ts";
 
 type FeedsEditPageProps = {
   categories: CategoriesTable[];
   feed: FeedsTable;
 };
 
-const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) => html`
+const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) =>
+  html`
   <header>
     <nav>
       <a href="/">Home</a>
@@ -48,8 +49,10 @@ const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) => html`
       <div>
         <label for="categoryId">Category</label>
         <select name="categoryId" id="categoryId" required>
-          ${categories.map(
-            (category) => html`
+          ${
+    categories.map(
+      (category) =>
+        html`
               <option
                 value=${category.id}
                 ${feed.categoryId === category.id ? "selected" : ""}
@@ -57,7 +60,8 @@ const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) => html`
                 ${category.name}
               </option>
             `,
-          )}
+    )
+  }
         </select>
       </div>
 
@@ -71,7 +75,8 @@ const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) => html`
 export default layouts.MainLayout({
   Body: FeedsEditPage,
   Scripts: [
-    ({ feed }: FeedsEditPageProps) => html`
+    ({ feed }: FeedsEditPageProps) =>
+      html`
       <script type="module">
         const form = document.querySelector("form");
         const urlInput = form.querySelector("input#url");

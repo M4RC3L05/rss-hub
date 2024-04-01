@@ -1,12 +1,11 @@
 import { html } from "hono/html";
 import type { HtmlEscapedString } from "hono/utils/html";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// deno-lint-ignore no-explicit-any
 type Component<P extends Record<string, unknown> = any> = P extends Record<
   string,
   unknown
->
-  ? (props: P) => HtmlEscapedString | Promise<HtmlEscapedString>
+> ? (props: P) => HtmlEscapedString | Promise<HtmlEscapedString>
   : () => HtmlEscapedString | Promise<HtmlEscapedString>;
 
 type ScriptComponent = Component;

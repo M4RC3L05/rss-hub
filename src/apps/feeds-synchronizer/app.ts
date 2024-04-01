@@ -1,9 +1,8 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
-import { stdSerializers } from "pino";
-import { makeLogger } from "#src/common/logger/mod.js";
-import type { CustomDatabase } from "#src/database/mod.js";
-import type { FeedsTable } from "#src/database/types/mod.js";
-import type { FeedService } from "#src/services/mod.js";
+import { formatError, makeLogger } from "#src/common/logger/mod.ts";
+import type { CustomDatabase } from "#src/database/mod.ts";
+import type { FeedsTable } from "#src/database/types/mod.ts";
+import type { FeedService } from "#src/services/mod.ts";
 
 const log = makeLogger("feed-synchronizer-runner");
 
@@ -17,30 +16,28 @@ const runner = async ({
   log.info("Synching begin");
 
   for (const feed of feeds) {
-    log.info({ feed }, `Synching feed ${feed.url}`);
+    log.info(`Synching feed ${feed.url}`, { feed });
 
     try {
       const { faildCount, failedReasons, successCount, totalCount } =
         await feedService.syncFeed(feed, { signal });
 
       log.info(
+        `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,
         {
-          failedReasons: failedReasons.map((reason) =>
-            reason instanceof Error
-              ? stdSerializers.errWithCause(reason)
-              : reason,
+          failedReasons: failedReasons.map((reason: unknown) =>
+            reason instanceof Error ? formatError(reason) : reason
           ),
           faildCount,
           successCount,
           totalCount,
           feed,
         },
-        `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,
       );
     } catch (error) {
-      log.error(error, `Sync failed ${feed.url}`);
+      log.error(`Sync failed ${feed.url}`, { error });
     } finally {
-      log.info({ feed }, `Synching synced ${feed.url}`);
+      log.info(`Synching synced ${feed.url}`, { feed });
     }
 
     if (signal?.aborted) {

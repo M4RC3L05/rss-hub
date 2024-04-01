@@ -1,9 +1,9 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
-import type { FeedsTable } from "#src/database/types/mod.js";
+import type { FeedsTable } from "#src/database/types/mod.ts";
 
 const handler = (router: Hono) => {
-  return router.get("/", async (c) => {
+  return router.get("/", (c) => {
     const feeds = c
       .get("database")
       .all<FeedsTable & { unreadCount: number; bookmarkedCount: number }>(sql`

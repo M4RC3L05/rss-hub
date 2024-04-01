@@ -1,4 +1,4 @@
-@import url("/deps/simpledotcss/simple.min.css");
+@import url("https://esm.sh/v135/simpledotcss@2.3.0/simple.min.css");
 
 #feed-item-content {
   overflow-x: auto;

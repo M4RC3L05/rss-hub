@@ -1,1 +1,1 @@
-export * as pages from "./pages/mod.js";
+export * as pages from "#src/apps/web/views/feeds/pages/mod.ts";

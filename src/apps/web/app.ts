@@ -1,23 +1,39 @@
-import { serveStatic } from "@hono/node-server/serve-static";
 import config from "config";
 import { type ContextVariableMap, Hono } from "hono";
+import { serveStatic } from "hono/deno";
 import { basicAuth } from "hono/basic-auth";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
-import type { StatusCode } from "hono/utils/http-status";
-import { makeLogger } from "#src/common/logger/mod.js";
-import type { DeepPartial } from "#src/common/utils/types.js";
-import { requestLifeCycle, serviceRegister } from "#src/middlewares/mod.js";
-import { router } from "./router.js";
+import { makeLogger } from "#src/common/logger/mod.ts";
+import { serviceRegister } from "#src/middlewares/mod.ts";
+import { router } from "#src/apps/web/router.ts";
+import type {
+  CategoriesService,
+  FeedItemsService,
+  FeedsService,
+  OpmlService,
+} from "#src/apps/web/services/api/mod.ts";
 
 const log = makeLogger("web");
 
-const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
+declare module "hono" {
+  interface ContextVariableMap {
+    services: {
+      api: {
+        categoriesService: CategoriesService;
+        opmlService: OpmlService;
+        feedItemsService: FeedItemsService;
+        feedsService: FeedsService;
+      };
+    };
+  }
+}
+
+export const makeApp = (deps: Partial<ContextVariableMap>) => {
   const app = new Hono();
 
-  app.use("*", requestLifeCycle);
   app.use("*", serviceRegister(deps));
-  app.use("*", secureHeaders());
+  app.use("*", secureHeaders({ referrerPolicy: "same-origin" }));
   app.use("*", async (c, next) => {
     try {
       await next();
@@ -37,10 +53,7 @@ const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
   app.use(
     "*",
     basicAuth({
-      username: config.get<{ name: string; pass: string }>("apps.web.basicAuth")
-        .name,
-      password: config.get<{ name: string; pass: string }>("apps.web.basicAuth")
-        .pass,
+      ...config.get<{ name: string; pass: string }>("apps.web.basicAuth"),
     }),
   );
 
@@ -52,44 +65,29 @@ const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
       rewriteRequestPath: (path) => path.replace("/public", ""),
     }),
   );
-  app.route(
-    "/deps",
-    new Hono()
-      .get(
-        "/simpledotcss/*",
-        serveStatic({
-          root: "./node_modules/simpledotcss",
-          rewriteRequestPath: (path) => path.replace("/deps/simpledotcss", ""),
-        }),
-      )
-      .get(
-        "/htmx.org/*",
-        serveStatic({
-          root: "./node_modules/htmx.org",
-          rewriteRequestPath: (path) => path.replace("/deps/htmx.org", ""),
-        }),
-      ),
-  );
 
   router(app);
 
   app.onError((error, c) => {
-    log.error(
-      error instanceof Error || typeof error === "object" ? error : { error },
-      "Something went wrong!",
-    );
+    log.error("Something went wrong!", { error });
 
     if (error instanceof HTTPException) {
       if (error.res) {
-        for (const [key, value] of error.res.headers.entries()) {
+        error.res.headers.forEach((value, key) => {
           c.header(key, value);
-        }
+        });
       }
     }
 
+    // Redirect back on request that alter the application state.
+    if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
+      return c.redirect(c.req.header("Referer") ?? "/");
+    }
+
     return c.text(
-      error.message ? error.message : "Something broke",
-      (error as Error & { status: StatusCode }).status ?? 500,
+      error.message ?? "Something broke",
+      // deno-lint-ignore no-explicit-any
+      (error as any).status ?? 500,
     );
   });
 
@@ -99,5 +97,3 @@ const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
 
   return app;
 };
-
-export default makeApp;

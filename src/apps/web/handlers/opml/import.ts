@@ -1,6 +1,5 @@
-import { Readable } from "node:stream";
 import type { Hono } from "hono";
-import { opmlViews } from "../../views/mod.js";
+import { opmlViews } from "#src/apps/web/views/mod.ts";
 
 export const handler = (router: Hono) => {
   router.get("/opml/import", (c) => {
@@ -9,8 +8,8 @@ export const handler = (router: Hono) => {
 
   router.post("/opml/import", async (c) => {
     await c.get("services").api.opmlService.import({
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      body: Readable.fromWeb(c.req.raw.body as any),
+      signal: c.req.raw.signal,
+      body: c.req.raw.body!,
       headers: {
         "content-length": c.req.header("content-length") ?? "",
         "content-type": c.req.header("content-type") ?? "",

@@ -1,7 +1,7 @@
 import type { XMLBuilder } from "fast-xml-parser";
-import * as _ from "lodash-es";
-import mime from "mime-types";
+import { contentType } from "@std/media-types";
 import { parse } from "node-html-parser";
+import * as _ from "lodash-es";
 
 /**
  * Feed resolvers.
@@ -42,10 +42,10 @@ export const resolveFeedItems = (feed: Record<string, unknown>) => {
 
   return _.chain(searchKeys)
     .map((k) =>
-      Array.isArray(_.get(feed, k)) ? _.get(feed, k) : [_.get(feed, k)],
+      Array.isArray(_.get(feed, k)) ? _.get(feed, k) : [_.get(feed, k)]
     )
     .map((v) =>
-      (v as unknown[]).filter((item) => item !== null && item !== undefined),
+      (v as unknown[]).filter((item) => item !== null && item !== undefined)
     )
     .find((v) => !_.isEmpty(v))
     .value() as Array<Record<string, unknown>> | undefined;
@@ -126,7 +126,7 @@ export const resolveFeedItemEnclosures = (feed: Record<string, unknown>) => {
   const ext = fromLink?.split(".")?.at(-1);
 
   if (fromLink && ext) {
-    const mt = mime.lookup(ext);
+    const mt = contentType(ext);
 
     if (
       mt &&
@@ -152,7 +152,7 @@ export const resolveFeedItemImage = (
     const isTypeImg = _.includes(type, "image") || _.includes(type, "img");
     const hasUrl = typeof url === "string" && url.trim().length > 0;
     const ext = url?.split(".")?.at(-1);
-    const mt = mime.lookup(ext ?? "");
+    const mt = contentType(ext ?? "");
     const hasImgUrl = mt && (mt.startsWith("image") || mt.startsWith("img"));
 
     return (isTypeImg && hasUrl) || hasImgUrl;
@@ -235,10 +235,9 @@ export const resolveFeedItemContent = (
 
   const xhtmlContent = _.get(feed, "content.@_type") === "xhtml";
   const contentObject = _.isPlainObject(_.get(feed, "content"));
-  const parsedXhtml =
-    contentObject && xhtmlContent
-      ? (builder.build(_.pick(feed, "content")) as string)
-      : undefined;
+  const parsedXhtml = contentObject && xhtmlContent
+    ? (builder.build(_.pick(feed, "content")) as string)
+    : undefined;
 
   return _.chain(searchKeys)
     .map((k) => _.get(feed, k) as unknown)
@@ -246,9 +245,9 @@ export const resolveFeedItemContent = (
     .map((v) =>
       Array.isArray(v)
         ? v
-            .filter((x) => typeof x === "string" && x.trim().length > 0)
-            .join("\n")
-        : v,
+          .filter((x) => typeof x === "string" && x.trim().length > 0)
+          .join("\n")
+        : v
     )
     .find((v) => typeof v === "string" && v.trim().length > 0)
     .value() as string | undefined;
@@ -263,7 +262,7 @@ export const formatFeedItemContent = (content?: string) => {
     const wrapper = parse(
       `<div class="iframe-container">${element.toString()}</div>`,
     ).childNodes[0];
-    // @ts-ignore
+
     element.insertAdjacentHTML("beforebegin", wrapper.outerHTML);
     element.remove();
   }

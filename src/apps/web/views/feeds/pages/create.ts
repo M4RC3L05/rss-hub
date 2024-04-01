@@ -1,12 +1,13 @@
 import { html } from "hono/html";
-import type { CategoriesTable } from "#src/database/types/mod.js";
-import { layouts } from "../../common/mod.js";
+import type { CategoriesTable } from "#src/database/types/mod.ts";
+import { layouts } from "#src/apps/web/views/common/mod.ts";
 
 type FeedsCreatePageProps = {
   categories: CategoriesTable[];
 };
 
-const FeedsCreatePage = ({ categories }: FeedsCreatePageProps) => html`
+const FeedsCreatePage = ({ categories }: FeedsCreatePageProps) =>
+  html`
   <header>
     <nav>
       <a href="/">Home</a>
@@ -32,13 +33,16 @@ const FeedsCreatePage = ({ categories }: FeedsCreatePageProps) => html`
       <div>
         <label for="categoryId">Category</label>
         <select name="categoryId" id="categoryId" required>
-          ${categories.map(
-            (category) => html`
+          ${
+    categories.map(
+      (category) =>
+        html`
               <option value=${category.id}>
                 ${category.name}
               </option>
             `,
-          )}
+    )
+  }
         </select>
       </div>
 
@@ -52,7 +56,8 @@ const FeedsCreatePage = ({ categories }: FeedsCreatePageProps) => html`
 export default layouts.MainLayout({
   Body: FeedsCreatePage,
   Scripts: [
-    () => html`
+    () =>
+      html`
       <script type="module">
         const form = document.querySelector("form");
         const urlInput = form.querySelector("input#url");

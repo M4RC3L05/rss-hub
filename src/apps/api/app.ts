@@ -3,30 +3,29 @@ import { type ContextVariableMap, Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import type { DeepPartial } from "#src/common/utils/types.js";
-import { errorMappers } from "#src/errors/mod.js";
-import {
-  errorMapper,
-  requestLifeCycle,
-  serviceRegister,
-} from "#src/middlewares/mod.js";
-import { router } from "./router.js";
+import { errorMappers } from "#src/errors/mod.ts";
+import { errorMapper, serviceRegister } from "#src/middlewares/mod.ts";
+import { router } from "#src/apps/api/router.ts";
+import type { CustomDatabase } from "#src/database/mod.ts";
+import type { FeedService } from "#src/services/mod.ts";
 
-export type Api = ReturnType<typeof makeApp>;
+declare module "hono" {
+  interface ContextVariableMap {
+    database: CustomDatabase;
+    feedService: FeedService;
+    shutdown: AbortSignal;
+  }
+}
 
-const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
+export const makeApp = (deps: Partial<ContextVariableMap>) => {
   const app = new Hono();
 
-  app.use("*", requestLifeCycle);
   app.use("*", serviceRegister(deps));
   app.use("*", cors());
   app.use(
     "*",
     basicAuth({
-      username: config.get<{ name: string; pass: string }>("apps.api.basicAuth")
-        .name,
-      password: config.get<{ name: string; pass: string }>("apps.api.basicAuth")
-        .pass,
+      ...config.get<{ name: string; pass: string }>("apps.api.basicAuth"),
     }),
   );
 
@@ -34,17 +33,7 @@ const makeApp = (deps: DeepPartial<ContextVariableMap>) => {
     throw new HTTPException(404, { message: "Route not found" });
   });
 
-  app.onError(
-    errorMapper({
-      mappers: [
-        errorMappers.validationErrorMapper,
-        errorMappers.sqliteErrorMapper,
-      ],
-      defaultMapper: errorMappers.defaultErrorMapper,
-    }),
-  );
+  app.onError(errorMapper({ defaultMapper: errorMappers.defaultErrorMapper }));
 
   return app.route("/api", router());
 };
-
-export default makeApp;

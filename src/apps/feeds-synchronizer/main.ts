@@ -1,33 +1,52 @@
 import { Cron } from "@m4rc3l05/cron";
-import { ShutdownManager } from "@m4rc3l05/shutdown-manager";
 import config from "config";
-import { makeLogger } from "#src/common/logger/mod.js";
-import { makeDatabase } from "#src/database/mod.js";
-import { FeedService } from "#src/services/mod.js";
-import runner from "./app.js";
+import { makeLogger } from "#src/common/logger/mod.ts";
+import { makeDatabase } from "#src/database/mod.ts";
+import { FeedService } from "#src/services/mod.ts";
+import runner from "#src/apps/feeds-synchronizer/app.ts";
+import { HookDrain } from "#src/common/process/hook-drain.ts";
 
 const { cron } = config.get<{
   cron: { pattern: string; tickerTimeout?: number; timezone: string };
 }>("apps.feeds-synchronizer");
 const log = makeLogger("feeds-synchronizer");
 
-const shutdownManager = new ShutdownManager({ log: log });
+const shutdown = new HookDrain({
+  log,
+  onFinishDrain: (error) => {
+    log.info("Exiting application");
+
+    if (error.error) {
+      if (error.reason === "timeout") {
+        log.warn("Global shutdown timeout exceeded");
+      }
+
+      Deno.exit(1);
+    } else {
+      Deno.exit(0);
+    }
+  },
+});
 
 const db = makeDatabase();
 
-shutdownManager.addHook("database", () => {
-  if (db.open) {
+shutdown.registerHook({
+  name: "database",
+  fn: () => {
     db.close();
-  }
+  },
 });
 
 const job = new Cron(cron.pattern, cron.timezone, cron.tickerTimeout);
 
-shutdownManager.addHook("feeds-synchronizer", async () => {
-  await job.stop();
+shutdown.registerHook({
+  name: "feeds-synchronizer",
+  fn: async () => {
+    await job.stop();
+  },
 });
 
-log.info({ nextAt: job.nextAt() }, "Registered feeds-synchronizer");
+log.info("Registered feeds-synchronizer", { nextAt: job.nextAt() });
 
 for await (const signal of job.start()) {
   try {

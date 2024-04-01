@@ -1,33 +1,20 @@
-import { zValidator } from "@hono/zod-validator";
 import type { Hono } from "hono";
-import { z } from "zod";
-import { RequestValidationError } from "#src/errors/mod.js";
-import { feedsViews } from "../../views/mod.js";
-
-const requestQuerySchema = z.object({ id: z.string() }).strict();
-
-const requestFormSchema = z
-  .object({
-    id: z.string(),
-    name: z.string().optional(),
-    url: z.string().optional(),
-    categoryId: z.string().optional(),
-  })
-  .strict();
+import { feedsViews } from "../../views/mod.ts";
 
 export const handler = (router: Hono) => {
   router.get(
     "/feeds/edit",
-    zValidator("query", requestQuerySchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
     async (c) => {
-      const { id } = c.req.valid("query");
+      const { id } = c.req.query();
 
       const [{ data: categories }, { data: feed }] = await Promise.all([
-        c.get("services").api.categoriesService.getCategories(),
-        c.get("services").api.feedsService.getFeedById({ id }),
+        c.get("services").api.categoriesService.getCategories({
+          signal: c.req.raw.signal,
+        }),
+        c.get("services").api.feedsService.getFeedById({
+          id,
+          signal: c.req.raw.signal,
+        }),
       ]);
 
       return c.html(feedsViews.pages.Edit({ categories, feed }));
@@ -36,14 +23,14 @@ export const handler = (router: Hono) => {
 
   router.post(
     "/feeds/edit",
-    zValidator("form", requestFormSchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
     async (c) => {
-      const { id, ...data } = c.req.valid("form");
+      const { id, ...data } = await c.req.parseBody();
 
-      await c.get("services").api.feedsService.editFeed({ id, data });
+      await c.get("services").api.feedsService.editFeed({
+        id: id as string,
+        data,
+        signal: c.req.raw.signal,
+      });
 
       return c.text("ok");
     },

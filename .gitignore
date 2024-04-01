@@ -1,11 +1,3 @@
-node_modules
-dist
 data/*
 !data/.gitkeep
-.pm2/*
-!.pm2/*.example
 config/local.json
-config/development.json
-coverage
-src/database/seed.sql
-**/public/config.json

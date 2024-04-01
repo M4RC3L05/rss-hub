@@ -1,24 +1,22 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod";
-import type { FeedItemsTable } from "#src/database/types/mod.js";
-import { RequestValidationError } from "#src/errors/mod.js";
+import vine from "@vinejs/vine";
+import type { FeedItemsTable } from "#src/database/types/mod.ts";
 
-const requestParamsSchema = z
-  .object({ feedId: z.string(), id: z.string() })
-  .strict();
+const requestParametersSchema = vine.object({
+  feedId: vine.string(),
+  id: vine.string(),
+});
+const requestParametersValidator = vine.compile(requestParametersSchema);
 
 const handler = (router: Hono) => {
   return router.get(
     "/:id/:feedId",
-    zValidator("param", requestParamsSchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
-    (c) => {
-      const { feedId, id } = c.req.valid("param");
+    async (c) => {
+      const { feedId, id } = await requestParametersValidator.validate(
+        c.req.param(),
+      );
 
       const feedItem = c.get("database").get<FeedItemsTable>(
         sql`

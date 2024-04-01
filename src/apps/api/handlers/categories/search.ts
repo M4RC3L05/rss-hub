@@ -1,6 +1,6 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
-import type { CategoriesTable } from "#src/database/types/mod.js";
+import type { CategoriesTable } from "#src/database/types/mod.ts";
 
 const handler = (router: Hono) => {
   return router.get("/", (c) => {

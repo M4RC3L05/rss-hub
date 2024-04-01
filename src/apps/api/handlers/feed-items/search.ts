@@ -1,41 +1,37 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
-import { z } from "zod";
-import type { FeedItemsTable } from "#src/database/types/mod.js";
-import { RequestValidationError } from "#src/errors/mod.js";
+import vine from "@vinejs/vine";
+import type { FeedItemsTable } from "#src/database/types/mod.ts";
 
-const requestQuerySchema = z
+const requestQuerySchema = vine
   .object({
-    bookmarked: z.string().optional(),
-    feedId: z.string().uuid(),
-    unread: z.string().optional(),
-    page: z.string().optional().default("0"),
-    limit: z.string().optional().default("10"),
-  })
-  .strict();
+    bookmarked: vine.string().optional(),
+    feedId: vine.string().uuid(),
+    unread: vine.string().optional(),
+    page: vine.number().parse((value) => value ?? 0),
+    limit: vine.number().parse((value) => value ?? 10),
+  });
+const requestQueryValidator = vine.compile(requestQuerySchema);
 
 const handler = (router: Hono) => {
   return router.get(
     "/",
-    zValidator("query", requestQuerySchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { query: result.error } });
-    }),
-    (c) => {
-      const query = c.req.valid("query");
+    async (c) => {
+      const query = await requestQueryValidator.validate(c.req.query());
       const feedItemsQuery = sql`
         select rowid, * from feed_items
         where
           feed_id = ${query.feedId}
           ${sql.if("unread" in query, () => sql`and readed_at is null`)}
-          ${sql.if(
-            "bookmarked" in query,
-            () => sql`and bookmarked_at is not null`,
-          )}
+          ${
+        sql.if(
+          "bookmarked" in query,
+          () => sql`and bookmarked_at is not null`,
+        )
+      }
         order by created_at desc, rowid desc
       `;
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+
       const { total } = c.get("database").get<{ total: number }>(sql`
         select count(id) as total
         from (${feedItemsQuery})

@@ -1,6 +1,6 @@
 import { html } from "hono/html";
-import type { FeedItemsTable, FeedsTable } from "#src/database/types/mod.js";
-import { layouts } from "../../common/mod.js";
+import type { FeedItemsTable, FeedsTable } from "#src/database/types/mod.ts";
+import { layouts } from "../../common/mod.ts";
 
 type FeedItemsIndexPageProps = {
   feed: FeedsTable;
@@ -22,7 +22,8 @@ const FeedsIndexPage = ({
   feedItems,
   feedItemsPagination,
   filters,
-}: FeedItemsIndexPageProps) => html`
+}: FeedItemsIndexPageProps) =>
+  html`
   <header>
     <nav>
       <a href="/">Home</a>
@@ -40,15 +41,17 @@ const FeedsIndexPage = ({
     >
       <input type="hidden" name="feedId" value=${feed.id} />
       <input type="hidden" name="state" value="read" />
-      ${feedItems.map(
-        (feedItem) =>
-          html`<input type="hidden" name="id[]" value=${feedItem.id} />`,
-      )}
       ${
-        feedItems.length <= 0
-          ? html`<input type="hidden" name="id[]" value="" />`
-          : html``
-      }
+    feedItems.map(
+      (feedItem) =>
+        html`<input type="hidden" name="id[]" value=${feedItem.id} />`,
+    )
+  }
+      ${
+    feedItems.length <= 0
+      ? html`<input type="hidden" name="id[]" value="" />`
+      : html``
+  }
       <button type="submit">
         Read page ✓
       </button>
@@ -86,20 +89,18 @@ const FeedsIndexPage = ({
     <a
       class="button"
       href=${
-        filters.unreaded.state
-          ? filters.unreaded.offLink
-          : filters.unreaded.onLink
-      }
+    filters.unreaded.state ? filters.unreaded.offLink : filters.unreaded.onLink
+  }
     >
       Unreaded ${filters.unreaded.state ? "☑" : "☐"}
     </a>
     <a
       class="button"
       href=${
-        filters.bookmarked.state
-          ? filters.bookmarked.offLink
-          : filters.bookmarked.onLink
-      }
+    filters.bookmarked.state
+      ? filters.bookmarked.offLink
+      : filters.bookmarked.onLink
+  }
     >
       Bookmarked ${filters.bookmarked.state ? "☑" : "☐"}
     </a>
@@ -113,48 +114,54 @@ const FeedsIndexPage = ({
   </header>
 
   <main>
-    ${feedItems.map(
-      (feedItem) => html`
+    ${
+    feedItems.map(
+      (feedItem) =>
+        html`
         <section style="overflow: auto;">
           ${
-            feedItem.img
-              ? html`<aside><img src=${feedItem.img} /></aside>`
-              : html``
-          }
+          feedItem.img
+            ? html`<aside><img src=${feedItem.img} /></aside>`
+            : html``
+        }
 
           <h3 style="margin-top: 0px">${feedItem.title}</h3>
           <p>${new Date(feedItem.createdAt).toLocaleString()}</p>
 
           <a
             style="margin-right: 8px"
-            href=${`/feed-items/show?feedId=${feed.id}&id=${decodeURIComponent(
-              feedItem.id,
-            )}`}
+            href=${`/feed-items/show?feedId=${feed.id}&id=${
+          decodeURIComponent(
+            feedItem.id,
+          )
+        }`}
           >
             More
           </a>
           ${
-            feedItem.link
-              ? html`
+          feedItem.link
+            ? html`
                   <a
-                    target="__blank"
+                    target="_blank"
                     href=${feedItem.link}
                   >
                     Open ⇗
                   </a>
                 `
-              : html``
-          }
+            : html``
+        }
         </section>
       `,
-    )}
+    )
+  }
     ${feedItems.length <= 0 ? html`<p>No items to display</p>` : html``}
   </main>
 `;
 
 export default layouts.MainLayout({
   Csss: [
-    () => html`
+    () =>
+      html`
       <style>
         #header-actions button,.button {
           font-size: .8rem;
@@ -168,6 +175,6 @@ export default layouts.MainLayout({
   Scripts: [
     () =>
       html`<script type="module">window.scrollTo({ top: 0, left: 0, behavior: "instant" })</script>`,
-    () => html`<script src="/deps/htmx.org/dist/htmx.min.js"></script>`,
+    () => html`<script src="https://unpkg.com/htmx.org@1.9.11"></script>`,
   ],
 });

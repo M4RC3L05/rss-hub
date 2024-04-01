@@ -1,26 +1,17 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod";
-import type { CategoriesTable } from "#src/database/types/mod.js";
-import { RequestValidationError } from "#src/errors/mod.js";
+import type { CategoriesTable } from "#src/database/types/mod.ts";
+import vine from "@vinejs/vine";
 
-const requestBodySchema = z
-  .object({
-    name: z.string().min(2),
-  })
-  .strict();
+const requestBodySchema = vine.object({ name: vine.string().minLength(2) });
+const requestBodyValidator = vine.compile(requestBodySchema);
 
 const handler = (router: Hono) => {
   return router.post(
     "/",
-    zValidator("json", requestBodySchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
-    (c) => {
-      const data = c.req.valid("json");
+    async (c) => {
+      const data = await requestBodyValidator.validate(await c.req.json());
       const category = c.get("database").get<CategoriesTable>(sql`
         insert into categories (name)
         values (${data.name})

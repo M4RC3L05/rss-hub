@@ -1,12 +1,13 @@
 import { html } from "hono/html";
-import type { CategoriesTable } from "#src/database/types/mod.js";
-import { layouts } from "../../common/mod.js";
+import type { CategoriesTable } from "#src/database/types/mod.ts";
+import { layouts } from "../../common/mod.ts";
 
 type CategoriesEditPageProps = {
   category: CategoriesTable;
 };
 
-const CategoriesEditPage = ({ category }: CategoriesEditPageProps) => html`
+const CategoriesEditPage = ({ category }: CategoriesEditPageProps) =>
+  html`
   <header>
     <nav>
       <a href="/">Home</a>
@@ -35,7 +36,8 @@ const CategoriesEditPage = ({ category }: CategoriesEditPageProps) => html`
 export default layouts.MainLayout({
   Body: CategoriesEditPage,
   Scripts: [
-    () => html`
+    () =>
+      html`
       <script type="module">
         const form = document.querySelector("form");
         const nameInput = form.querySelector("input#name");

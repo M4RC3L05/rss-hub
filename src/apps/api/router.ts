@@ -1,5 +1,5 @@
-import { handlersRouter } from "./handlers/mod.js";
+import { handlersRouter } from "./handlers/mod.ts";
 
 export const router = () => {
-  return handlersRouter();
+	return handlersRouter();
 };

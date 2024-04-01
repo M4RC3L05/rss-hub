@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { layouts } from "../../common/mod.js";
+import { layouts } from "../../common/mod.ts";
 
 const OpmlImportPage = () => html`
   <header>
@@ -27,9 +27,9 @@ const OpmlImportPage = () => html`
 `;
 
 export default layouts.MainLayout({
-  Body: OpmlImportPage,
-  Scripts: [
-    () => html`
+	Body: OpmlImportPage,
+	Scripts: [
+		() => html`
       <script type="module">
         const form = document.querySelector("form");
         const formError = document.querySelector("#form-error")
@@ -59,5 +59,5 @@ export default layouts.MainLayout({
         })
       </script>
     `,
-  ],
+	],
 });

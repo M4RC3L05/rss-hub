@@ -1,34 +1,25 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { stdSerializers } from "pino";
-import { z } from "zod";
-import { makeLogger } from "#src/common/logger/mod.js";
-import type { FeedsTable } from "#src/database/types/mod.js";
-import { RequestValidationError } from "#src/errors/mod.js";
+import vine from "@vinejs/vine";
+import { makeLogger } from "#src/common/logger/mod.ts";
+import type { FeedsTable } from "#src/database/types/mod.ts";
 
-const requestBodySchema = z
+const requestBodySchema = vine
   .object({
-    name: z.string().min(2),
-    url: z.string().url(),
-    categoryId: z.string().uuid(),
-  })
-  .strict();
-
-export type CreateFeedRequestBodySchema = z.infer<typeof requestBodySchema>;
+    name: vine.string().minLength(2),
+    url: vine.string().url(),
+    categoryId: vine.string().uuid(),
+  });
+const requestBodyValidator = vine.compile(requestBodySchema);
 
 const log = makeLogger("create-feed-handler");
 
 const handler = (router: Hono) => {
   return router.post(
     "/",
-    zValidator("json", requestBodySchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
-    (c) => {
-      const data = c.req.valid("json");
+    async (c) => {
+      const data = await requestBodyValidator.validate(await c.req.json());
       const feed = c.get("database").get<FeedsTable>(sql`
         insert into feeds (name, url, category_id)
         values (${data.name}, ${data.url}, ${data.categoryId})
@@ -41,26 +32,22 @@ const handler = (router: Hono) => {
 
       c.get("feedService")
         .syncFeed(feed, {
-          signal: c.get("shutdownManager").abortSignal,
+          signal: AbortSignal.any([
+            AbortSignal.timeout(10_000),
+            c.get("shutdown"),
+          ]),
         })
         .then(({ faildCount, failedReasons, successCount, totalCount }) => {
-          log.info(
-            {
-              failedReasons: failedReasons.map((reason) =>
-                reason instanceof Error
-                  ? stdSerializers.errWithCause(reason)
-                  : reason,
-              ),
-              faildCount,
-              successCount,
-              totalCount,
-              feed,
-            },
-            `Synching feed ${feed.url}`,
-          );
+          log.info(`Synching feed ${feed.url}`, {
+            failedReasons,
+            faildCount,
+            successCount,
+            totalCount,
+            feed,
+          });
         })
         .catch((error) => {
-          log.error(error, `Could not sync ${feed.url}`);
+          log.error(`Could not sync ${feed.url}`, { error });
         });
 
       return c.json({ data: feed }, 201);

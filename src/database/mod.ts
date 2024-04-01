@@ -1,72 +1,65 @@
-import { randomUUID } from "node:crypto";
-import { type TSqlFragment, sql } from "@m4rc3l05/sqlite-tag";
-import Database, { type Statement } from "better-sqlite3";
+import { Database, type Statement } from "@db/sqlite";
+import type { TSqlFragment } from "@m4rc3l05/sqlite-tag";
+import { mapKeys } from "@std/collections";
+import { toCamelCase as camelCase } from "@std/text";
 import config from "config";
-import { camelCase, isObject, mapKeys } from "lodash-es";
-import { makeLogger } from "../common/logger/mod.js";
-
-const log = makeLogger("database");
 
 const toCamelCase = <T>(data: unknown) => {
-  if (Array.isArray(data))
-    return data.map((item) => mapKeys(item, (_, key) => camelCase(key))) as T;
+	if (Array.isArray(data)) {
+		return data.map((item) => mapKeys(item, (key) => camelCase(key))) as T;
+	}
 
-  if (isObject(data)) return mapKeys(data, (_, key) => camelCase(key)) as T;
+	if (typeof data === "object") {
+		return mapKeys(data as Record<string, unknown>, (key) =>
+			camelCase(key),
+		) as T;
+	}
 
-  return data as T;
+	return data as T;
 };
 
 export class CustomDatabase extends Database {
-  #cache = new Map<string, Statement>();
+	#cache = new Map<string, Statement>();
 
-  #ensureInCache(query: string) {
-    const key = query.trim();
+	#ensureInCache(query: string) {
+		const key = query.trim();
 
-    if (!this.#cache.has(key)) {
-      this.#cache.set(key, this.prepare(key));
-    }
+		if (!this.#cache.has(key)) {
+			this.#cache.set(key, this.prepare(key));
+		}
 
-    return this.#cache.get(key) as Statement;
-  }
+		return this.#cache.get(key) as Statement;
+	}
 
-  get<T>(query: TSqlFragment): T | undefined {
-    const prepared = this.#ensureInCache(query.query);
+	get<T>(query: TSqlFragment): T | undefined {
+		const prepared = this.#ensureInCache(query.query);
 
-    return toCamelCase<T>(prepared.get(query.params));
-  }
+		// deno-lint-ignore no-explicit-any
+		return toCamelCase<T>(prepared.get(...(query.params as any)));
+	}
 
-  all<T>(query: TSqlFragment): T[] {
-    const prepared = this.#ensureInCache(query.query);
+	all<T>(query: TSqlFragment): T[] {
+		const prepared = this.#ensureInCache(query.query);
 
-    return toCamelCase<T[]>(prepared.all(query.params));
-  }
+		// deno-lint-ignore no-explicit-any
+		return toCamelCase<T[]>(prepared.all(...(query.params as any)));
+	}
 
-  execute(query: TSqlFragment) {
-    this.run(query);
+	execute(query: TSqlFragment) {
+		const prepared = this.#ensureInCache(query.query);
 
-    return this;
-  }
-
-  run(query: TSqlFragment) {
-    const prepared = this.#ensureInCache(query.query);
-
-    return prepared.run(query.params);
-  }
-
-  iterate<T>(query: TSqlFragment): IterableIterator<T> {
-    const prepared = this.#ensureInCache(query.query);
-
-    return prepared.iterate(query.params) as IterableIterator<T>;
-  }
+		// deno-lint-ignore no-explicit-any
+		return prepared.run(...(query.params as any));
+	}
 }
 
-export const makeDatabase = () =>
-  new CustomDatabase(config.get("database.path"), {
-    verbose(message, ...args) {
-      log.debug({ sql: message, args }, "Running sql");
-    },
-  })
-    .execute(sql`pragma journal_mode = WAL`)
-    .execute(sql`pragma busy_timeout = 5000`)
-    .execute(sql`pragma foreign_keys = ON`)
-    .function("uuid_v4", () => randomUUID());
+export const makeDatabase = () => {
+	const db = new CustomDatabase(config.get("database.path"));
+
+	db.exec("pragma journal_mode = WAL");
+	db.exec("pragma busy_timeout = 5000");
+	db.exec("pragma foreign_keys = ON");
+	db.function("uuid_v4", () => globalThis.crypto.randomUUID());
+
+	return db;
+};

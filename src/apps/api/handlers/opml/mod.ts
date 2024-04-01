@@ -1,7 +1,6 @@
-import { type Env, Hono } from "hono";
-import type { SchemaType } from "#src/common/utils/types.js";
-import { default as exportOpml } from "./export.js";
-import { default as importOpml } from "./import.js";
+import { Hono } from "hono";
+import { default as exportOpml } from "./export.ts";
+import { default as importOpml } from "./import.ts";
 
 export const router = () => {
   let router = new Hono();
@@ -9,10 +8,5 @@ export const router = () => {
   router = importOpml(router);
   router = exportOpml(router);
 
-  return router as Hono<
-    Env,
-    SchemaType<ReturnType<typeof importOpml>> &
-      SchemaType<ReturnType<typeof exportOpml>>,
-    "/"
-  >;
+  return router;
 };

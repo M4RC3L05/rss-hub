@@ -1,12 +1,13 @@
 import { html, raw } from "hono/html";
-import type { FeedItemsTable } from "#src/database/types/mod.js";
-import { layouts } from "../../common/mod.js";
+import type { FeedItemsTable } from "#src/database/types/mod.ts";
+import { layouts } from "../../common/mod.ts";
 
 type FeedItemsShowPageProps = {
   feedItem: FeedItemsTable;
 };
 
-const FeedsShowPage = ({ feedItem }: FeedItemsShowPageProps) => html`
+const FeedsShowPage = ({ feedItem }: FeedItemsShowPageProps) =>
+  html`
   <header>
     <nav>
       <a href="/">Home</a>
@@ -26,8 +27,8 @@ const FeedsShowPage = ({ feedItem }: FeedItemsShowPageProps) => html`
       <input type="hidden" name="id" value=${feedItem.id} />
       <input type="hidden" name="feedId" value=${feedItem.feedId} />
       <input type="hidden" name="state" value=${
-        feedItem.readedAt ? "unread" : "read"
-      } />
+    feedItem.readedAt ? "unread" : "read"
+  } />
       <button type="submit">
         Read ${feedItem.readedAt ? "☑" : "☐"}
       </button>
@@ -42,8 +43,8 @@ const FeedsShowPage = ({ feedItem }: FeedItemsShowPageProps) => html`
       <input type="hidden" name="id" value=${feedItem.id} />
       <input type="hidden" name="feedId" value=${feedItem.feedId} />
       <input type="hidden" name="state" value=${
-        feedItem.bookmarkedAt ? "unbookmark" : "bookmark"
-      } />
+    feedItem.bookmarkedAt ? "unbookmark" : "bookmark"
+  } />
       <button type="submit">
         Bookmark ${feedItem.bookmarkedAt ? "☑" : "☐"}
       </button>
@@ -72,7 +73,8 @@ const FeedsShowPage = ({ feedItem }: FeedItemsShowPageProps) => html`
 export default layouts.MainLayout({
   Body: FeedsShowPage,
   Scripts: [
-    () => html`
+    () =>
+      html`
       <script type="module">
         const onOkReadStatePatch = (form) => {
           const state = form.querySelector("input[name='state']").value;
@@ -97,6 +99,6 @@ export default layouts.MainLayout({
         window.onOkReadabilityGet = onOkReadabilityGet;
       </script>
     `,
-    () => html`<script src="/deps/htmx.org/dist/htmx.min.js"></script>`,
+    () => html`<script src="https://unpkg.com/htmx.org@1.9.11"></script>`,
   ],
 });

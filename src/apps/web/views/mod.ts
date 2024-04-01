@@ -1,4 +1,4 @@
-export * as feedsViews from "./feeds/mod.js";
-export * as feedItemsViews from "./feed-items/mod.js";
-export * as categoriesViews from "./categories/mod.js";
-export * as opmlViews from "./opml/mod.js";
+export * as feedsViews from "./feeds/mod.ts";
+export * as feedItemsViews from "./feed-items/mod.ts";
+export * as categoriesViews from "./categories/mod.ts";
+export * as opmlViews from "./opml/mod.ts";

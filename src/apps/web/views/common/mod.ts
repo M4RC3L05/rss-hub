@@ -1,1 +1,1 @@
-export * as layouts from "./layouts/mod.js";
+export * as layouts from "./layouts/mod.ts";

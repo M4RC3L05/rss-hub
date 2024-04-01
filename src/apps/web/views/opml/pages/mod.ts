@@ -1,1 +1,1 @@
-export { default as Import } from "./import.js";
+export { default as Import } from "./import.ts";

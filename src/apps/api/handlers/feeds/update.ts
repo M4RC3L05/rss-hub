@@ -1,39 +1,26 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod";
-import { RequestValidationError } from "#src/errors/mod.js";
+import vine from "@vinejs/vine";
 
-const requestParametersSchema = z
-  .object({
-    id: z.string().uuid(),
-  })
-  .strict();
-const requestBodySchema = z
-  .object({
-    name: z.string().min(2).optional(),
-    url: z.string().url().optional(),
-    categoryId: z.string().uuid().optional(),
-  })
-  .strict();
+const requestParametersSchema = vine.object({ id: vine.string().uuid() });
+const requestParametersValidator = vine.compile(requestParametersSchema);
 
-export type UpdateFeedRequestBodySchema = z.infer<typeof requestBodySchema>;
+const requestBodySchema = vine.object({
+  name: vine.string().minLength(2).optional(),
+  url: vine.string().url().optional(),
+  categoryId: vine.string().uuid().optional(),
+});
+const requestBodyValidator = vine.compile(requestBodySchema);
 
 const handler = (router: Hono) => {
   return router.patch(
     "/:id",
-    zValidator("param", requestParametersSchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { params: result.error } });
-    }),
-    zValidator("json", requestBodySchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
-    (c) => {
-      const parameters = c.req.valid("param");
-      const data = c.req.valid("json");
+    async (c) => {
+      const parameters = await requestParametersValidator.validate(
+        c.req.param(),
+      );
+      const data = await requestBodyValidator.validate(await c.req.json());
       const feed = c.get("database").get(sql`
         update feeds set ${sql.set(data)}
         where id = ${parameters.id}

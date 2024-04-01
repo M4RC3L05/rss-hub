@@ -1,1 +1,1 @@
-export { client, serviceRequester } from "./service-requester.js";
+export { BaseService } from "./base-service.ts";

@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { layouts } from "../../common/mod.js";
+import { layouts } from "../../common/mod.ts";
 
 const CategoriesCreatePage = () => html`
   <header>
@@ -26,9 +26,9 @@ const CategoriesCreatePage = () => html`
 `;
 
 export default layouts.MainLayout({
-  Body: CategoriesCreatePage,
-  Scripts: [
-    () => html`
+	Body: CategoriesCreatePage,
+	Scripts: [
+		() => html`
       <script type="module">
         const form = document.querySelector("form");
         const nameInput = form.querySelector("input#name");
@@ -59,5 +59,5 @@ export default layouts.MainLayout({
         })
       </script>
     `,
-  ],
+	],
 });

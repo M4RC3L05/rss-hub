@@ -1,28 +1,25 @@
-import { zValidator } from "@hono/zod-validator";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import { Readability } from "@mozilla/readability";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { JSDOM } from "jsdom";
-import { z } from "zod";
-import { makeLogger } from "#src/common/logger/mod.js";
-import type { FeedItemsTable } from "#src/database/types/mod.js";
-import { RequestValidationError } from "#src/errors/mod.js";
+import vine from "@vinejs/vine";
+import { makeLogger } from "#src/common/logger/mod.ts";
+import type { FeedItemsTable } from "#src/database/types/mod.ts";
 
-const requestParamsSchema = z
-  .object({ id: z.string(), feedId: z.string() })
-  .strict();
+const requestParamsSchema = vine.object({
+  id: vine.string(),
+  feedId: vine.string(),
+});
+const requestParametersValidator = vine.compile(requestParamsSchema);
+
 const log = makeLogger("extract-feed-item-contents");
 
 const handler = (router: Hono) => {
   return router.get(
     "/:id/:feedId/extract-content",
-    zValidator("param", requestParamsSchema, (result) => {
-      if (!result.success)
-        throw new RequestValidationError({ request: { body: result.error } });
-    }),
     async (c) => {
-      const data = c.req.valid("param");
+      const data = await requestParametersValidator.validate(c.req.param());
       const result = c.get("database").get<FeedItemsTable>(
         sql`
           select *
@@ -42,6 +39,10 @@ const handler = (router: Hono) => {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3",
           },
+          signal: AbortSignal.any([
+            AbortSignal.timeout(10_000),
+            c.req.raw.signal,
+          ]),
         }).then((response) => response.text());
 
         const dom = new JSDOM(pageContent);
@@ -54,7 +55,7 @@ const handler = (router: Hono) => {
 
         return c.json({ data: parsed?.content ?? "" }, 200);
       } catch (error) {
-        log.error(error, "Unable to extract feed item content");
+        log.error("Unable to extract feed item content", { error });
 
         if (!result || !result?.link) {
           throw new HTTPException(400, {

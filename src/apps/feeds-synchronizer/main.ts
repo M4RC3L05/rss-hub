@@ -5,6 +5,7 @@ import { makeDatabase } from "#src/database/mod.ts";
 import { FeedService } from "#src/services/mod.ts";
 import runner from "#src/apps/feeds-synchronizer/app.ts";
 import { HookDrain } from "#src/common/process/hook-drain.ts";
+import { gracefulShutdown } from "#src/common/process/mod.ts";
 
 const { cron } = config.get<{
   cron: { pattern: string; tickerTimeout?: number; timezone: string };
@@ -27,6 +28,8 @@ const shutdown = new HookDrain({
     }
   },
 });
+
+gracefulShutdown({ hookDrain: shutdown, log });
 
 const db = makeDatabase();
 

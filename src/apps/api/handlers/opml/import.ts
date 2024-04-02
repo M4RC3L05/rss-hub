@@ -86,7 +86,7 @@ const handler = (router: Hono) => {
           }
         }
       }
-    })();
+    }).immediate();
 
     // Deferred sync inserted feeds if any
     if (feedsToSync.length > 0) {

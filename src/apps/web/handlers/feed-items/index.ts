@@ -1,9 +1,6 @@
 import type { Hono } from "hono";
 import { feedItemsViews } from "#src/apps/web/views/mod.ts";
 
-const replaceAndReloadLink = (url: string) =>
-  `javascript:replaceAndReload("${url}")`;
-
 export const handler = (router: Hono) => {
   router.get(
     "/feed-items",
@@ -49,58 +46,46 @@ export const handler = (router: Hono) => {
           filters: {
             unreaded: {
               state: !!unread,
-              onLink: replaceAndReloadLink(
-                `${currUrl.pathname}${`${
-                  currUrl.search.replaceAll(
-                    "&unread=true",
-                    "",
-                  )
-                }&unread=true`}`,
-              ),
-              offLink: replaceAndReloadLink(
-                `${currUrl.pathname}${
-                  currUrl.search.replaceAll(
-                    "&unread=true",
-                    "",
-                  )
-                }`,
-              ),
+              onLink: `${currUrl.pathname}${`${
+                currUrl.search.replaceAll(
+                  "&unread=true",
+                  "",
+                )
+              }&unread=true`}`,
+              offLink: `${currUrl.pathname}${
+                currUrl.search.replaceAll(
+                  "&unread=true",
+                  "",
+                )
+              }`,
             },
             bookmarked: {
               state: !!bookmarked,
-              onLink: replaceAndReloadLink(
-                `${currUrl.pathname}${`${
-                  currUrl.search.replaceAll(
-                    "&bookmarked=true",
-                    "",
-                  )
-                }&bookmarked=true`}`,
-              ),
-              offLink: replaceAndReloadLink(
-                `${currUrl.pathname}${
-                  currUrl.search.replaceAll(
-                    "&bookmarked=true",
-                    "",
-                  )
-                }`,
-              ),
+              onLink: `${currUrl.pathname}${`${
+                currUrl.search.replaceAll(
+                  "&bookmarked=true",
+                  "",
+                )
+              }&bookmarked=true`}`,
+              offLink: `${currUrl.pathname}${
+                currUrl.search.replaceAll(
+                  "&bookmarked=true",
+                  "",
+                )
+              }`,
             },
           },
           feedItemsPagination: {
-            startLink: replaceAndReloadLink(
-              previousLink.replace(/&page=[0-9]+/, "&page=0"),
-            ),
-            previousLink: replaceAndReloadLink(previousLink),
-            nextLink: replaceAndReloadLink(nextLink),
-            endLink: replaceAndReloadLink(
-              previousLink.replace(
-                /&page=[0-9]+/,
-                `&page=${
-                  Math.floor(
-                    feedItemsPagination.total / feedItemsPagination.limit,
-                  )
-                }`,
-              ),
+            startLink: previousLink.replace(/&page=[0-9]+/, "&page=0"),
+            previousLink: previousLink,
+            nextLink: nextLink,
+            endLink: previousLink.replace(
+              /&page=[0-9]+/,
+              `&page=${
+                Math.floor(
+                  feedItemsPagination.total / feedItemsPagination.limit,
+                )
+              }`,
             ),
           },
         }),

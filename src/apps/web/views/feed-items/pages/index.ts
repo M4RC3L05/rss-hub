@@ -1,6 +1,7 @@
 import { html } from "hono/html";
 import type { FeedItemsTable, FeedsTable } from "#src/database/types/mod.ts";
 import { layouts } from "#src/apps/web/views/common/mod.ts";
+import { encodeBase64Url } from "@std/encoding/base64url";
 
 type FeedItemsIndexPageProps = {
   feed: FeedsTable;
@@ -35,9 +36,8 @@ const FeedsIndexPage = ({
   <header id="header-actions" style="position: sticky; top: 0; padding: 8px 0px; z-index: 2">
     <form
       style="display: inline;"
-      hx-patch="/feed-items/state"
-      hx-swap="none"
-      hx-on::after-on-load="window.location.reload()"
+      action="/feed-items/state"
+      method="POST"
     >
       <input type="hidden" name="feedId" value=${feed.id} />
       <input type="hidden" name="state" value="read" />
@@ -59,9 +59,8 @@ const FeedsIndexPage = ({
 
     <form
       style="display: inline;"
-      hx-patch="/feed-items/state"
-      hx-swap="none"
-      hx-on::after-on-load="window.location.reload()"
+      action="/feed-items/state"
+      method="POST"
     >
       <input type="hidden" name="feedId" value=${feed.id} />
       <input type="hidden" name="state" value="read" />
@@ -70,15 +69,13 @@ const FeedsIndexPage = ({
       </button>
     </form>
 
-    <a class="button" href=${`/feeds/edit?id=${feed.id}`}>Edit feed ✏</a>
+    <a class="button" href=${`/feeds/${feed.id}/edit`}>Edit feed ✏</a>
 
     <form
       style="display: inline;"
-      hx-post="/feeds/delete"
-      hx-swap="none"
-      hx-on::after-on-load="history.back()"
+      action="/feeds/${feed.id}/delete"
+      method="POST"
     >
-      <input type="hidden" name="id" value=${feed.id} />
       <button type="submit">
         Delete feed ⨯
       </button>
@@ -128,20 +125,28 @@ const FeedsIndexPage = ({
           <h3 style="margin-top: 0px">${feedItem.title}</h3>
           <p>${new Date(feedItem.createdAt).toLocaleString()}</p>
 
-          <a
-            style="margin-right: 8px"
-            href=${`/feed-items/show?feedId=${feed.id}&id=${
-          decodeURIComponent(
-            feedItem.id,
+          <form
+            style="display: inline; margin-right: 4px"
+            action="/feed-items/state?redirect=${
+          encodeBase64Url(
+            `/feed-items/${encodeURIComponent(feedItem.id)}/${feedItem.feedId}`,
           )
-        }`}
+        }"
+            method="POST"
           >
-            More
-          </a>
+            <input type="hidden" name="feedId" value=${feed.id} />
+            <input type="hidden" name="state" value="read" />
+            <input type="hidden" name="id[]" value=${feedItem.id} />
+
+            <button type="submit">
+              More
+            </button>
+          </form>
           ${
           feedItem.link
             ? html`
                   <a
+                    class="button"
                     target="_blank"
                     href=${feedItem.link}
                   >
@@ -163,7 +168,10 @@ export default layouts.MainLayout({
     () =>
       html`
       <style>
-        #header-actions button,.button {
+        #header-actions button,
+        #header-actions .button,
+        main button,
+        main .button {
           font-size: .8rem;
           font-weight: bold;
           padding: .5rem .7rem;
@@ -172,9 +180,4 @@ export default layouts.MainLayout({
     `,
   ],
   Body: FeedsIndexPage,
-  Scripts: [
-    () =>
-      html`<script type="module">window.scrollTo({ top: 0, left: 0, behavior: "instant" })</script>`,
-    () => html`<script src="https://unpkg.com/htmx.org@1.9.11"></script>`,
-  ],
 });

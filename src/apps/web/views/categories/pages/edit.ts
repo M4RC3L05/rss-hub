@@ -17,10 +17,7 @@ const CategoriesEditPage = ({ category }: CategoriesEditPageProps) =>
   </header>
 
   <main>
-    <div id="form-error"></div>
-    <form action="/categories/edit" method="POST" class="text-align: center">
-      <input type="hidden" name="id" value=${category.id} />
-
+    <form action="/categories/${category.id}/edit" method="POST" class="text-align: center">
       <div>
         <label for="name">Category name</label>
         <input type="text" id="name" name="name" placeholder="Name of the category" value=${category.name} required />
@@ -33,40 +30,4 @@ const CategoriesEditPage = ({ category }: CategoriesEditPageProps) =>
   </main>
 `;
 
-export default layouts.MainLayout({
-  Body: CategoriesEditPage,
-  Scripts: [
-    () =>
-      html`
-      <script type="module">
-        const form = document.querySelector("form");
-        const nameInput = form.querySelector("input#name");
-        const formError = document.querySelector("#form-error")
-
-        let abort;
-
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          abort?.abort();
-          abort = new AbortController();
-
-          const data = new FormData(form);
-
-          formError.innerHTML = '<p class="notice">Updating category...</p>'
-
-          await fetch(form.action, { signal: abort.signal, method: "post", body: data })
-            .then((response) => {
-              if (response.status !== 200) {
-                throw new Error("Could update category")
-              }
-
-              history.back();
-            })
-            .catch(e => {
-              formError.innerHTML = '<p class="notice">Could not update category</p>';
-            });
-        })
-      </script>
-    `,
-  ],
-});
+export default layouts.MainLayout({ Body: CategoriesEditPage });

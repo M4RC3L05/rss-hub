@@ -1,7 +1,7 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import vine from "@vinejs/vine";
+import { makeLogger } from "#src/common/logger/mod.ts";
 
 const requestBodySchema = vine.union([
   vine.union.if(
@@ -17,6 +17,8 @@ const requestBodySchema = vine.union([
   ),
 ]);
 const requestBodyValidator = vine.compile(requestBodySchema);
+
+const log = makeLogger("mark-as-read");
 
 const handler = (router: Hono) => {
   return router.patch(
@@ -54,9 +56,7 @@ const handler = (router: Hono) => {
       );
 
       if (changes <= 0) {
-        throw new HTTPException(400, {
-          message: "Could not mark feed item as read",
-        });
+        log.warn("Nothing was marked as readed");
       }
 
       return c.body(null, 204);

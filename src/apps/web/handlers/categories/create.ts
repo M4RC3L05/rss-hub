@@ -14,7 +14,7 @@ export const handler = (router: Hono) => {
         signal: c.req.raw.signal,
       });
 
-      return c.text("ok");
+      return c.redirect("/");
     },
   );
 };

@@ -2,6 +2,8 @@ import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import vine from "@vinejs/vine";
+import { mapKeys } from "@std/collections";
+import { toSnakeCase } from "@std/text";
 
 const requestParametersSchema = vine.object({ id: vine.string().uuid() });
 const requestParametersValidator = vine.compile(requestParametersSchema);
@@ -22,7 +24,7 @@ const handler = (router: Hono) => {
       );
       const data = await requestBodyValidator.validate(await c.req.json());
       const feed = c.get("database").get(sql`
-        update feeds set ${sql.set(data)}
+        update feeds set ${sql.set(mapKeys(data, (key) => toSnakeCase(key)))}
         where id = ${parameters.id}
         returning *
       `);

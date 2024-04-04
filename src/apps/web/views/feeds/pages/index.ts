@@ -47,15 +47,13 @@ const FeedsIndexPage = ({ categories, feeds }: FeedsIndexPageProps) =>
             <hr />
 
             <div class="feed-actions">
-              <a class="button" href=${`/categories/edit?id=${category.id}`}>Edit ✏</a>
+              <a class="button" href=${`/categories/${category.id}/edit`}>Edit ✏</a>
 
               <form
                 style="display: inline; margin-right: 8px"
-                hx-post="/categories/delete"
-                hx-on::after-on-load="window.location.reload()"
-                hx-swap="none"
+                action="/categories/${category.id}/delete"
+                method="POST"
               >
-                <input type="hidden" name="id" value=${category.id} />
                 <button type="submit">
                   Delete ⨯
                 </button>
@@ -84,7 +82,4 @@ export default layouts.MainLayout({
     `,
   ],
   Body: FeedsIndexPage,
-  Scripts: [
-    () => html`<script src="https://unpkg.com/htmx.org@1.9.11"></script>`,
-  ],
 });

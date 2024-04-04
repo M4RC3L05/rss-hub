@@ -3,9 +3,9 @@ import { categoriesViews } from "#src/apps/web/views/mod.ts";
 
 export const handler = (router: Hono) => {
   router.get(
-    "/categories/edit",
+    "/categories/:id/edit",
     async (c) => {
-      const { id } = c.req.query();
+      const { id } = c.req.param();
 
       const { data: category } = await c
         .get("services")
@@ -18,9 +18,10 @@ export const handler = (router: Hono) => {
     },
   );
   router.post(
-    "/categories/edit",
+    "/categories/:id/edit",
     async (c) => {
-      const { id, ...data } = await c.req.parseBody();
+      const { id } = c.req.param();
+      const data = await c.req.parseBody();
 
       await c
         .get("services")
@@ -30,7 +31,7 @@ export const handler = (router: Hono) => {
           signal: c.req.raw.signal,
         });
 
-      return c.text("ok");
+      return c.redirect("/");
     },
   );
 };

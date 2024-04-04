@@ -3,9 +3,9 @@ import { feedsViews } from "#src/apps/web/views/mod.ts";
 
 export const handler = (router: Hono) => {
   router.get(
-    "/feeds/edit",
+    "/feeds/:id/edit",
     async (c) => {
-      const { id } = c.req.query();
+      const { id } = c.req.param();
 
       const [{ data: categories }, { data: feed }] = await Promise.all([
         c.get("services").api.categoriesService.getCategories({
@@ -22,17 +22,33 @@ export const handler = (router: Hono) => {
   );
 
   router.post(
-    "/feeds/edit",
+    "/feeds/:id/edit",
     async (c) => {
-      const { id, ...data } = await c.req.parseBody();
+      const { id } = c.req.param();
+      const data = await c.req.parseBody();
+
+      const { data: feed } = await c.get("services").api.feedsService
+        .getFeedById({
+          id,
+          signal: c.req.raw.signal,
+        });
+
+      if (feed.url !== data.url) {
+        const { data: { title } } = await c.get("services").api.feedsService
+          .verifyUrl({ data: { url: data.url }, signal: c.req.raw.signal });
+
+        if (typeof data.name === "string" && data.name.length <= 0) {
+          data.name = title;
+        }
+      }
 
       await c.get("services").api.feedsService.editFeed({
-        id: id as string,
+        id,
         data,
         signal: c.req.raw.signal,
       });
 
-      return c.text("ok");
+      return c.redirect(`/feed-items?feedId=${id}`);
     },
   );
 };

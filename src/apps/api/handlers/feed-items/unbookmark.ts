@@ -1,13 +1,15 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import vine from "@vinejs/vine";
+import { makeLogger } from "#src/common/logger/mod.ts";
 
 const requestBodySchema = vine.object({
   id: vine.string(),
   feedId: vine.string().uuid(),
 });
 const requestBodyValidator = vine.compile(requestBodySchema);
+
+const log = makeLogger("unbookmark");
 
 const handler = (router: Hono) => {
   return router.patch(
@@ -26,9 +28,7 @@ const handler = (router: Hono) => {
       );
 
       if (changes <= 0) {
-        throw new HTTPException(400, {
-          message: "Could not unbookmark feed item",
-        });
+        log.warn("Nothing was unbookmarked");
       }
 
       return c.body(null, 204);

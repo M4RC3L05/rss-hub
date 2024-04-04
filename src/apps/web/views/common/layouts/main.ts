@@ -36,15 +36,6 @@ const MainLayout = <B extends BodyComponent>({
 
       <body>
         ${Body?.(props)}
-
-        <script type="module">
-          const replaceAndReload = (url) => {
-            history.replaceState(null, null, url);
-            location.reload();
-          }
-
-          window.replaceAndReload = replaceAndReload;
-        </script>
         ${Scripts?.map((Script) => Script(props))}
       </body>
 

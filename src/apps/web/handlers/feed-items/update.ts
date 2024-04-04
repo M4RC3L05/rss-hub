@@ -1,10 +1,12 @@
 import type { Hono } from "hono";
+import { decodeBase64Url } from "@std/encoding/base64url";
 
 export const handler = (router: Hono) => {
-  router.patch(
+  router.post(
     "/feed-items/state",
     async (c) => {
       const body = await c.req.parseBody();
+      const { redirect } = c.req.query();
       const { feedId, state, ...rest } = body;
 
       if (["read", "unread"].includes(state as string)) {
@@ -49,7 +51,12 @@ export const handler = (router: Hono) => {
           }));
       }
 
-      return c.text("ok");
+      return c.redirect(
+        redirect
+          ? new TextDecoder().decode(decodeBase64Url(redirect))
+          : c.req.header("Referer") ??
+            `/feed-items?feedId=${feedId}`,
+      );
     },
   );
 };

@@ -21,7 +21,7 @@ const handler = (router: Hono) => {
       const feedItem = c.get("database").get<FeedItemsTable>(
         sql`
           select * from feed_items
-          where id = ${id} and feed_id = ${feedId}
+          where id = ${decodeURIComponent(id)} and feed_id = ${feedId}
         `,
       );
 

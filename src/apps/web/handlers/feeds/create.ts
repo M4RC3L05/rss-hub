@@ -14,12 +14,23 @@ export const handler = (router: Hono) => {
     async (c) => {
       const data = await c.req.parseBody();
 
+      const { data: { title } } = await c.get("services").api.feedsService
+        .verifyUrl({
+          data: { url: data.url },
+          signal: c.req.raw.signal,
+        });
+
       await c.get("services").api.feedsService.createFeed({
-        data,
+        data: {
+          ...data,
+          name: typeof data.name === "string" && data.name.length > 0
+            ? data.name
+            : title,
+        },
         signal: c.req.raw.signal,
       });
 
-      return c.text("ok");
+      return c.redirect("/");
     },
   );
 };

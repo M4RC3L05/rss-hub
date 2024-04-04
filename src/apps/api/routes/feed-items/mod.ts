@@ -1,11 +1,11 @@
 import { Hono } from "hono";
-import { bookmark } from "./bookmark.ts";
-import { extractContent } from "./extract-content.ts";
-import { get } from "./get.ts";
-import { markAsRead } from "./mark-as-read.ts";
-import { markAsUnread } from "./mark-as-unread.ts";
-import { search } from "./search.ts";
-import { unbookmark } from "./unbookmark.ts";
+import { bookmark } from "#src/apps/api/routes/feed-items/bookmark.ts";
+import { extractContent } from "#src/apps/api/routes/feed-items/extract-content.ts";
+import { get } from "#src/apps/api/routes/feed-items/get.ts";
+import { markAsRead } from "#src/apps/api/routes/feed-items/mark-as-read.ts";
+import { markAsUnread } from "#src/apps/api/routes/feed-items/mark-as-unread.ts";
+import { search } from "#src/apps/api/routes/feed-items/search.ts";
+import { unbookmark } from "#src/apps/api/routes/feed-items/unbookmark.ts";
 
 export const feedItemsRoutes = () => {
   const router = new Hono();

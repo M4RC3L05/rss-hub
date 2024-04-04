@@ -4,16 +4,14 @@ import { layouts } from "#src/apps/web/views/common/mod.ts";
 
 type FeedItemsShowPageProps = {
   feedItem: FeedItemsTable;
-  backLink: string;
 };
 
 const FeedsShowPage = (
-  { feedItem, backLink }: FeedItemsShowPageProps,
+  { feedItem }: FeedItemsShowPageProps,
 ) =>
   html`
   <header>
     <nav>
-      <a href="${backLink}">Back</a>
       <a href="/">Home</a>
     </nav>
 

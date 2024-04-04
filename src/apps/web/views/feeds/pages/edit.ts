@@ -1,4 +1,4 @@
-import { html } from "hono/html";
+import { html, raw } from "hono/html";
 import type { CategoriesTable, FeedsTable } from "#src/database/types/mod.ts";
 import { layouts } from "#src/apps/web/views/common/mod.ts";
 
@@ -28,7 +28,7 @@ const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) =>
           id="name"
           name="name"
           placeholder="Name of the feed"
-          value=${feed.name}
+          value="${feed.name}"
         />
       </div>
 
@@ -39,7 +39,7 @@ const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) =>
           id="url"
           name="url"
           placeholder="Feed url"
-          value=${feed.url}
+          value="${raw(feed.url)}"
           required
           valid
         />

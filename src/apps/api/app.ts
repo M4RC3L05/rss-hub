@@ -5,7 +5,7 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { errorMappers } from "#src/errors/mod.ts";
 import { errorMapper, serviceRegister } from "#src/middlewares/mod.ts";
-import { router } from "#src/apps/api/router.ts";
+import { router } from "#src/apps/api/routes/mod.ts";
 import type { CustomDatabase } from "#src/database/mod.ts";
 import type { FeedService } from "#src/services/mod.ts";
 

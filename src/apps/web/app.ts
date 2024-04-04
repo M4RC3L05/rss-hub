@@ -6,7 +6,7 @@ import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import { serviceRegister } from "#src/middlewares/mod.ts";
-import { router } from "#src/apps/web/router.ts";
+import { router } from "#src/apps/web/routes/mod.ts";
 import type {
   CategoriesService,
   FeedItemsService,
@@ -31,6 +31,33 @@ declare module "hono" {
 
 export const makeApp = (deps: Partial<ContextVariableMap>) => {
   const app = new Hono();
+
+  app.onError((error, c) => {
+    log.error("Something went wrong!", { error });
+
+    if (error instanceof HTTPException) {
+      if (error.res) {
+        error.res.headers.forEach((value, key) => {
+          c.header(key, value);
+        });
+      }
+    }
+
+    // Redirect back on request that alter the application state.
+    if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
+      return c.redirect(c.req.header("Referer") ?? "/");
+    }
+
+    return c.text(
+      error.message ?? "Something broke",
+      // deno-lint-ignore no-explicit-any
+      (error as any).status ?? 500,
+    );
+  });
+
+  app.notFound(() => {
+    throw new HTTPException(404, { message: "Route not found" });
+  });
 
   app.use("*", serviceRegister(deps));
   app.use("*", secureHeaders({ referrerPolicy: "same-origin" }));
@@ -66,34 +93,5 @@ export const makeApp = (deps: Partial<ContextVariableMap>) => {
     }),
   );
 
-  router(app);
-
-  app.onError((error, c) => {
-    log.error("Something went wrong!", { error });
-
-    if (error instanceof HTTPException) {
-      if (error.res) {
-        error.res.headers.forEach((value, key) => {
-          c.header(key, value);
-        });
-      }
-    }
-
-    // Redirect back on request that alter the application state.
-    if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
-      return c.redirect(c.req.header("Referer") ?? "/");
-    }
-
-    return c.text(
-      error.message ?? "Something broke",
-      // deno-lint-ignore no-explicit-any
-      (error as any).status ?? 500,
-    );
-  });
-
-  app.notFound(() => {
-    throw new HTTPException(404, { message: "Route not found" });
-  });
-
-  return app;
+  return app.route("/", router());
 };

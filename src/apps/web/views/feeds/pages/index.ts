@@ -11,7 +11,7 @@ const FeedsIndexPage = ({ categories, feeds }: FeedsIndexPageProps) =>
   html`
   <header>
     <h1>RSS Hub</h1>
-    <p>Track and get the latests new</p>
+    <p>Track and get the latests news</p>
   </header>
 
   <header id="header-actions" style="position: sticky; top: 0; z-index: 2; padding: 8px 0px;">

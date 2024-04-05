@@ -71,15 +71,31 @@ const FeedsIndexPage = ({
 
     <a class="button" href=${`/feeds/${feed.id}/edit`}>Edit feed ✏</a>
 
-    <form
-      style="display: inline;"
-      action="/feeds/${feed.id}/delete"
-      method="POST"
+
+    <dialog id="dialog-${feed.id}">
+      <p>Are you sure you want to delete feed "${feed.name}"?</p>
+
+      <form
+        style="display: inline;"
+        action="/feeds/${feed.id}/delete"
+        method="POST"
+      >
+        <button type="submit">
+          Yes
+        </button>
+      </form>
+
+      <form method="dialog" style="display: inline; margin-right: 8px">
+        <button>No</button>
+      </form>
+    </dialog>
+
+    <button
+      style="display: inline; margin-right: 8px"
+      onclick="getElementById('dialog-${feed.id}').show()"
     >
-      <button type="submit">
-        Delete feed ⨯
-      </button>
-    </form>
+      Delete ⨯?
+    </button>
 
     <br />
 

@@ -49,15 +49,30 @@ const FeedsIndexPage = ({ categories, feeds }: FeedsIndexPageProps) =>
             <div class="feed-actions">
               <a class="button" href=${`/categories/${category.id}/edit`}>Edit ✏</a>
 
-              <form
+              <dialog id="dialog-${category.id}">
+                <p>Are you sure you want to delete category "${category.name}"?</p>
+
+                <form
+                  style="display: inline; margin-right: 8px"
+                  action="/categories/${category.id}/delete"
+                  method="POST"
+                >
+                  <button type="submit">
+                    Yes
+                  </button>
+                </form>
+
+                <form method="dialog" style="display: inline; margin-right: 8px">
+                  <button>No</button>
+                </form>
+              </dialog>
+
+              <button
                 style="display: inline; margin-right: 8px"
-                action="/categories/${category.id}/delete"
-                method="POST"
+                onclick="getElementById('dialog-${category.id}').show()"
               >
-                <button type="submit">
-                  Delete ⨯
-                </button>
-              </form>
+                Delete ⨯?
+              </button>
             </div>
         </details>
       `,

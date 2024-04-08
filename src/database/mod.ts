@@ -61,6 +61,7 @@ export const makeDatabase = () => {
   db.exec("pragma busy_timeout = 5000");
   db.exec("pragma foreign_keys = ON");
   db.exec("pragma synchronous = NORMAL");
+  db.exec("pragma temp_store = MEMORY");
   db.exec("pragma cache_size = 500000000");
   db.function("uuid_v4", () => globalThis.crypto.randomUUID());
 

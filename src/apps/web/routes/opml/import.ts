@@ -16,6 +16,6 @@ export const importFeeds = (router: Hono) => {
       },
     });
 
-    return c.text("ok");
+    return c.redirect("/");
   });
 };

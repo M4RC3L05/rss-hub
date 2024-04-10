@@ -17,7 +17,7 @@ const CategoriesEditPage = ({ category }: CategoriesEditPageProps) =>
   </header>
 
   <main>
-    <form action="/categories/${category.id}/edit" method="POST" class="text-align: center">
+    <form action="/categories/${category.id}/edit" method="post" class="text-align: center">
       <div>
         <label for="name">Category name</label>
         <input type="text" id="name" name="name" placeholder="Name of the category" value=${category.name} required />

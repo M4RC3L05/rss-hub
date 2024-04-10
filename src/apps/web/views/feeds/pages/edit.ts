@@ -20,7 +20,7 @@ const FeedsEditPage = ({ categories, feed }: FeedsEditPageProps) =>
   <main>
     <div id="form-error"></div>
 
-    <form action="/feeds/${feed.id}/edit" method="POST" class="text-align: center">
+    <form action="/feeds/${feed.id}/edit" method="post" class="text-align: center">
       <div>
         <label for="name">Feed name</label>
         <input

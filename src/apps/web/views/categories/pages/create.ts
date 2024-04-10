@@ -12,7 +12,7 @@ const CategoriesCreatePage = () =>
   </header>
 
   <main>
-    <form action="/categories/create" method="POST" class="text-align: center">
+    <form action="/categories/create" method="post" class="text-align: center">
       <div>
         <label for="name">Category name</label>
         <input type="text" id="name" name="name" placeholder="Name of the category" required />

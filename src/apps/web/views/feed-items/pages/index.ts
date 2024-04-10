@@ -37,7 +37,7 @@ const FeedsIndexPage = ({
     <form
       style="display: inline;"
       action="/feed-items/state"
-      method="POST"
+      method="post"
     >
       <input type="hidden" name="feedId" value=${feed.id} />
       <input type="hidden" name="state" value="read" />
@@ -60,7 +60,7 @@ const FeedsIndexPage = ({
     <form
       style="display: inline;"
       action="/feed-items/state"
-      method="POST"
+      method="post"
     >
       <input type="hidden" name="feedId" value=${feed.id} />
       <input type="hidden" name="state" value="read" />
@@ -78,7 +78,7 @@ const FeedsIndexPage = ({
       <form
         style="display: inline;"
         action="/feeds/${feed.id}/delete"
-        method="POST"
+        method="post"
       >
         <button type="submit">
           Yes
@@ -148,7 +148,7 @@ const FeedsIndexPage = ({
             `/feed-items/${encodeURIComponent(feedItem.id)}/${feedItem.feedId}`,
           )
         }"
-            method="POST"
+            method="post"
           >
             <input type="hidden" name="feedId" value=${feed.id} />
             <input type="hidden" name="state" value="read" />

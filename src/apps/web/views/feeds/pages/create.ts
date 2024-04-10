@@ -19,7 +19,7 @@ const FeedsCreatePage = ({ categories }: FeedsCreatePageProps) =>
   <main>
     <div id="form-error"></div>
 
-    <form action="/feeds/create" method="POST" class="text-align: center">
+    <form action="/feeds/create" method="post" class="text-align: center">
       <div>
         <label for="name">Feed name</label>
         <input type="text" id="name" name="name" placeholder="Name of the feed" />

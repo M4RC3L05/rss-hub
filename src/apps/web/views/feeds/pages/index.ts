@@ -55,7 +55,7 @@ const FeedsIndexPage = ({ categories, feeds }: FeedsIndexPageProps) =>
                 <form
                   style="display: inline; margin-right: 8px"
                   action="/categories/${category.id}/delete"
-                  method="POST"
+                  method="post"
                 >
                   <button type="submit">
                     Yes

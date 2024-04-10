@@ -22,7 +22,7 @@ const FeedsShowPage = (
     <form
       style="margin-right: 4px"
       action="/feed-items/state"
-      method="POST"
+      method="post"
     >
       <input type="hidden" name="id" value=${feedItem.id} />
       <input type="hidden" name="feedId" value=${feedItem.feedId} />
@@ -37,7 +37,7 @@ const FeedsShowPage = (
     <form
       style="margin-right: 4px"
       action="/feed-items/state"
-      method="POST"
+      method="post"
     >
       <input type="hidden" name="id" value=${feedItem.id} />
       <input type="hidden" name="feedId" value=${feedItem.feedId} />

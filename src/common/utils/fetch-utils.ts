@@ -40,7 +40,7 @@ export const request = async (
     if (normalizedOptions.maxRetries <= 0) throw error;
 
     if (normalizedOptions.retryNumber < normalizedOptions.maxRetries) {
-      log.error(error, "Could not fetch, proceed to retry");
+      log.error("Could not fetch, proceed to retry", { error });
       log.info(
         `Try Nº ${normalizedOptions.retryNumber}, retrying in 2 seconds`,
       );

@@ -67,10 +67,7 @@ export const makeApp = (deps: Partial<ContextVariableMap>) => {
     } finally {
       // This is important so that we always make sure the browser will not cache the previous page
       // so that the requests are always made.
-      if (
-        !c.req.path.startsWith("/public") &&
-        !c.req.path.startsWith("/deps")
-      ) {
+      if (!c.req.path.startsWith("/public")) {
         c.header("cache-control", "no-cache, no-store, must-revalidate");
         c.header("pragma", "no-cache");
         c.header("expires", "0");

@@ -14,7 +14,7 @@ class OpmlService extends BaseService {
       path: "/api/opml/import",
       init: {
         signal,
-        body: body,
+        body,
         method: "post",
         headers: headers,
       },

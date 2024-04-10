@@ -40,20 +40,20 @@ export const search = (router: Hono) => {
         .get("database")
         .all<FeedItemsTable & { rowid: number }>(sql`
           ${feedItemsQuery}
-          limit ${Number(query.limit)}
-          offset ${Number(query.page) * Number(query.limit)}
+          limit ${query.limit}
+          offset ${query.page * query.limit}
         `);
 
       return c.json({
         data: feedItems,
         pagination: {
-          previous: Math.max(Number(query.page) - 1, 0),
+          previous: Math.max(query.page - 1, 0),
           next: Math.min(
-            Number(query.page) + 1,
-            Math.floor(total / Number(query.limit)),
+            query.page + 1,
+            Math.floor(total / query.limit),
           ),
           total,
-          limit: Number(query.limit),
+          limit: query.limit,
         },
       });
     },

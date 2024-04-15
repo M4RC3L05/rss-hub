@@ -1,14 +1,38 @@
 import { FeedResolver } from "#src/resolvers/feed-resolver/interfaces.ts";
-import type { XMLBuilder } from "fast-xml-parser";
+import type { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { contentType } from "@std/media-types";
 import { parse } from "node-html-parser";
 import * as _ from "lodash-es";
 
 export class XMLFeedResolver implements FeedResolver {
   #builder: XMLBuilder;
+  #parser: XMLParser;
 
-  constructor({ builder }: { builder: XMLBuilder }) {
+  constructor({ builder, parser }: { builder: XMLBuilder; parser: XMLParser }) {
     this.#builder = builder;
+    this.#parser = parser;
+  }
+
+  resolveHomePageUrl(feed: Record<string, unknown>) {
+    const searchKeys = [
+      "link",
+      "channel.link",
+      "atom:link",
+    ];
+
+    return _.chain(searchKeys)
+      .map((k) => _.get(feed, k))
+      .flatMap((v) => Array.isArray(v) ? v : [v])
+      .filter((v) => typeof v === "object" ? !v?.["@_rel"] : v)
+      .map((v) => typeof v === "object" ? v?.["@_href"] : v)
+      .find((v) => typeof v === "string" && v.trim().length > 0)
+      .value() as string;
+  }
+
+  toObject(data: unknown) {
+    if (!data) return;
+
+    return this.#parser.parse(data as string) as Record<string, unknown>;
   }
 
   resolveFeed(data: Record<string, unknown>) {
@@ -108,7 +132,7 @@ export class XMLFeedResolver implements FeedResolver {
   resolveFeedItemEnclosures(feedItem: Record<string, unknown>) {
     const searchKeys = ["enclosure"];
 
-    const standard = _.chain(searchKeys)
+    return _.chain(searchKeys)
       .map((k) => _.get(feedItem, k) as Record<string, unknown>)
       .filter((v) => _.isPlainObject(v))
       .map((v) => ({
@@ -121,33 +145,12 @@ export class XMLFeedResolver implements FeedResolver {
           v.url.trim().length > 0,
       )
       .value() as Array<{ url: string; type?: string }>;
-
-    if (standard.length > 0) return standard;
-
-    const fromLink = this.resolveFeedItemLink(feedItem);
-    const ext = fromLink?.split(".")?.at(-1);
-
-    if (fromLink && ext) {
-      const mt = contentType(ext);
-
-      if (
-        mt &&
-        (mt.startsWith("image") ||
-          mt.startsWith("img") ||
-          mt.startsWith("video") ||
-          mt.startsWith("audio"))
-      ) {
-        return [{ url: fromLink, type: mt }];
-      }
-    }
-
-    return [];
   }
 
   resolveFeedItemImage(
-    feed: Record<string, unknown>,
+    feedItem: Record<string, unknown>,
   ) {
-    const enclosures = this.resolveFeedItemEnclosures(feed);
+    const enclosures = this.resolveFeedItemEnclosures(feedItem);
 
     const found = enclosures.find(({ type, url }) => {
       const isTypeImg = _.includes(type, "image") || _.includes(type, "img");
@@ -162,16 +165,19 @@ export class XMLFeedResolver implements FeedResolver {
     if (found) return found.url;
 
     if (
-      _.has(feed, "media:content") &&
-      _.has(feed, "media:content.@_url") &&
-      (_.get(feed, "media:content.@_medium") === "image" ||
-        _.includes(_.get(feed, "media:content.@_type") as string, "image") ||
-        _.includes(_.get(feed, "media:content.@_type") as string, "img") ||
+      _.has(feedItem, "media:content") &&
+      _.has(feedItem, "media:content.@_url") &&
+      (_.get(feedItem, "media:content.@_medium") === "image" ||
+        _.includes(
+          _.get(feedItem, "media:content.@_type") as string,
+          "image",
+        ) ||
+        _.includes(_.get(feedItem, "media:content.@_type") as string, "img") ||
         ["jpeg", "jpg", "gif", "png", "webp"].includes(
-          _.get(feed, "media:content.@_url") as string,
+          _.get(feedItem, "media:content.@_url") as string,
         ))
     ) {
-      return _.get(feed, "media:content.@_url") as string;
+      return _.get(feedItem, "media:content.@_url") as string;
     }
 
     const searchKeys = [
@@ -187,13 +193,13 @@ export class XMLFeedResolver implements FeedResolver {
     ];
 
     const result = _.chain(searchKeys)
-      .map((k) => _.get(feed, k) as unknown)
+      .map((k) => _.get(feedItem, k) as unknown)
       .find((v) => typeof v === "string" && v.trim().length > 0)
       .value() as string | undefined;
 
     if (result) return result;
 
-    const content = this.resolveFeedItemContent(feed);
+    const content = this.resolveFeedItemContent(feedItem);
 
     if (content) {
       const r = /<img[^>]+src="([^"]+)"/im;
@@ -204,7 +210,7 @@ export class XMLFeedResolver implements FeedResolver {
       }
     }
 
-    const imgFromLink = this.resolveFeedItemLink(feed);
+    const imgFromLink = this.resolveFeedItemLink(feedItem);
 
     if (
       ["jpeg", "jpg", "gif", "png", "webp"].includes(

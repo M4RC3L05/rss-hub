@@ -3,10 +3,13 @@ import { sql } from "@m4rc3l05/sqlite-tag";
 import * as entities from "@std/html";
 import * as _ from "lodash-es";
 import { request } from "#src/common/utils/fetch-utils.ts";
-import { xmlParser } from "#src/common/utils/xml-utils.ts";
 import type { CustomDatabase } from "../database/mod.ts";
 import type { FeedsTable } from "../database/types/mod.ts";
-import { type FeedResolver, xmlFeedResolver } from "#src/resolvers/mod.ts";
+import {
+  type FeedResolver,
+  jsonFeedResolver,
+  xmlFeedResolver,
+} from "#src/resolvers/mod.ts";
 
 const xmlContentTypeHeaders = [
   "application/xml",
@@ -17,13 +20,23 @@ const xmlContentTypeHeaders = [
   "text/html",
 ];
 
+const jsonContentTypeHeaders = [
+  "application/feed+json",
+  "application/json",
+];
+
 const validContentTypes = [
   ...xmlContentTypeHeaders,
+  ...jsonContentTypeHeaders,
 ];
 
 const resolveFeedResolver = (contentType: string): FeedResolver => {
   if (xmlContentTypeHeaders.some((ct) => contentType.includes(ct))) {
     return xmlFeedResolver;
+  }
+
+  if (jsonContentTypeHeaders.some((ct) => contentType.includes(ct))) {
+    return jsonFeedResolver;
   }
 
   throw new Error(`No feed resolver for content type "${contentType}"`);
@@ -45,7 +58,7 @@ class FeedService {
         feed.url,
         options,
       );
-      data = this.toObject(extracted);
+      data = fr.toObject(extracted);
       feedResolver = fr;
     } catch (error) {
       throw new Error(`Could not get/parse feed "${feed.url}"`, {
@@ -57,7 +70,7 @@ class FeedService {
       throw new Error("Aborted");
     }
 
-    const feedPage = feedResolver.resolveFeed(data);
+    const feedPage = feedResolver.resolveFeed(data!);
 
     if (!feedPage) {
       throw new Error(`Could not get feed for feed ${feed.url}`, {
@@ -84,7 +97,7 @@ class FeedService {
     const status = await Promise.allSettled(
       // deno-lint-ignore require-await
       feedItems.map(async (entry) =>
-        this.#syncFeedEntry(entry, feedResolver, feed.id)
+        this.#syncFeedEntry(feedPage, entry, feedResolver, feed.id)
       ),
     );
     const totalCount = status.length;
@@ -101,17 +114,13 @@ class FeedService {
     return { totalCount, successCount, faildCount, failedReasons };
   }
 
-  toObject(data: string): Record<string, unknown> {
-    return xmlParser.parse(data) as Record<string, unknown>;
-  }
-
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
     const { data: rawFeed, feedResolver } = await this.#extractRawFeed(
       url,
       options as Omit<typeof options, "database">,
     );
-    const parsed = this.toObject(rawFeed);
-    const feed = feedResolver.resolveFeed(parsed);
+    const parsed = feedResolver.toObject(rawFeed);
+    const feed = feedResolver.resolveFeed(parsed!);
 
     if (!feed) {
       throw new Error(`No feed found in url ${url}`);
@@ -174,14 +183,16 @@ class FeedService {
   }
 
   #syncFeedEntry(
+    feed: Record<string, unknown>,
     feedItem: Record<string, unknown>,
     feedResolver: FeedResolver,
     feedId: string,
   ) {
+    const homePageUrl = feedResolver.resolveHomePageUrl(feed);
     const id = feedResolver.resolveFeedItemGuid(feedItem);
     const enclosures = feedResolver.resolveFeedItemEnclosures(feedItem);
     let feedImage = feedResolver.resolveFeedItemImage(feedItem);
-    const content = feedResolver.resolveFeedItemContent(feedItem);
+    let content = feedResolver.resolveFeedItemContent(feedItem);
     const pubDate = feedResolver.resolveFeedItemPubDate(feedItem);
     const updatedAt = feedResolver.resolveUpdatedAt(feedItem);
     const link = feedResolver.resolveFeedItemLink(feedItem);
@@ -189,6 +200,24 @@ class FeedService {
 
     if (feedImage) {
       feedImage = entities.unescape(feedImage);
+    }
+
+    if (
+      typeof feedImage === "string" && !feedImage?.trim()?.startsWith("http") &&
+      typeof homePageUrl === "string" && homePageUrl.trim().startsWith("http")
+    ) {
+      feedImage = new URL(feedImage, homePageUrl).toString();
+    }
+
+    if (typeof content === "string") {
+      const r = /<img[^>]+src="([^"]+)"/img;
+      content = content.replaceAll(r, (str, url) => {
+        if (url.startsWith("http") || typeof homePageUrl !== "string") {
+          return str;
+        }
+
+        return str.replace(url, new URL(url, homePageUrl).toString());
+      });
     }
 
     const toInsert = {

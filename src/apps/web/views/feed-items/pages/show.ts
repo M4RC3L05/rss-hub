@@ -70,6 +70,38 @@ const FeedsShowPage = (
   </header>
 
   <main id="feed-item-content">
+    ${
+    feedItem.enclosure && JSON.parse(feedItem.enclosure).length > 0
+      ? html`
+      ${
+        JSON.parse(feedItem.enclosure).map(
+          (enclosure: { url: string; type?: string }) => {
+            if (
+              enclosure.type?.includes("image") ??
+                enclosure.type?.includes("img") ??
+                [".png", ".jpg", ".jpeg", ".gif"].some((end) =>
+                  enclosure.url.endsWith(end)
+                )
+            ) {
+              return html`<img src="${enclosure.url}" />`;
+            }
+
+            if (enclosure.type?.includes("video")) {
+              return html`<video controls><source src="${enclosure.url}" type=${enclosure.type} /></video>`;
+            }
+
+            if (enclosure.type?.includes("audio")) {
+              return html`<audio controls><source src="${enclosure.url}" type=${enclosure.type} /></audio>`;
+            }
+
+            return "";
+          },
+        )
+      }
+      <hr />
+    `
+      : html``
+  }
     ${raw(feedItem.content)}
   </main>
 `;

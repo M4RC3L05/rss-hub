@@ -1,4 +1,5 @@
 export type FeedResolver = {
+  toObject: (data: unknown) => Record<string, unknown> | undefined;
   resolveFeed: (
     data: Record<string, unknown>,
   ) => Record<string, unknown> | undefined;
@@ -6,6 +7,7 @@ export type FeedResolver = {
   resolveFeedItems: (
     data: Record<string, unknown>,
   ) => Record<string, unknown>[];
+  resolveHomePageUrl: (feed: Record<string, unknown>) => string | undefined;
 
   resolveFeedItemGuid: (
     feedItem: Record<string, unknown>,

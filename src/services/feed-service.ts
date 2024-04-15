@@ -3,10 +3,31 @@ import { sql } from "@m4rc3l05/sqlite-tag";
 import * as entities from "@std/html";
 import * as _ from "lodash-es";
 import { request } from "#src/common/utils/fetch-utils.ts";
-import { xmlBuilder, xmlParser } from "#src/common/utils/xml-utils.ts";
+import { xmlParser } from "#src/common/utils/xml-utils.ts";
 import type { CustomDatabase } from "../database/mod.ts";
 import type { FeedsTable } from "../database/types/mod.ts";
-import { feedResolvers } from "#src/resolvers/mod.ts";
+import { type FeedResolver, xmlFeedResolver } from "#src/resolvers/mod.ts";
+
+const xmlContentTypeHeaders = [
+  "application/xml",
+  "application/rss+xml",
+  "application/rdf+xml",
+  "application/atom+xml",
+  "text/xml",
+  "text/html",
+];
+
+const validContentTypes = [
+  ...xmlContentTypeHeaders,
+];
+
+const resolveFeedResolver = (contentType: string): FeedResolver => {
+  if (xmlContentTypeHeaders.some((ct) => contentType.includes(ct))) {
+    return xmlFeedResolver;
+  }
+
+  throw new Error(`No feed resolver for content type "${contentType}"`);
+};
 
 class FeedService {
   #db: CustomDatabase;
@@ -17,10 +38,15 @@ class FeedService {
 
   async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal }) {
     let data: Record<string, unknown> | undefined;
+    let feedResolver: FeedResolver;
 
     try {
-      const extracted = await this.#extractRawFeed(feed.url, options);
+      const { data: extracted, feedResolver: fr } = await this.#extractRawFeed(
+        feed.url,
+        options,
+      );
       data = this.toObject(extracted);
+      feedResolver = fr;
     } catch (error) {
       throw new Error(`Could not get/parse feed "${feed.url}"`, {
         cause: error,
@@ -31,7 +57,7 @@ class FeedService {
       throw new Error("Aborted");
     }
 
-    const feedPage = feedResolvers.resolveFeed(data);
+    const feedPage = feedResolver.resolveFeed(data);
 
     if (!feedPage) {
       throw new Error(`Could not get feed for feed ${feed.url}`, {
@@ -43,7 +69,7 @@ class FeedService {
       throw new Error("Aborted");
     }
 
-    const feedItems = feedResolvers.resolveFeedItems(feedPage);
+    const feedItems = feedResolver.resolveFeedItems(feedPage);
 
     if (!feedItems) {
       throw new Error(`No feed items for feed "${feed.url}"`, {
@@ -57,7 +83,9 @@ class FeedService {
 
     const status = await Promise.allSettled(
       // deno-lint-ignore require-await
-      feedItems.map(async (entry) => this.#syncFeedEntry(entry, feed.id)),
+      feedItems.map(async (entry) =>
+        this.#syncFeedEntry(entry, feedResolver, feed.id)
+      ),
     );
     const totalCount = status.length;
     const successCount = status.filter(
@@ -78,27 +106,18 @@ class FeedService {
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
-    const rawFeed = await this.#extractRawFeed(
+    const { data: rawFeed, feedResolver } = await this.#extractRawFeed(
       url,
       options as Omit<typeof options, "database">,
     );
     const parsed = this.toObject(rawFeed);
+    const feed = feedResolver.resolveFeed(parsed);
 
-    if (!feedResolvers.resolveFeed(parsed)) {
+    if (!feed) {
       throw new Error(`No feed found in url ${url}`);
     }
 
-    return parsed;
-  }
-
-  getFeedTitle(raw: Record<string, unknown>) {
-    const feed = feedResolvers.resolveFeed(raw);
-
-    if (!feed) {
-      throw new Error("Could not get feed title.");
-    }
-
-    return feedResolvers.resolveFeedTitle(feed);
+    return { feed, feedResolver };
   }
 
   async #extractRawFeed(url: string, options: { signal?: AbortSignal }) {
@@ -124,14 +143,6 @@ class FeedService {
       }
 
       const contentType = response.headers.get("content-type");
-      const validContentTypes = [
-        "application/xml",
-        "application/rss+xml",
-        "application/rdf+xml",
-        "application/atom+xml",
-        "text/xml",
-        "text/html",
-      ];
 
       if (!contentType) {
         throw new Error(`No content type provided for feed "${url}"`);
@@ -151,7 +162,10 @@ class FeedService {
         });
       }
 
-      return await response.text();
+      return {
+        data: await response.text(),
+        feedResolver: resolveFeedResolver(contentType),
+      };
     } catch (error) {
       throw new Error(`Error fetching feed ${url}`, {
         cause: error,
@@ -159,20 +173,19 @@ class FeedService {
     }
   }
 
-  #syncFeedEntry(feedItem: Record<string, unknown>, feedId: string) {
-    const id = feedResolvers.resolveFeedItemGuid(feedItem);
-    const enclosures = feedResolvers.resolveFeedItemEnclosures(feedItem);
-    let feedImage = feedResolvers.resolveFeedItemImage(
-      (feed) => feedResolvers.resolveFeedItemContent(xmlBuilder, feed),
-      feedItem,
-    );
-    const content = feedResolvers.formatFeedItemContent(
-      feedResolvers.resolveFeedItemContent(xmlBuilder, feedItem),
-    );
-    const pubDate = feedResolvers.resolveFeedItemPubDate(feedItem);
-    const updatedAt = feedResolvers.resolveUpdatedAt(feedItem);
-    const link = feedResolvers.resolveFeedItemLink(feedItem);
-    const title = feedResolvers.resolveFeedItemTitle(feedItem);
+  #syncFeedEntry(
+    feedItem: Record<string, unknown>,
+    feedResolver: FeedResolver,
+    feedId: string,
+  ) {
+    const id = feedResolver.resolveFeedItemGuid(feedItem);
+    const enclosures = feedResolver.resolveFeedItemEnclosures(feedItem);
+    let feedImage = feedResolver.resolveFeedItemImage(feedItem);
+    const content = feedResolver.resolveFeedItemContent(feedItem);
+    const pubDate = feedResolver.resolveFeedItemPubDate(feedItem);
+    const updatedAt = feedResolver.resolveUpdatedAt(feedItem);
+    const link = feedResolver.resolveFeedItemLink(feedItem);
+    const title = feedResolver.resolveFeedItemTitle(feedItem);
 
     if (feedImage) {
       feedImage = entities.unescape(feedImage);

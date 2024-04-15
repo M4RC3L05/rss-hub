@@ -1,1 +1,2 @@
-export * as feedResolvers from "#src/resolvers/feed-resolvers.ts";
+export { xmlFeedResolver } from "#src/resolvers/feed-resolver/mod.ts";
+export type { FeedResolver } from "#src/resolvers/feed-resolver/mod.ts";

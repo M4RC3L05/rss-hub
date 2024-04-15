@@ -15,11 +15,14 @@ export const validateUrl = (router: Hono) => {
     async (c) => {
       try {
         const data = await requestBodyValidator.validate(await c.req.json());
-        const extracted = await c
+        const { feed: extracted, feedResolver } = await c
           .get("feedService")
           .verifyFeed(data.url, { signal: c.req.raw.signal });
 
-        const title = c.get("feedService").getFeedTitle(extracted);
+        const title = feedResolver.resolveFeedTitle(extracted);
+
+        if (!title) throw new Error("No title for feed");
+
         const feed = c
           .get("database")
           .get(sql`select id from feeds where url = ${data.url}`);

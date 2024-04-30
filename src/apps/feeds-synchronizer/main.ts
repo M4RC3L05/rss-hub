@@ -1,10 +1,10 @@
 import { Cron } from "@m4rc3l05/cron";
 import config from "config";
 import { makeLogger } from "#src/common/logger/mod.ts";
-import { makeDatabase } from "#src/database/mod.ts";
+import { type CustomDatabase, makeDatabase } from "#src/database/mod.ts";
 import { FeedService } from "#src/services/mod.ts";
 import runner from "#src/apps/feeds-synchronizer/app.ts";
-import { HookDrain } from "#src/common/process/hook-drain.ts";
+import { ProcessLifecycle } from "@m4rc3l05/process-lifecycle";
 import { gracefulShutdown } from "#src/common/process/mod.ts";
 
 const { cron } = config.get<{
@@ -12,46 +12,30 @@ const { cron } = config.get<{
 }>("apps.feeds-synchronizer");
 const log = makeLogger("feeds-synchronizer");
 
-const shutdown = new HookDrain({
-  log,
-  onFinishDrain: (error) => {
-    log.info("Exiting application");
+const processLifecycle = new ProcessLifecycle();
 
-    if (error.error) {
-      if (error.reason === "timeout") {
-        log.warn("Global shutdown timeout exceeded");
-      }
+gracefulShutdown({ processLifecycle, log });
 
-      Deno.exit(1);
-    } else {
-      Deno.exit(0);
-    }
-  },
+processLifecycle.registerService({
+  name: "db",
+  boot: () => makeDatabase(),
+  shutdown: (db) => db.close(),
 });
 
-gracefulShutdown({ hookDrain: shutdown, log });
-
-const db = makeDatabase();
-
-shutdown.registerHook({
-  name: "database",
-  fn: () => {
-    db.close();
-  },
+processLifecycle.registerService({
+  name: "feeds-synchronizer-cron",
+  boot: () => new Cron(cron.pattern, cron.timezone, cron.tickerTimeout),
+  shutdown: (cron) => cron.stop(),
 });
 
-const job = new Cron(cron.pattern, cron.timezone, cron.tickerTimeout);
+await processLifecycle.boot();
 
-shutdown.registerHook({
-  name: "feeds-synchronizer",
-  fn: async () => {
-    await job.stop();
-  },
-});
+const cronJob = processLifecycle.getService<Cron>("feeds-synchronizer-cron");
+const db = processLifecycle.getService<CustomDatabase>("db");
 
-log.info("Registered feeds-synchronizer", { nextAt: job.nextAt() });
+log.info("Registered feeds-synchronizer", { nextAt: cronJob.nextAt() });
 
-for await (const signal of job.start()) {
+for await (const signal of cronJob.start()) {
   try {
     log.info("Running feeds-synchronizer");
 
@@ -60,6 +44,6 @@ for await (const signal of job.start()) {
     log.error(error, "Error running feeds-synchronizer task");
   } finally {
     log.info("feeds-synchronizer completed");
-    log.info(`Next at ${job.nextAt()}`);
+    log.info(`Next at ${cronJob.nextAt()}`);
   }
 }

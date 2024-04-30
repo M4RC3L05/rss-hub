@@ -29,6 +29,8 @@ export const gracefulShutdown = (
     } else {
       log.info("Process shutdown ended");
     }
+
+    Deno.exit(error ? 1 : 0);
   });
 
   processLifecycle.on("bootServiceStarted", ({ name }) => {

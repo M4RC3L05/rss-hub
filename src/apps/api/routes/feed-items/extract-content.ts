@@ -45,10 +45,49 @@ export const extractContent = (router: Hono) => {
           ]),
         }).then((response) => response.text());
 
+        const url = new URL(result?.link);
+
         const dom = new JSDOM(pageContent);
 
         for (const element of dom.window.document.querySelectorAll("a")) {
-          element.setAttribute("target", "_blank");
+          const href = (element.getAttribute("href") ?? "").trim();
+
+          if (!href.startsWith("#")) {
+            element.setAttribute("target", "_blank");
+          }
+        }
+
+        for (
+          const eleWithExternalResources of dom.window.document
+            .querySelectorAll("[src], [href], [srcset]")
+        ) {
+          const href = (eleWithExternalResources.getAttribute("href") ?? "")
+            .trim();
+          const src = (eleWithExternalResources.getAttribute("src") ?? "")
+            .trim();
+          const srcset = (eleWithExternalResources.getAttribute("srcset") ?? "")
+            .trim();
+
+          if (href.startsWith("/")) {
+            eleWithExternalResources.setAttribute(
+              "href",
+              new URL(href, url.origin).toString(),
+            );
+          }
+
+          if (src.startsWith("/")) {
+            eleWithExternalResources.setAttribute(
+              "src",
+              new URL(src, url.origin).toString(),
+            );
+          }
+
+          if (srcset.startsWith("/")) {
+            eleWithExternalResources.setAttribute(
+              "srcset",
+              new URL(srcset, url.origin).toString(),
+            );
+          }
         }
 
         const parsed = new Readability(dom.window.document).parse();

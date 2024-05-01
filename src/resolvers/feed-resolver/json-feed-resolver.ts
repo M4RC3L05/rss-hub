@@ -1,4 +1,4 @@
-import { FeedResolver } from "#src/resolvers/feed-resolver/mod.ts";
+import type { FeedResolver } from "#src/resolvers/feed-resolver/mod.ts";
 import { contentType } from "@std/media-types";
 import { parse } from "node-html-parser";
 

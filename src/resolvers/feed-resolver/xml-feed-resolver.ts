@@ -1,4 +1,4 @@
-import { FeedResolver } from "#src/resolvers/feed-resolver/interfaces.ts";
+import type { FeedResolver } from "#src/resolvers/feed-resolver/interfaces.ts";
 import type { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { contentType } from "@std/media-types";
 import { parse } from "node-html-parser";

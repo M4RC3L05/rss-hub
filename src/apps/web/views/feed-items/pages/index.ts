@@ -33,7 +33,7 @@ const FeedsIndexPage = ({
     <h1>${feed.name}</h1>
   </header>
 
-  <header id="header-actions" style="position: sticky; top: 0; padding: 8px 0px; z-index: 2">
+  <header id="header-actions" style="position: sticky; top: 0; padding: 8px 0px; z-index: 3">
     <form
       style="display: inline;"
       action="/feed-items/state"
@@ -131,10 +131,21 @@ const FeedsIndexPage = ({
     feedItems.map(
       (feedItem) =>
         html`
-        <section style="overflow: auto;">
+        <section style="position: relative">
           ${
           feedItem.img
-            ? html`<aside><img src=${feedItem.img} /></aside>`
+            ? html`
+              <aside onclick="getElementById('dialog-feeditem-img-${feedItem.id}').show()">
+                <img src=${feedItem.img} />
+              </aside>
+              <dialog id="dialog-feeditem-img-${feedItem.id}" style="position: absolute; top: 0; z-index: 2; width: 100%">
+                <form method="dialog" style="display: inline; margin-right: 8px">
+                  <button>⨯</button>
+                </form>
+
+                <img src=${feedItem.img} style="width: 100%; height: auto" />
+              </dialog>
+            `
             : html``
         }
 

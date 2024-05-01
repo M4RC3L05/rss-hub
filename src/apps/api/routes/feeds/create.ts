@@ -35,7 +35,6 @@ export const create = (router: Hono) => {
           signal: AbortSignal.any([
             AbortSignal.timeout(10_000),
             c.get("shutdown"),
-            c.req.raw.signal,
           ]),
         })
         .then(({ faildCount, failedReasons, successCount, totalCount }) => {

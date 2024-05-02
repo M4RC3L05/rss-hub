@@ -47,6 +47,8 @@ processLifecycle.registerService({
       tickerTimeout: cron.tickerTimeout,
     });
 
+    log.info(`Next at ${cronInstance.nextAt()}`);
+
     cronInstance.start();
 
     return cronInstance;

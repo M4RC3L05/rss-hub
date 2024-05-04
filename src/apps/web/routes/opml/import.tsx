@@ -1,9 +1,9 @@
 import type { Hono } from "hono";
-import { opmlViews } from "#src/apps/web/views/mod.ts";
+import { OpmlImportPage } from "#src/apps/web/views/opml/pages/import.tsx";
 
 export const importFeeds = (router: Hono) => {
   router.get("/import", (c) => {
-    return c.html(opmlViews.pages.Import());
+    return c.render(<OpmlImportPage />);
   });
 
   router.post("/import", async (c) => {

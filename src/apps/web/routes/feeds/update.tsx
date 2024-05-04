@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { feedsViews } from "#src/apps/web/views/mod.ts";
+import { FeedsEditPage } from "#src/apps/web/views/feeds/pages/edit.tsx";
 
 export const update = (router: Hono) => {
   router.get(
@@ -17,7 +17,7 @@ export const update = (router: Hono) => {
         }),
       ]);
 
-      return c.html(feedsViews.pages.Edit({ categories, feed }));
+      return c.render(<FeedsEditPage categories={categories} feed={feed} />);
     },
   );
 

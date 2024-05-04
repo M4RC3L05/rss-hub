@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { feedItemsViews } from "#src/apps/web/views/mod.ts";
+import { FeedItemsReadabilityPage } from "#src/apps/web/views/feed-items/pages/readability.tsx";
 
 export const readability = (router: Hono) => {
   router.get(
@@ -16,7 +16,7 @@ export const readability = (router: Hono) => {
 
       feedItem.content = page;
 
-      return c.html(feedItemsViews.pages.Readability({ feedItem }));
+      return c.render(<FeedItemsReadabilityPage feedItem={feedItem} />);
     },
   );
 };

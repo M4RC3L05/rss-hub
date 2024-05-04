@@ -35,3 +35,14 @@
   width: 100%;
   height: 100%;
 }
+
+#header-actions button,
+#header-actions .button,
+main button,
+main .button,
+.feed-actions button,
+.feed-actions .button {
+  font-size: .8rem;
+  font-weight: bold;
+  padding: .5rem .7rem;
+}

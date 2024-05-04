@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { feedsViews } from "#src/apps/web/views/mod.ts";
+import { FeedsIndexPage } from "#src/apps/web/views/feeds/pages/index.tsx";
 
 export const index = (router: Hono) => {
   router.get("/", async (c) => {
@@ -10,6 +10,6 @@ export const index = (router: Hono) => {
       c.get("services").api.feedsService.getFeeds({ signal: c.req.raw.signal }),
     ]);
 
-    return c.html(feedsViews.pages.Index({ categories, feeds }));
+    return c.render(<FeedsIndexPage categories={categories} feeds={feeds} />);
   });
 };

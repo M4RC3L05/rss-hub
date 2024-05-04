@@ -1,9 +1,9 @@
 import type { Hono } from "hono";
-import { categoriesViews } from "#src/apps/web/views/mod.ts";
+import { CategoriesCreatePage } from "#src/apps/web/views/categories/pages/create.tsx";
 
 export const create = (router: Hono) => {
   router.get("/create", (c) => {
-    return c.html(categoriesViews.pages.Create());
+    return c.render(<CategoriesCreatePage />);
   });
 
   router.post(

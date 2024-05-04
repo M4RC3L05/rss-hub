@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { feedItemsViews } from "#src/apps/web/views/mod.ts";
+import { FeedItemsShowPage } from "#src/apps/web/views/feed-items/pages/show.tsx";
 
 export const show = (router: Hono) => {
   router.get(
@@ -10,7 +10,7 @@ export const show = (router: Hono) => {
       const { data: feedItem } = await c.get("services").api.feedItemsService
         .getFeedItemById({ feedId, id, signal: c.req.raw.signal });
 
-      return c.html(feedItemsViews.pages.Show({ feedItem: feedItem }));
+      return c.render(<FeedItemsShowPage feedItem={feedItem} />);
     },
   );
 };

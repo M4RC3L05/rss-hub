@@ -1,12 +1,12 @@
 import type { Hono } from "hono";
-import { feedsViews } from "#src/apps/web/views/mod.ts";
+import { FeedsCreatePage } from "#src/apps/web/views/feeds/pages/create.tsx";
 
 export const create = (router: Hono) => {
   router.get("/create", async (c) => {
     const { data: categories } = await c.get("services").api.categoriesService
       .getCategories({ signal: c.req.raw.signal });
 
-    return c.html(feedsViews.pages.Create({ categories }));
+    return c.render(<FeedsCreatePage categories={categories} />);
   });
 
   router.post(

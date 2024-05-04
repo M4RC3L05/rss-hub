@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { feedItemsViews } from "#src/apps/web/views/mod.ts";
+import { FeedItemsIndexPage } from "#src/apps/web/views/feed-items/pages/index.tsx";
 
 export const index = (router: Hono) => {
   router.get(
@@ -39,11 +39,11 @@ export const index = (router: Hono) => {
 
       const currUrl = new URL(c.req.url);
 
-      return c.html(
-        feedItemsViews.pages.Index({
-          feed,
-          feedItems,
-          filters: {
+      return c.render(
+        <FeedItemsIndexPage
+          feed={feed}
+          feedItems={feedItems}
+          filters={{
             unreaded: {
               state: !!unread,
               onLink: `${currUrl.pathname}${`${
@@ -74,8 +74,8 @@ export const index = (router: Hono) => {
                 )
               }`,
             },
-          },
-          feedItemsPagination: {
+          }}
+          feedItemsPagination={{
             startLink: previousLink.replace(/&page=[0-9]+/, "&page=0"),
             previousLink: previousLink,
             nextLink: nextLink,
@@ -87,8 +87,8 @@ export const index = (router: Hono) => {
                 )
               }`,
             ),
-          },
-        }),
+          }}
+        />,
       );
     },
   );

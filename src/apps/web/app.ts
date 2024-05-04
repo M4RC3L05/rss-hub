@@ -2,6 +2,7 @@ import config from "config";
 import { type ContextVariableMap, Hono } from "hono";
 import { serveStatic } from "hono/deno";
 import { basicAuth } from "hono/basic-auth";
+import { jsxRenderer } from "hono/jsx-renderer";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
 import { makeLogger } from "#src/common/logger/mod.ts";
@@ -13,6 +14,7 @@ import type {
   FeedsService,
   OpmlService,
 } from "#src/apps/web/services/api/mod.ts";
+import { MainLayout } from "#src/apps/web/views/common/layouts/main.tsx";
 
 const log = makeLogger("web");
 
@@ -89,6 +91,8 @@ export const makeApp = (deps: Partial<ContextVariableMap>) => {
       rewriteRequestPath: (path) => path.replace("/public", ""),
     }),
   );
+
+  app.get("*", jsxRenderer(MainLayout, { docType: true, stream: true }));
 
   return app.route("/", router());
 };

@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { categoriesViews } from "#src/apps/web/views/mod.ts";
+import { CategoriesEditPage } from "#src/apps/web/views/categories/pages/edit.tsx";
 
 export const update = (router: Hono) => {
   router.get(
@@ -14,7 +14,7 @@ export const update = (router: Hono) => {
           signal: c.req.raw.signal,
         });
 
-      return c.html(categoriesViews.pages.Edit({ category }));
+      return c.render(<CategoriesEditPage category={category} />);
     },
   );
   router.post(

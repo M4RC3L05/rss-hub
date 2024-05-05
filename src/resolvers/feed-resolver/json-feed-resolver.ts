@@ -1,6 +1,6 @@
 import type { FeedResolver } from "#src/resolvers/feed-resolver/mod.ts";
 import { contentType } from "@std/media-types";
-import { parse } from "node-html-parser";
+import { DOMParser, type Element } from "deno-dom";
 
 export class JSONFeedResolver implements FeedResolver {
   resolveHomePageUrl(feed: Record<string, unknown>) {
@@ -119,23 +119,32 @@ export class JSONFeedResolver implements FeedResolver {
   #formatFeedItemContent(content?: string) {
     if (!content) return content;
 
-    const dom = parse(content);
+    const dom = new DOMParser().parseFromString(content, "text/html");
+
+    if (!dom) {
+      return content;
+    }
 
     for (const element of dom.querySelectorAll("iframe")) {
-      const wrapper = parse(
-        `<div class="iframe-container">${element.toString()}</div>`,
-      ).childNodes[0];
+      const wrapper = new DOMParser().parseFromString(
+        `<div class="iframe-container">${(element as Element).outerHTML}</div>`,
+        "text/html",
+      )?.querySelector("div.iframe-container") as Element | undefined;
 
-      element.insertAdjacentHTML("beforebegin", wrapper.outerHTML);
-      element.remove();
+      if (!wrapper) continue;
+
+      element.parentNode?.insertBefore(wrapper, element);
+      (element as Element).remove();
     }
 
     for (const element of dom.querySelectorAll("a")) {
-      element.setAttribute("target", "_blank");
+      (element as Element).setAttribute("target", "_blank");
     }
 
-    for (const element of dom.querySelectorAll("script")) element.remove();
+    for (const element of dom.querySelectorAll("script")) {
+      (element as Element).remove();
+    }
 
-    return dom.toString();
+    return dom.body.innerHTML;
   }
 }

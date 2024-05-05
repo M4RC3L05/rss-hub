@@ -36,10 +36,9 @@
     "@std/text": "jsr:@std/text@0.224.0",
     "@vinejs/vine": "npm:@vinejs/vine@2.0.0",
     "config": "npm:config@3.3.11",
+    "deno-dom": "https://deno.land/x/deno_dom@v0.1.45/deno-dom-native.ts",
     "fast-xml-parser": "npm:fast-xml-parser@4.3.6",
     "hono": "npm:hono@4.2.8",
-    "jsdom": "npm:jsdom@24.0.0",
-    "lodash-es": "npm:lodash-es@4.17.21",
-    "node-html-parser": "npm:node-html-parser@6.1.13"
+    "lodash-es": "npm:lodash-es@4.17.21"
   }
 }

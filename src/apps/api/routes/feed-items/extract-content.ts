@@ -2,7 +2,7 @@ import { sql } from "@m4rc3l05/sqlite-tag";
 import { Readability } from "@mozilla/readability";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { JSDOM } from "jsdom";
+import { DOMParser, type Element } from "deno-dom";
 import vine from "@vinejs/vine";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";
@@ -47,19 +47,26 @@ export const extractContent = (router: Hono) => {
 
         const url = new URL(result?.link);
 
-        const dom = new JSDOM(pageContent);
+        const dom = new DOMParser().parseFromString(pageContent, "text/html");
 
-        for (const element of dom.window.document.querySelectorAll("a")) {
-          const href = (element.getAttribute("href") ?? "").trim();
+        if (!dom) {
+          throw new Error(`Could not parse page from "${result?.link}"`);
+        }
+
+        // deno-lint-ignore no-explicit-any
+        for (const element of dom.querySelectorAll("a") as any as Element[]) {
+          const href = ((element as Element).getAttribute("href") ?? "").trim();
 
           if (!href.startsWith("#")) {
-            element.setAttribute("target", "_blank");
+            (element as Element).setAttribute("target", "_blank");
           }
         }
 
         for (
-          const eleWithExternalResources of dom.window.document
-            .querySelectorAll("[src], [href], [srcset]")
+          const eleWithExternalResources of dom.querySelectorAll(
+            "[src], [href], [srcset]",
+            // deno-lint-ignore no-explicit-any
+          ) as any as Element[]
         ) {
           const href = (eleWithExternalResources.getAttribute("href") ?? "")
             .trim();
@@ -90,7 +97,7 @@ export const extractContent = (router: Hono) => {
           }
         }
 
-        const parsed = new Readability(dom.window.document).parse();
+        const parsed = new Readability(dom).parse();
 
         return c.json({ data: parsed?.content ?? "" }, 200);
       } catch (error) {

@@ -2,7 +2,7 @@ import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import vine from "@vinejs/vine";
-import { makeLogger } from "#src/common/logger/mod.ts";
+import { formatError, makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedsTable } from "#src/database/types/mod.ts";
 
 const requestBodySchema = vine
@@ -39,7 +39,9 @@ export const create = (router: Hono) => {
         })
         .then(({ faildCount, failedReasons, successCount, totalCount }) => {
           log.info(`Synching feed ${feed.url}`, {
-            failedReasons,
+            failedReasons: failedReasons.map((reason) =>
+              reason instanceof Error ? formatError(reason) : reason
+            ),
             faildCount,
             successCount,
             totalCount,

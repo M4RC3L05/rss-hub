@@ -15,9 +15,14 @@ export const validateUrl = (router: Hono) => {
     async (c) => {
       try {
         const data = await requestBodyValidator.validate(await c.req.json());
-        const { feed: extracted, feedResolver } = await c
-          .get("feedService")
-          .verifyFeed(data.url, { signal: c.req.raw.signal });
+        const { feed: extracted, feedResolver } = await c.get("feedService")
+          .verifyFeed(data.url, {
+            signal: AbortSignal.any([
+              AbortSignal.timeout(10_000),
+              c.get("shutdown"),
+              c.req.raw.signal,
+            ]),
+          });
 
         const title = feedResolver.resolveFeedTitle(extracted);
 

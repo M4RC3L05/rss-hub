@@ -6,6 +6,8 @@ import { DOMParser, type Element } from "deno-dom";
 import vine from "@vinejs/vine";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";
+import { Requester } from "@m4rc3l05/requester";
+import * as requesterComposers from "@m4rc3l05/requester/composers";
 
 const requestParamsSchema = vine.object({
   id: vine.string(),
@@ -14,6 +16,9 @@ const requestParamsSchema = vine.object({
 const requestParametersValidator = vine.compile(requestParamsSchema);
 
 const log = makeLogger("extract-feed-item-contents");
+const requester = new Requester().with(
+  requesterComposers.timeout({ ms: 10_000 }),
+).build();
 
 export const extractContent = (router: Hono) => {
   router.get(
@@ -34,15 +39,12 @@ export const extractContent = (router: Hono) => {
       }
 
       try {
-        const pageContent = await fetch(result?.link, {
+        const pageContent = await requester(result?.link, {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3",
           },
-          signal: AbortSignal.any([
-            AbortSignal.timeout(10_000),
-            c.req.raw.signal,
-          ]),
+          signal: c.req.raw.signal,
         }).then((response) => response.text());
 
         const url = new URL(result?.link);

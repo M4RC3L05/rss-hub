@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { sql } from "@m4rc3l05/sqlite-tag";
 import * as entities from "@std/html";
+import { Requester } from "@m4rc3l05/requester";
+import * as requesterComposers from "@m4rc3l05/requester/composers";
 import * as _ from "lodash-es";
-import { request } from "#src/common/utils/fetch-utils.ts";
 import type { CustomDatabase } from "../database/mod.ts";
 import type { FeedsTable } from "../database/types/mod.ts";
 import {
@@ -44,9 +45,19 @@ const resolveFeedResolver = (contentType: string): FeedResolver => {
 
 class FeedService {
   #db: CustomDatabase;
+  #requester: ReturnType<Requester["build"]>;
 
   constructor(db: CustomDatabase) {
     this.#db = db;
+    this.#requester = new Requester().with(
+      requesterComposers.timeout({ ms: 5000 }),
+      requesterComposers.retry({
+        maxRetries: 3,
+        retryDelay: 1000,
+        shouldRetry: ({ error }) =>
+          !!error && !["AbortError"].includes(error.name),
+      }),
+    ).build();
   }
 
   async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal }) {
@@ -117,7 +128,7 @@ class FeedService {
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
     const { data: rawFeed, feedResolver } = await this.#extractRawFeed(
       url,
-      options as Omit<typeof options, "database">,
+      options ?? {},
     );
     const parsed = feedResolver.toObject(rawFeed);
     const feed = feedResolver.resolveFeed(parsed!);
@@ -131,10 +142,10 @@ class FeedService {
 
   async #extractRawFeed(url: string, options: { signal?: AbortSignal }) {
     try {
-      const response = await request(url, options, { maxRetries: 1 });
+      const response = await this.#requester(url, options);
 
       if (!response.ok) {
-        throw new Error(`Error fetching feed ${url}`, {
+        throw new Error(`Request is not ok`, {
           cause: {
             response: _.pick(response, [
               "headers",
@@ -145,6 +156,10 @@ class FeedService {
             ]),
           },
         });
+      }
+
+      if (response.status === 304) {
+        throw new Error("Feed did not change");
       }
 
       if (!response.headers.has("content-type")) {

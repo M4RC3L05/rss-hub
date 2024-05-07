@@ -1,5 +1,12 @@
 @import url("https://esm.sh/v135/simpledotcss@2.3.0/simple.min.css");
 
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
 #feed-item-content {
   overflow-x: auto;
 }

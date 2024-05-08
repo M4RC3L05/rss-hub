@@ -197,6 +197,20 @@ class FeedService {
     }
   }
 
+  #normalizeLink<S extends string>(link: S, root?: string, relative?: string) {
+    if (link.startsWith("http")) {
+      return link;
+    } else if (link.startsWith("/")) {
+      if (!root) return link;
+
+      return URL.parse(link, root)?.toString();
+    } else {
+      if (!relative) return link;
+
+      return URL.parse(link, relative)?.toString();
+    }
+  }
+
   #syncFeedEntry(
     feed: Record<string, unknown>,
     feedItem: Record<string, unknown>,
@@ -217,22 +231,17 @@ class FeedService {
       feedImage = entities.unescape(feedImage);
     }
 
-    if (
-      typeof feedImage === "string" && !feedImage?.trim()?.startsWith("http") &&
-      typeof homePageUrl === "string" && homePageUrl.trim().startsWith("http")
-    ) {
-      feedImage = new URL(feedImage, homePageUrl).toString();
-    }
+    feedImage = feedImage
+      ? this.#normalizeLink(feedImage, homePageUrl, link)
+      : feedImage;
 
     if (typeof content === "string") {
       const r = /<img[^>]+src="([^"]+)"/img;
-      content = content.replaceAll(r, (str, url) => {
-        if (url.startsWith("http") || typeof homePageUrl !== "string") {
-          return str;
-        }
-
-        return str.replace(url, new URL(url, homePageUrl).toString());
-      });
+      content = content.replaceAll(r, (str, url) =>
+        str.replace(
+          url,
+          this.#normalizeLink(url, homePageUrl, link) ?? url,
+        ));
     }
 
     const toInsert = {

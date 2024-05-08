@@ -18,7 +18,7 @@ const requestParametersValidator = vine.compile(requestParamsSchema);
 const log = makeLogger("extract-feed-item-contents");
 const requester = new Requester().with(
   requesterComposers.timeout({ ms: 10_000 }),
-).build();
+);
 
 export const extractContent = (router: Hono) => {
   router.get(
@@ -39,7 +39,7 @@ export const extractContent = (router: Hono) => {
       }
 
       try {
-        const pageContent = await requester(result?.link, {
+        const pageContent = await requester.fetch(result?.link, {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3",

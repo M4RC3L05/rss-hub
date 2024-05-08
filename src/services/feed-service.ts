@@ -45,19 +45,19 @@ const resolveFeedResolver = (contentType: string): FeedResolver => {
 
 class FeedService {
   #db: CustomDatabase;
-  #requester: ReturnType<Requester["build"]>;
+  #requester: Requester;
 
   constructor(db: CustomDatabase) {
     this.#db = db;
     this.#requester = new Requester().with(
       requesterComposers.timeout({ ms: 5000 }),
+      requesterComposers.skip({ n: 1 }, requesterComposers.delay({ ms: 1000 })),
       requesterComposers.retry({
         maxRetries: 3,
-        retryDelay: 1000,
         shouldRetry: ({ error }) =>
           !!error && !["AbortError"].includes(error.name),
       }),
-    ).build();
+    );
   }
 
   async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal }) {
@@ -142,7 +142,7 @@ class FeedService {
 
   async #extractRawFeed(url: string, options: { signal?: AbortSignal }) {
     try {
-      const response = await this.#requester(url, options);
+      const response = await this.#requester.fetch(url, options);
 
       if (!response.ok) {
         throw new Error(`Request is not ok`, {

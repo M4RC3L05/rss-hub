@@ -148,7 +148,7 @@ export const FeedItemsIndexPage: FC<FeedItemsIndexPageProps> = ({
     <main>
       {feedItems.map(
         (feedItem) => (
-          <section style="position: relative; overflow: auto" class="clearfix">
+          <section style="position: relative" class="clearfix">
             {feedItem.img
               ? (
                 <>

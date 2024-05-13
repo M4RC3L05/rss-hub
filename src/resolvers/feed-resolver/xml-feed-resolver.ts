@@ -60,13 +60,8 @@ export class XMLFeedResolver implements FeedResolver {
   }
 
   resolveFeedItems(feed: Record<string, unknown>) {
-    const searchKeys = [
-      "channel.item",
-      "channel.items",
-      "item",
-      "items",
-      "entry",
-    ];
+    // rdf or atom or rss
+    const searchKeys = ["item", "entry", "channel.item"];
 
     return (_.chain(searchKeys)
       .map((k) =>

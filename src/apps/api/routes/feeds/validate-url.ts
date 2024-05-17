@@ -15,7 +15,7 @@ export const validateUrl = (router: Hono) => {
     async (c) => {
       try {
         const data = await requestBodyValidator.validate(await c.req.json());
-        const { feed: extracted, feedResolver } = await c.get("feedService")
+        const { title } = await c.get("feedService")
           .verifyFeed(data.url, {
             signal: AbortSignal.any([
               AbortSignal.timeout(10_000),
@@ -23,8 +23,6 @@ export const validateUrl = (router: Hono) => {
               c.req.raw.signal,
             ]),
           });
-
-        const title = feedResolver.resolveFeedTitle(extracted);
 
         if (!title) throw new Error("No title for feed");
 

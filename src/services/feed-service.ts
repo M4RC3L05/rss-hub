@@ -1,16 +1,12 @@
 import { createHash } from "node:crypto";
 import { sql } from "@m4rc3l05/sqlite-tag";
-import * as entities from "@std/html";
 import { Requester } from "@m4rc3l05/requester";
 import * as requesterComposers from "@m4rc3l05/requester/composers";
+import { resolve as feedResolver } from "@m4rc3l05/feed-normalizer";
 import * as _ from "lodash-es";
 import type { CustomDatabase } from "../database/mod.ts";
 import type { FeedsTable } from "../database/types/mod.ts";
-import {
-  type FeedResolver,
-  jsonFeedResolver,
-  xmlFeedResolver,
-} from "#src/resolvers/mod.ts";
+import { formatError } from "#src/common/logger/mod.ts";
 
 const xmlContentTypeHeaders = [
   "application/xml",
@@ -31,18 +27,6 @@ const validContentTypes = [
   ...jsonContentTypeHeaders,
 ];
 
-const resolveFeedResolver = (contentType: string): FeedResolver => {
-  if (xmlContentTypeHeaders.some((ct) => contentType.includes(ct))) {
-    return xmlFeedResolver;
-  }
-
-  if (jsonContentTypeHeaders.some((ct) => contentType.includes(ct))) {
-    return jsonFeedResolver;
-  }
-
-  throw new Error(`No feed resolver for content type "${contentType}"`);
-};
-
 class FeedService {
   #db: CustomDatabase;
   #requester: Requester;
@@ -61,56 +45,19 @@ class FeedService {
   }
 
   async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal }) {
-    let data: Record<string, unknown> | undefined;
-    let feedResolver: FeedResolver;
-
-    try {
-      const { data: extracted, feedResolver: fr } = await this.#extractRawFeed(
-        feed.url,
-        options,
-      );
-      data = fr.toObject(extracted);
-      feedResolver = fr;
-    } catch (error) {
-      throw new Error(`Could not get/parse feed "${feed.url}"`, {
-        cause: error,
-      });
-    }
+    const extracted = await this.#extractRawFeed(feed.url, options);
 
     if (options?.signal?.aborted) {
       throw new Error("Aborted");
     }
 
-    const feedPage = feedResolver.resolveFeed(data!);
-
-    if (!feedPage) {
-      throw new Error(`Could not get feed for feed ${feed.url}`, {
-        cause: data,
-      });
-    }
-
-    if (options?.signal?.aborted) {
-      throw new Error("Aborted");
-    }
-
-    const feedItems = feedResolver.resolveFeedItems(feedPage);
-
-    if (!feedItems) {
-      throw new Error(`No feed items for feed "${feed.url}"`, {
-        cause: feedPage,
-      });
-    }
-
-    if (options?.signal?.aborted) {
-      throw new Error("Aborted");
-    }
+    const data = feedResolver(extracted);
 
     const status = await Promise.allSettled(
       // deno-lint-ignore require-await
-      feedItems.map(async (entry) =>
-        this.#syncFeedEntry(feedPage, entry, feedResolver, feed.id)
-      ),
+      data.items.map(async (entry) => this.#syncFeedEntry(feed.id, entry)),
     );
+
     const totalCount = status.length;
     const successCount = status.filter(
       ({ status }) => status === "fulfilled",
@@ -122,28 +69,26 @@ class FeedService {
       .filter(({ status }) => status === "rejected")
       .map((data) => (data as PromiseRejectedResult).reason as unknown);
 
-    return { totalCount, successCount, faildCount, failedReasons };
+    return {
+      totalCount,
+      successCount,
+      faildCount,
+      failedReasons: failedReasons.map((reason) =>
+        reason instanceof Error ? formatError(reason) : reason
+      ),
+    };
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
-    const { data: rawFeed, feedResolver } = await this.#extractRawFeed(
-      url,
-      options ?? {},
-    );
-    const parsed = feedResolver.toObject(rawFeed);
-    const feed = feedResolver.resolveFeed(parsed!);
+    const rawFeed = await this.#extractRawFeed(url, options ?? {});
+    const parsed = feedResolver(rawFeed);
 
-    if (!feed) {
-      throw new Error(`No feed found in url ${url}`);
-    }
-
-    return { feed, feedResolver };
+    return parsed;
   }
 
   async #extractRawFeed(url: string, options: { signal?: AbortSignal }) {
     try {
       const response = await this.#requester.fetch(url, options);
-
       if (!response.ok) {
         throw new Error(`Request is not ok`, {
           cause: {
@@ -186,10 +131,7 @@ class FeedService {
         });
       }
 
-      return {
-        data: await response.text(),
-        feedResolver: resolveFeedResolver(contentType),
-      };
+      return await response.text();
     } catch (error) {
       throw new Error(`Error fetching feed ${url}`, {
         cause: error,
@@ -197,68 +139,25 @@ class FeedService {
     }
   }
 
-  #normalizeLink<S extends string>(link: S, root?: string, relative?: string) {
-    if (link.startsWith("http")) {
-      return link;
-    } else if (link.startsWith("/")) {
-      if (!root) return link;
-
-      return URL.parse(link, root)?.toString();
-    } else {
-      if (!relative) return link;
-
-      return URL.parse(link, relative)?.toString();
-    }
-  }
-
   #syncFeedEntry(
-    feed: Record<string, unknown>,
-    feedItem: Record<string, unknown>,
-    feedResolver: FeedResolver,
     feedId: string,
+    item: ReturnType<typeof feedResolver>["items"][0],
   ) {
-    const homePageUrl = feedResolver.resolveHomePageUrl(feed);
-    const id = feedResolver.resolveFeedItemGuid(feedItem);
-    const enclosures = feedResolver.resolveFeedItemEnclosures(feedItem);
-    let feedImage = feedResolver.resolveFeedItemImage(feedItem);
-    let content = feedResolver.resolveFeedItemContent(feedItem);
-    const pubDate = feedResolver.resolveFeedItemPubDate(feedItem);
-    const updatedAt = feedResolver.resolveUpdatedAt(feedItem);
-    const link = feedResolver.resolveFeedItemLink(feedItem);
-    const title = feedResolver.resolveFeedItemTitle(feedItem);
-
-    if (feedImage) {
-      feedImage = entities.unescape(feedImage);
-    }
-
-    feedImage = feedImage
-      ? this.#normalizeLink(feedImage, homePageUrl, link)
-      : feedImage;
-
-    if (typeof content === "string") {
-      const r = /<img[^>]+src="([^"]+)"/img;
-      content = content.replaceAll(r, (str, url) =>
-        str.replace(
-          url,
-          this.#normalizeLink(url, homePageUrl, link) ?? url,
-        ));
-    }
-
     const toInsert = {
-      id: id ??
-        createHash("sha512").update(JSON.stringify(feedItem)).digest("base64"),
+      id: item.id ??
+        createHash("sha512").update(JSON.stringify(item)).digest("base64"),
       feedId,
-      raw: JSON.stringify(feedItem),
-      content: content ?? "",
-      img: feedImage ?? null,
-      createdAt: pubDate?.toISOString() ??
-        updatedAt?.toISOString() ??
+      raw: JSON.stringify(item),
+      content: item.content ?? "",
+      img: item.image ?? null,
+      createdAt: item.createdAt?.toISOString() ??
+        item.updatedAt?.toISOString() ??
         new Date().toISOString(),
-      title: title ?? "",
-      enclosure: JSON.stringify(enclosures),
-      link: link ?? null,
-      updatedAt: updatedAt?.toISOString() ??
-        pubDate?.toISOString() ??
+      title: item.title ?? "",
+      enclosure: JSON.stringify(item.enclosures),
+      link: item.link ?? null,
+      updatedAt: item.updatedAt?.toISOString() ??
+        item.createdAt?.toISOString() ??
         new Date().toISOString(),
     };
 
@@ -273,29 +172,29 @@ class FeedService {
         do update set
           content = ${
         sql.ternary(
-          !!content,
+          !!item.content,
           () => sql`${toInsert.content}`,
           () => sql.id("content"),
         )
       },
           img = ${
         sql.ternary(
-          !!feedImage,
+          !!item.image,
           () => sql`${toInsert.img}`,
           () => sql.id("img"),
         )
       },
-          title = ${title ? sql`${toInsert.title}` : sql.id("title")},
+          title = ${item.title ? sql`${toInsert.title}` : sql.id("title")},
           enclosure = ${
         sql.ternary(
-          enclosures.length > 0,
+          item.enclosures.length > 0,
           () => sql`${toInsert.enclosure}`,
           () => sql.id("enclosure"),
         )
       },
           link = ${
         sql.ternary(
-          !!link,
+          !!item.link,
           () => sql`${toInsert.link}`,
           () => sql.id("link"),
         )

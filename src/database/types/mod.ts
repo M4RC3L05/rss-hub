@@ -21,7 +21,6 @@ export type FeedItemsTable = {
   link?: string;
   img?: string;
   content: string;
-  raw: string;
   feedId: string;
   createdAt: string;
   updatedAt: string;

@@ -147,7 +147,6 @@ class FeedService {
       id: item.id ??
         createHash("sha512").update(JSON.stringify(item)).digest("base64"),
       feedId,
-      raw: JSON.stringify(item),
       content: item.content ?? "",
       img: item.image ?? null,
       createdAt: item.createdAt?.toISOString() ??

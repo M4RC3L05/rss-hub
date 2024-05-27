@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { exportFeeds } from "#src/apps/web/routes/opml/export.ts";
 import { importFeeds } from "#src/apps/web/routes/opml/import.tsx";
 

@@ -1,4 +1,4 @@
-import type { Context, ContextVariableMap, Next } from "hono";
+import type { Context, ContextVariableMap, Next } from "@hono/hono";
 
 const serviceRegister = (deps: Partial<ContextVariableMap>) => {
   return (c: Context, next: Next) => {

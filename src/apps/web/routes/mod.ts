@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { categoriesRoutes } from "#src/apps/web/routes/categories/mod.ts";
 import { feedItemsRoutes } from "#src/apps/web/routes/feed-items/mod.ts";
 import { feedsRoutes } from "#src/apps/web/routes/feeds/mod.ts";

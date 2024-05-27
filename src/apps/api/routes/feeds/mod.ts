@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { create } from "#src/apps/api/routes/feeds/create.ts";
 import { del } from "#src/apps/api/routes/feeds/delete.ts";
 import { get } from "#src/apps/api/routes/feeds/get.ts";

@@ -1,4 +1,4 @@
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import { FeedItemsIndexPage } from "#src/apps/web/views/feed-items/pages/index.tsx";
 
 export const index = (router: Hono) => {

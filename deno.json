@@ -12,7 +12,7 @@
   },
   "compilerOptions": {
     "jsx": "precompile",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "@hono/hono/jsx"
   },
   "lint": {
     "rules": {
@@ -22,6 +22,7 @@
   "imports": {
     "#src/": "./src/",
     "@db/sqlite": "jsr:@db/sqlite@0.11.1",
+    "@hono/hono": "jsr:@hono/hono@4.4.0",
     "@m4rc3l05/cron": "jsr:@m4rc3l05/cron@1.1.0",
     "@m4rc3l05/feed-normalizer": "jsr:@m4rc3l05/feed-normalizer@0.1.8",
     "@m4rc3l05/process-lifecycle": "jsr:@m4rc3l05/process-lifecycle@0.1.0",
@@ -40,7 +41,6 @@
     "config": "npm:config@3.3.11",
     "deno-dom": "https://deno.land/x/deno_dom@v0.1.45/deno-dom-native.ts",
     "fast-xml-parser": "npm:fast-xml-parser@4.4.0",
-    "hono": "npm:hono@4.3.11",
     "lodash-es": "npm:lodash-es@4.17.21"
   }
 }

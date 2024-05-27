@@ -1,4 +1,4 @@
-import type { FC } from "hono/jsx";
+import type { FC } from "@hono/hono/jsx";
 import type { CategoriesTable, FeedsTable } from "#src/database/types/mod.ts";
 
 type FeedsIndexPageProps = {

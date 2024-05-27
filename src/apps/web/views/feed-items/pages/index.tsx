@@ -1,4 +1,4 @@
-import type { FC } from "hono/jsx";
+import type { FC } from "@hono/hono/jsx";
 import type { FeedItemsTable, FeedsTable } from "#src/database/types/mod.ts";
 import { encodeBase64Url } from "@std/encoding/base64url";
 

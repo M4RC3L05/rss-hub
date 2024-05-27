@@ -1,5 +1,5 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import type { CategoriesTable } from "#src/database/types/mod.ts";
 
 export const search = (router: Hono) => {

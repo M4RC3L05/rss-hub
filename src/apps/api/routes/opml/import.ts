@@ -1,8 +1,8 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
 import { unescape } from "@std/html";
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import * as _ from "lodash-es";
-import { HTTPException } from "hono/http-exception";
+import { HTTPException } from "@hono/hono/http-exception";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import { xmlParser } from "#src/common/utils/xml-utils.ts";
 import type { FeedsTable } from "#src/database/types/mod.ts";

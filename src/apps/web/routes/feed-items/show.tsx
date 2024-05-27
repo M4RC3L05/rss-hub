@@ -1,4 +1,4 @@
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import { FeedItemsShowPage } from "#src/apps/web/views/feed-items/pages/show.tsx";
 
 export const show = (router: Hono) => {

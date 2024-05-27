@@ -1,4 +1,4 @@
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import { CategoriesEditPage } from "#src/apps/web/views/categories/pages/edit.tsx";
 
 export const update = (router: Hono) => {

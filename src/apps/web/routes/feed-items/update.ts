@@ -1,4 +1,4 @@
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import { decodeBase64Url } from "@std/encoding/base64url";
 
 export const update = (router: Hono) => {

@@ -1,10 +1,10 @@
 import config from "config";
-import { type ContextVariableMap, Hono } from "hono";
-import { serveStatic } from "hono/deno";
-import { basicAuth } from "hono/basic-auth";
-import { jsxRenderer } from "hono/jsx-renderer";
-import { HTTPException } from "hono/http-exception";
-import { secureHeaders } from "hono/secure-headers";
+import { type ContextVariableMap, Hono } from "@hono/hono";
+import { serveStatic } from "@hono/hono/deno";
+import { basicAuth } from "@hono/hono/basic-auth";
+import { jsxRenderer } from "@hono/hono/jsx-renderer";
+import { HTTPException } from "@hono/hono/http-exception";
+import { secureHeaders } from "@hono/hono/secure-headers";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import { serviceRegister } from "#src/middlewares/mod.ts";
 import { router } from "#src/apps/web/routes/mod.ts";
@@ -18,7 +18,7 @@ import { MainLayout } from "#src/apps/web/views/common/layouts/main.tsx";
 
 const log = makeLogger("web");
 
-declare module "hono" {
+declare module "@hono/hono" {
   interface ContextVariableMap {
     services: {
       api: {

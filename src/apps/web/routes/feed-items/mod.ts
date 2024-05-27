@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { index } from "#src/apps/web/routes/feed-items/index.tsx";
 import { readability } from "#src/apps/web/routes/feed-items/readability.tsx";
 import { show } from "#src/apps/web/routes/feed-items/show.tsx";

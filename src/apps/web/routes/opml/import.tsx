@@ -1,4 +1,4 @@
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 import { OpmlImportPage } from "#src/apps/web/views/opml/pages/import.tsx";
 
 export const importFeeds = (router: Hono) => {

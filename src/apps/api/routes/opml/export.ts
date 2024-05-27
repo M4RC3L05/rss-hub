@@ -1,6 +1,6 @@
 import { sql } from "@m4rc3l05/sqlite-tag";
 import { escape } from "@std/html";
-import type { Hono } from "hono";
+import type { Hono } from "@hono/hono";
 
 export const exportFeeds = (router: Hono) => {
   router.get("/export", (c) => {

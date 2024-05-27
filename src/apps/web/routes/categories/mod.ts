@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { create } from "#src/apps/web/routes/categories/create.tsx";
 import { del } from "#src/apps/web/routes/categories/delete.ts";
 import { update } from "#src/apps/web/routes/categories/update.tsx";

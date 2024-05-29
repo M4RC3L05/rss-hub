@@ -11,7 +11,7 @@ export const exportFeeds = (router: Hono) => {
 
     const categories = c
       .get("database")
-      .all<{ id: string; name: string }>(sql`select * from categories`);
+      .getPrepared<{ id: string; name: string }>(sql`select * from categories`);
 
     for (const category of categories) {
       const text = escape(category.name);
@@ -19,7 +19,7 @@ export const exportFeeds = (router: Hono) => {
 
       const feeds = c
         .get("database")
-        .all<{ name: string; url: string }>(
+        .getPrepared<{ name: string; url: string }>(
           sql`select * from feeds where category_id = ${category.id}`,
         );
 

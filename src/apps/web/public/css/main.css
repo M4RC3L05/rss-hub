@@ -1,6 +1,5 @@
 @import url("https://esm.sh/v135/simpledotcss@2.3.0/simple.min.css");
 
-
 .clearfix::after {
   content: "";
   clear: both;
@@ -49,7 +48,7 @@ main button,
 main .button,
 .feed-actions button,
 .feed-actions .button {
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: bold;
-  padding: .5rem .7rem;
+  padding: 0.5rem 0.7rem;
 }

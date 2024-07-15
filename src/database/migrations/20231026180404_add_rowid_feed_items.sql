@@ -9,22 +9,22 @@ create table tmp_feed_items (
   content text not null,
   raw text not null,
   feed_id text not null,
-  created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ' , 'now')),
-  updated_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ' , 'now')),
+  created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  updated_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
   readed_at text,
 
-  foreign key(feed_id) references feeds(id) on delete cascade,
-  primary key(id, feed_id)
+  foreign key (feed_id) references feeds (id) on delete cascade,
+  primary key (id, feed_id)
 ) strict;
 
 insert into tmp_feed_items
-select * from feed_items;
+select * from feed_items; -- noqa: AM04
 
 drop table feed_items;
 
 alter table tmp_feed_items rename to feed_items;
 
-create trigger "feed_items_update_updated_at"
+create trigger "feed_items_update_updated_at" -- noqa: PRS
 after update on feed_items
 for each row
 when NEW.updated_at = OLD.updated_at
@@ -34,4 +34,3 @@ end;
 
 
 -- migrate:down
-

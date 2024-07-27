@@ -30,16 +30,6 @@
           }
         }
       }
-    },
-    "feeds-synchronizer": {
-      "cron": {
-        "timezone": "FEEDS_SYNCHRONIZER_CRON_TIMEZONE",
-        "pattern": "FEEDS_SYNCHRONIZER_CRON_PATTERN",
-        "tickerTimeout": {
-          "__name": "FEEDS_SYNCHRONIZER_CRON_TICKER_TIMEOUT",
-          "__format": "number"
-        }
-      }
     }
   },
   "database": {

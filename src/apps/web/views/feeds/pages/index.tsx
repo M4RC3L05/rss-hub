@@ -54,7 +54,12 @@ export const FeedsIndexPage: FC<FeedsIndexPageProps> = (
               .map(
                 (feed) => (
                   <div>
-                    <a href={`/feed-items?feedId=${feed.id}&unread=true`}>
+                    <a
+                      href={`/feed-items?feedId=${feed.id}&unread=true`}
+                      style={`font-weight: ${
+                        feed.unreadCount > 0 ? "bold" : "normal"
+                      };`}
+                    >
                       {feed.name} ({feed.unreadCount} | {feed.bookmarkedCount})
                     </a>
                   </div>

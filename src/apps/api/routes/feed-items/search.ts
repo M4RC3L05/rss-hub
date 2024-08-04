@@ -6,7 +6,7 @@ import type { FeedItemsTable } from "#src/database/types/mod.ts";
 const requestQuerySchema = vine
   .object({
     bookmarked: vine.string().optional(),
-    feedId: vine.string().uuid(),
+    feedId: vine.string().uuid().optional(),
     unread: vine.string().optional(),
     page: vine.number().parse((value) => value ?? 0),
     limit: vine.number().parse((value) => value ?? 10),
@@ -18,15 +18,16 @@ export const search = (router: Hono) => {
     "/",
     async (c) => {
       const query = await requestQueryValidator.validate(c.req.query());
+
       const feedItemsQuery = sql`
         select rowid, * from feed_items
         where
-          feed_id = ${query.feedId}
-          ${sql.if("unread" in query, () => sql`and readed_at is null`)}
           ${
-        sql.if(
-          "bookmarked" in query,
-          () => sql`and bookmarked_at is not null`,
+        sql.join(
+          sql` and `,
+          sql.if("feedId" in query, () => sql`feed_id = ${query.feedId}`),
+          sql.if("unread" in query, () => sql`readed_at is null`),
+          sql.if("bookmarked" in query, () => sql`bookmarked_at is not null`),
         )
       }
         order by created_at desc, rowid desc
@@ -36,6 +37,7 @@ export const search = (router: Hono) => {
         select count(id) as total
         from (${feedItemsQuery})
       `)!;
+
       const feedItems = c
         .get("database")
         .all<FeedItemsTable & { rowid: number }>(sql`

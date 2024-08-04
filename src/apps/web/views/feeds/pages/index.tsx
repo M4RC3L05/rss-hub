@@ -11,6 +11,10 @@ export const FeedsIndexPage: FC<FeedsIndexPageProps> = (
 ) => (
   <>
     <header>
+      <nav>
+        <a href="/bookmarked">Bookmarked</a>
+      </nav>
+
       <h1>RSS Hub</h1>
       <p>Track and get the latests news</p>
     </header>

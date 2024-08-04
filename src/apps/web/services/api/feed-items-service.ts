@@ -7,13 +7,14 @@ class FeedItemsService extends BaseService {
     pagination,
     signal,
   }: {
-    feedId: string;
+    feedId?: string;
     filters?: { bookmarked?: boolean; unread?: boolean };
     pagination?: { limit?: number; page?: number };
     signal: AbortSignal;
   }) {
-    const query: Record<string, string> = { feedId };
+    const query: Record<string, string> = {};
 
+    if (feedId) query.feedId = feedId;
     if (filters?.bookmarked) query.bookmarked = "true";
     if (filters?.unread) query.unread = "true";
 

@@ -20,7 +20,7 @@
         "deno lint",
         "yamllint .",
         "sqlfluff lint .",
-        "deno run -A --no-lock npm:markdownlint-cli2 \"**/*.{md,markdown}\" \"#.git-hooks\""
+        "deno run -A --no-lock npm:markdownlint-cli2 \"**/*.{md,markdown}\" \"#{.git-hooks,.devbox}\""
       ]
     }
   }

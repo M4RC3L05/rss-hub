@@ -2,7 +2,7 @@ import { sql } from "@m4rc3l05/sqlite-tag";
 import { Readability } from "@mozilla/readability";
 import type { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
-import { DOMParser, type Element } from "deno-dom";
+import { DOMParser, type Element } from "@b-fuze/deno-dom";
 import vine from "@vinejs/vine";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";

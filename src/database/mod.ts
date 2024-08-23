@@ -64,10 +64,12 @@ export class CustomDatabase extends Database {
     return prepared.run(...query.params as RestBindParameters);
   }
 
-  getPrepared<T>(query: SqlFragment) {
-    return this.prepare<T>(query.query).bind(
+  iter<T>(query: SqlFragment) {
+    const prepared = this.#ensureInCache(query.query);
+
+    return prepared.iter(
       ...query.params as RestBindParameters,
-    );
+    ) as IterableIterator<T>;
   }
 }
 

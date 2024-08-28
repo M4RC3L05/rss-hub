@@ -1,3 +1,6 @@
+[settings]
+experimental = true
+
 [tools]
 deno = "1.46"
 yamllint = "latest"

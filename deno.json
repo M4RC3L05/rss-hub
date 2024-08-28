@@ -29,7 +29,7 @@
     "@hono/hono": "jsr:@hono/hono@4.5.8",
     "@m4rc3l05/feed-normalizer": "jsr:@m4rc3l05/feed-normalizer@0.1.8",
     "@m4rc3l05/process-lifecycle": "jsr:@m4rc3l05/process-lifecycle@0.1.0",
-    "@m4rc3l05/requester": "jsr:@m4rc3l05/requester@0.4.0",
+    "@m4rc3l05/requester": "jsr:@m4rc3l05/requester@0.5.0",
     "@m4rc3l05/sqlite-tag": "jsr:@m4rc3l05/sqlite-tag@0.2.0",
     "@mozilla/readability": "npm:@mozilla/readability@0.5.0",
     "@std/async": "jsr:@std/async@1.0.3",

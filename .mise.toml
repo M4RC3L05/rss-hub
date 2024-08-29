@@ -12,7 +12,10 @@ yamlfmt = "latest"
 
 [tasks."check:format"]
 run = """
+#!/usr/bin/env sh
+
 set -ex
+
 deno fmt --check
 deno run -A --no-lock npm:prettier -c "./**/*.{html,css}"
 yamlfmt -dry -lint $(find . -name '*.yaml')
@@ -20,7 +23,10 @@ yamlfmt -dry -lint $(find . -name '*.yaml')
 
 [tasks."check:lint"]
 run = """
+#!/usr/bin/env sh
+
 set -ex
+
 deno lint
 deno check --no-lock $(find . -name '*.ts' -o -name '*.tsx')
 deno run -A --no-lock npm:markdownlint-cli2 "**/*.{md,markdown}"

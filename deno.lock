@@ -35,7 +35,8 @@
       "npm:fast-xml-parser@4.3.6": "npm:fast-xml-parser@4.3.6",
       "npm:fast-xml-parser@4.4.1": "npm:fast-xml-parser@4.4.1",
       "npm:lodash-es@4.17.21": "npm:lodash-es@4.17.21",
-      "npm:radash@12.1.0": "npm:radash@12.1.0"
+      "npm:radash@12.1.0": "npm:radash@12.1.0",
+      "npm:simpledotcss@2.3.2": "npm:simpledotcss@2.3.2"
     },
     "jsr": {
       "@b-fuze/deno-dom@0.1.47": {
@@ -238,6 +239,10 @@
         "integrity": "sha512-b0Zcf09AhqKS83btmUeYBS8tFK7XL2e3RvLmZcm0sTdF1/UUlHSsjXdCcWNxe7yfmAlPve5ym0DmKGtTzP6kVQ==",
         "dependencies": {}
       },
+      "simpledotcss@2.3.2": {
+        "integrity": "sha512-/LoZHX66g+DDj1HzinshbSujFKQ+VP3t9cE1+aTtKCQCXJMNWKiVRZlpXMXCamnGquQOwgeMZsAtvdZd5hdpdQ==",
+        "dependencies": {}
+      },
       "strnum@1.0.5": {
         "integrity": "sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==",
         "dependencies": {}
@@ -269,7 +274,8 @@
       "npm:@vinejs/vine@2.1.0",
       "npm:config@3.3.12",
       "npm:fast-xml-parser@4.4.1",
-      "npm:lodash-es@4.17.21"
+      "npm:lodash-es@4.17.21",
+      "npm:simpledotcss@2.3.2"
     ]
   }
 }

@@ -7,17 +7,21 @@
     "web": "deno run -A --unstable-ffi --cached-only src/apps/web/main.ts",
     "dev:dbmate": "deno run -A --no-lock npm:dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema",
     "jobs:feeds-synchronizer": "deno run -A --unstable-ffi --cached-only src/apps/jobs/feeds-synchronizer/main.ts",
-    "deps:lock": "deno cache --frozen=false **/*.ts **/*.tsx",
-    "deps": "deno cache --reload --frozen **/*.ts **/*.tsx"
+    "deps:lock": "deno cache --frozen=false --node-modules-dir **/*.ts **/*.tsx",
+    "deps": "deno cache --reload --frozen --node-modules-dir **/*.ts **/*.tsx"
   },
   "compilerOptions": {
     "jsx": "precompile",
     "jsxImportSource": "@hono/hono/jsx"
   },
   "lint": {
+    "exclude": ["node_modules"],
     "rules": {
       "include": ["verbatim-module-syntax"]
     }
+  },
+  "fmt": {
+    "exclude": ["node_modules"]
   },
   "lock": {
     "frozen": true
@@ -42,6 +46,7 @@
     "@vinejs/vine": "npm:@vinejs/vine@2.1.0",
     "config": "npm:config@3.3.12",
     "fast-xml-parser": "npm:fast-xml-parser@4.4.1",
-    "lodash-es": "npm:lodash-es@4.17.21"
+    "lodash-es": "npm:lodash-es@4.17.21",
+    "simpledotcss": "npm:simpledotcss@2.3.2"
   }
 }

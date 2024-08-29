@@ -1,10 +1,11 @@
 [settings]
 experimental = true
+pipx_uvx = true
 
 [tools]
+uv = "latest"
 deno = "1.46"
 yamllint = "latest"
-pipx = "latest"
 sqlite = "3.46.0"
 yamlfmt = "latest"
 "pipx:sqlfluff/sqlfluff" = "latest"

@@ -38,6 +38,13 @@ export const FeedsIndexPage: FC<FeedsIndexPageProps> = (
         Add Feed +
       </a>
       <a
+        href="/feeds/feed-links"
+        style="display: inline; margin-right: 8px"
+        class="button"
+      >
+        Find feeds <span style="font-size: 20px">⌕</span>
+      </a>
+      <a
         href="/opml/import"
         style="display: inline; margin-right: 8px"
         class="button"

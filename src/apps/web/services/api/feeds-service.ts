@@ -61,6 +61,16 @@ class FeedsService extends BaseService {
       },
     });
   }
+
+  getFeedLinks({ url, signal }: { url: string; signal: AbortSignal }) {
+    return this.request({
+      path: `/api/feeds/feed-links?url=${url}`,
+      init: {
+        signal,
+        method: "GET",
+      },
+    });
+  }
 }
 
 export default FeedsService;

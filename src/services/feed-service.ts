@@ -6,7 +6,10 @@ import { resolve as feedResolver } from "@m4rc3l05/feed-normalizer";
 import * as _ from "lodash-es";
 import type { CustomDatabase } from "../database/mod.ts";
 import type { FeedsTable } from "../database/types/mod.ts";
-import { formatError } from "#src/common/logger/mod.ts";
+import { formatError, makeLogger } from "#src/common/logger/mod.ts";
+import { DOMParser } from "@b-fuze/deno-dom/native";
+import { join, normalize } from "@std/path";
+import { xmlParser } from "#src/common/utils/xml-utils.ts";
 
 const xmlContentTypeHeaders = [
   "application/xml",
@@ -27,9 +30,32 @@ const validContentTypes = [
   ...jsonContentTypeHeaders,
 ];
 
+const potencialFeedLinkFragments = [
+  "/rss",
+  "/rss.xml",
+  "/feed",
+  "/feed.xml",
+  "/atom",
+  "/atom.xml",
+  "/json",
+];
+
+const log = makeLogger("feed-service");
+
+const normalizeLink = (normalizedURL: URL, link: string) =>
+  URL.parse(
+    link.startsWith("http") ? normalize(link) : normalize(
+      join(
+        link.startsWith("/") ? normalizedURL.origin : normalizedURL.href,
+        link,
+      ),
+    ),
+  )?.toString();
+
 class FeedService {
   #db: CustomDatabase;
   #requester: Requester;
+  #domParser;
 
   constructor(db: CustomDatabase) {
     this.#db = db;
@@ -42,6 +68,86 @@ class FeedService {
           !!error && !["AbortError"].includes(error.name),
       }),
     );
+    this.#domParser = new DOMParser();
+  }
+
+  async getFeedLinks(url: string | URL, options: { signal?: AbortSignal }) {
+    const normalizedURL = new URL(url);
+    const pageResponse = await this.#requester.fetch(normalizedURL.toString(), {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3",
+      },
+      ...(options ?? {}),
+    });
+
+    if (!pageResponse.ok) {
+      throw new Error("Could not fetch page", {
+        cause: {
+          cause: {
+            response: _.pick(pageResponse, [
+              "headers",
+              "status",
+              "statusText",
+              "type",
+              "url",
+            ]),
+          },
+        },
+      });
+    }
+
+    const pageText = await pageResponse.text();
+    const parsedPageDom = this.#domParser.parseFromString(
+      pageText,
+      "text/html",
+    );
+
+    const feedLinks = Array.from(parsedPageDom.head.querySelectorAll(
+      'link[type="application/rss+xml"], link[type="application/rss"], link[type="application/atom+xml"], link[type="application/atom"], link[type="application/feed+json"], link[type="application/json"]',
+    ))
+      .map((ele) => ele.getAttribute("href")?.trim())
+      .filter((link) => typeof link === "string")
+      .map((frag) => normalizeLink(normalizedURL, frag))
+      .filter((url) => typeof url === "string");
+
+    if (feedLinks.length <= 0) {
+      const siteMapResponse = await fetch(
+        new URL("/sitemap.xml", normalizedURL.origin),
+      );
+
+      if (!pageResponse.ok) {
+        log.warn("Unable to fetch sitemap, skipping", {
+          response: _.pick(pageResponse, [
+            "headers",
+            "status",
+            "statusText",
+            "type",
+            "url",
+          ]),
+        });
+
+        return feedLinks;
+      }
+
+      const xmlDOM = xmlParser.parse(await siteMapResponse.text());
+      const links: { loc?: string }[] =
+        Array.isArray(xmlDOM?.sitemapindex?.sitemap)
+          ? xmlDOM?.sitemapindex?.sitemap
+          : [];
+
+      feedLinks.push(
+        ...links.filter((item) =>
+          typeof item.loc === "string" &&
+          potencialFeedLinkFragments.some((frag) => item.loc!.includes(frag))
+        )
+          .filter((item) => typeof item.loc === "string")
+          .map((item) => normalizeLink(normalizedURL, item.loc!))
+          .filter((link) => typeof link === "string"),
+      );
+    }
+
+    return feedLinks;
   }
 
   async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal }) {

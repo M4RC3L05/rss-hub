@@ -25,28 +25,28 @@ export const FeedsIndexPage: FC<FeedsIndexPageProps> = (
     >
       <a
         href="/categories/create"
-        style="display: inline; margin-right: 8px"
+        style="margin-right: 8px"
         class="button"
       >
         Add category +
       </a>
       <a
         href="/feeds/create"
-        style="display: inline; margin-right: 8px"
+        style="margin-right: 8px"
         class="button"
       >
         Add Feed +
       </a>
       <a
         href="/feeds/feed-links"
-        style="display: inline; margin-right: 8px"
+        style="margin-right: 8px"
         class="button"
       >
-        Find feeds <span style="font-size: 20px">⌕</span>
+        Find feeds <span style="line-height: 0.8rem; font-size: 1.2rem">⌕</span>
       </a>
       <a
         href="/opml/import"
-        style="display: inline; margin-right: 8px"
+        style="margin-right: 8px"
         class="button"
       >
         Import ↥

@@ -8,7 +8,7 @@ import type { CustomDatabase } from "../database/mod.ts";
 import type { FeedsTable } from "../database/types/mod.ts";
 import { formatError, makeLogger } from "#src/common/logger/mod.ts";
 import { DOMParser } from "@b-fuze/deno-dom/native";
-import { join, normalize } from "@std/path";
+import { dirname, join, normalize } from "@std/path";
 import { xmlParser } from "#src/common/utils/xml-utils.ts";
 
 const xmlContentTypeHeaders = [
@@ -42,15 +42,19 @@ const potencialFeedLinkFragments = [
 
 const log = makeLogger("feed-service");
 
-const normalizeLink = (normalizedURL: URL, link: string) =>
-  URL.parse(
-    link.startsWith("http") ? normalize(link) : normalize(
-      join(
-        link.startsWith("/") ? normalizedURL.origin : normalizedURL.href,
-        link,
-      ),
+const normalizeLink = (normalizedURL: URL, link: string) => {
+  const domain = normalizedURL.origin;
+  const normalizedPath = normalize(normalizedURL.href.replace(domain, ""));
+  const normalizedLink = link.startsWith("http") ? link : normalize(link);
+
+  return normalizedLink.startsWith("http") ? normalizedLink : new URL(
+    normalizedLink.startsWith("/") ? normalizedLink : join(
+      dirname(normalizedPath),
+      normalizedLink,
     ),
-  )?.toString();
+    domain,
+  ).toString();
+};
 
 class FeedService {
   #db: CustomDatabase;

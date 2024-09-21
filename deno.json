@@ -45,7 +45,6 @@
     "@std/path": "jsr:@std/path@1.0.6",
     "@std/streams": "jsr:@std/streams@1.0.5",
     "@std/text": "jsr:@std/text@1.0.6",
-    "@std/url": "jsr:@std/url@0.225.1",
     "@vinejs/vine": "npm:@vinejs/vine@2.1.0",
     "config": "npm:config@3.3.12",
     "fast-xml-parser": "npm:fast-xml-parser@4.5.0",

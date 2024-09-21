@@ -329,7 +329,6 @@
       "jsr:@std/path@1.0.6",
       "jsr:@std/streams@1.0.5",
       "jsr:@std/text@1.0.6",
-      "jsr:@std/url@0.225.1",
       "npm:@mozilla/readability@0.5.0",
       "npm:@vinejs/vine@2.1.0",
       "npm:config@3.3.12",

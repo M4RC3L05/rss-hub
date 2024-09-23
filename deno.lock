@@ -8,7 +8,6 @@
       "jsr:@denosaurs/plug@1.0.3": "jsr:@denosaurs/plug@1.0.3",
       "jsr:@hono/hono@4.6.2": "jsr:@hono/hono@4.6.2",
       "jsr:@m4rc3l05/feed-normalizer@0.1.8": "jsr:@m4rc3l05/feed-normalizer@0.1.8",
-      "jsr:@m4rc3l05/pretty-logs@0.1.0": "jsr:@m4rc3l05/pretty-logs@0.1.0",
       "jsr:@m4rc3l05/process-lifecycle@0.1.1": "jsr:@m4rc3l05/process-lifecycle@0.1.1",
       "jsr:@m4rc3l05/requester@0.5.0": "jsr:@m4rc3l05/requester@0.5.0",
       "jsr:@m4rc3l05/sqlite-tag@0.2.0": "jsr:@m4rc3l05/sqlite-tag@0.2.0",
@@ -89,13 +88,6 @@
           "jsr:@std/html@0.224.0",
           "npm:fast-xml-parser@4.3.6",
           "npm:radash@12.1.0"
-        ]
-      },
-      "@m4rc3l05/pretty-logs@0.1.0": {
-        "integrity": "1ab8d4a5e8fdfcc215cf7c51a223273a6dd2b33913a83a9963ebffd830c749aa",
-        "dependencies": [
-          "jsr:@std/fmt@1.0.2",
-          "jsr:@std/streams@1.0.5"
         ]
       },
       "@m4rc3l05/process-lifecycle@0.1.1": {
@@ -317,7 +309,6 @@
       "jsr:@db/sqlite@0.12.0",
       "jsr:@hono/hono@4.6.2",
       "jsr:@m4rc3l05/feed-normalizer@0.1.8",
-      "jsr:@m4rc3l05/pretty-logs@0.1.0",
       "jsr:@m4rc3l05/process-lifecycle@0.1.1",
       "jsr:@m4rc3l05/requester@0.5.0",
       "jsr:@m4rc3l05/sqlite-tag@0.2.0",

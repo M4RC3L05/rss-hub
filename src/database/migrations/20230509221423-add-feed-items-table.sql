@@ -17,12 +17,13 @@ create table feed_items (
   primary key (id, feed_id)
 );
 
-create trigger "feed_items_update_updated_at" -- noqa: PRS
+create trigger "feed_items_update_updated_at"
 after update on feed_items
 for each row
-when NEW.updated_at = OLD.updated_at
+when new.updated_at = old.updated_at
 begin
-  update feeds set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') where id = OLD.id;
+update feeds set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+where id = old.id;
 end
 
 -- migrate:down

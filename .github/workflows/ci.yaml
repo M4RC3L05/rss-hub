@@ -19,7 +19,7 @@ jobs:
           cache: true
 
       - name: install deps
-        run: deno install --node-modules-dir --entrypoint **/*.ts **/*.tsx
+        run: deno install --node-modules-dir
 
       - name: check format
         run: mise run check:format

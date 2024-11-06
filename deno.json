@@ -1,6 +1,6 @@
 {
   "name": "@m4rc3l05/rss-hub",
-  "version": "7.6.7",
+  "version": "7.6.8",
   "exports": "./deno.json",
   "tasks": {
     "api": "deno run -A --cached-only src/apps/api/main.ts",

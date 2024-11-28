@@ -6,7 +6,7 @@
     "api": "deno run -A --cached-only src/apps/api/main.ts",
     "web": "deno run -A --cached-only src/apps/web/main.ts",
     "pretty-logs": "deno run --no-lock jsr:@m4rc3l05/pretty-logs@0.2.2/bin/deno",
-    "dev:dbmate": "deno run -A --no-lock npm:dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema",
+    "dev:dbmate": "deno run -Ar --no-lock npm:dbmate@2.17.0 -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema",
     "jobs:feeds-synchronizer": "deno run -A --cached-only src/apps/jobs/feeds-synchronizer/main.ts"
   },
   "compilerOptions": {
@@ -22,6 +22,7 @@
   "fmt": {
     "exclude": ["node_modules"]
   },
+  "unstable": ["fmt-sql"],
   "lock": {
     "frozen": true
   },

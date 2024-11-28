@@ -1,5 +1,4 @@
 -- migrate:up
-
-create index idx_feeds_category_id on feeds (category_id);
+CREATE INDEX idx_feeds_category_id ON feeds (category_id);
 
 -- migrate:down

@@ -1,5 +1,5 @@
 -- migrate:up
-
-alter table feed_items drop column raw;
+ALTER TABLE
+  feed_items DROP COLUMN raw;
 
 -- migrate:down

@@ -35,6 +35,7 @@
     "jsr:@std/path@~0.213.1": "0.213.1",
     "jsr:@std/text@1.0.8": "1.0.8",
     "npm:@mozilla/readability@0.5.0": "0.5.0",
+    "npm:@types/node@*": "22.5.4",
     "npm:@vinejs/vine@2.1.0": "2.1.0",
     "npm:config@3.3.12": "3.3.12",
     "npm:fast-xml-parser@4.3.6": "4.3.6",
@@ -194,6 +195,12 @@
     "@poppinss/macroable@1.0.3": {
       "integrity": "sha512-B4iV6QxW//Fn17+qF1EMZRmoThIUJlCtcO85yoRDJnMyHeAthjz4ig9OTkfGGXKtQhcdPX0me75gU5K9J897+w=="
     },
+    "@types/node@22.5.4": {
+      "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
     "@types/validator@13.12.2": {
       "integrity": "sha512-6SlHBzUW8Jhf3liqrGGXyTJSIFe4nqlJ5A5KaMZ2l/vbM3Wh3KSybots/wfWVzNLK4D1NZluDlSQIbIEPx6oyA=="
     },
@@ -258,6 +265,9 @@
     "strnum@1.0.5": {
       "integrity": "sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA=="
     },
+    "undici-types@6.19.8": {
+      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
+    },
     "validator@13.12.0": {
       "integrity": "sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg=="
     }
@@ -279,6 +289,7 @@
       "jsr:@std/path@1.0.8",
       "jsr:@std/text@1.0.8",
       "npm:@mozilla/readability@0.5.0",
+      "npm:@types/node@*",
       "npm:@vinejs/vine@2.1.0",
       "npm:config@3.3.12",
       "npm:fast-xml-parser@4.5.0",

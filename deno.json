@@ -10,6 +10,7 @@
     "jobs:feeds-synchronizer": "deno run -A --cached-only src/apps/jobs/feeds-synchronizer/main.ts"
   },
   "compilerOptions": {
+    "types": ["npm:@types/node"],
     "jsx": "precompile",
     "jsxImportSource": "@hono/hono/jsx"
   },

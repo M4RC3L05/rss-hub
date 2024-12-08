@@ -4,7 +4,6 @@ import { FeedService } from "#src/services/mod.ts";
 import runner from "#src/apps/jobs/feeds-synchronizer/app.ts";
 import { ProcessLifecycle } from "@m4rc3l05/process-lifecycle";
 import { gracefulShutdown } from "#src/common/process/mod.ts";
-import { delay } from "@std/async";
 
 const log = makeLogger("feeds-synchronizer");
 
@@ -22,13 +21,12 @@ processLifecycle.registerService({
   name: "job",
   boot: (pc) => {
     const db = pc.getService<CustomDatabase>("db");
-    const ac = new AbortController();
     const job = async () => {
       try {
         log.info("Running feeds-synchronizer");
 
         await runner({
-          signal: ac.signal,
+          signal: pc.signal,
           db,
           feedService: new FeedService(db),
         });
@@ -39,20 +37,9 @@ processLifecycle.registerService({
       }
     };
 
-    return {
-      job: delay(0, { signal: ac.signal }).then(() => job(), (error) => {
-        log.warn("Something stopped deferred delay", { error });
-      }),
-      ac,
-    };
+    return { job: job() };
   },
-  shutdown: async ({ ac, job }) => {
-    if (!ac.signal.aborted) {
-      ac.abort();
-    }
-
-    await Promise.allSettled([job]);
-  },
+  shutdown: ({ job }) => job,
 });
 
 await processLifecycle.boot();

@@ -1,6 +1,6 @@
 {
   "name": "@m4rc3l05/rss-hub",
-  "version": "7.6.10",
+  "version": "7.6.11",
   "exports": "./deno.json",
   "tasks": {
     "api": {

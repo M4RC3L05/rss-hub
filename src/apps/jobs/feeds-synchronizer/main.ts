@@ -22,6 +22,8 @@ processLifecycle.registerService({
   boot: (pc) => {
     const db = pc.getService<CustomDatabase>("db");
     const job = async () => {
+      if (Deno.env.get("BUILD_DRY_RUN") === "true") return;
+
       try {
         log.info("Running feeds-synchronizer");
 
@@ -43,3 +45,7 @@ processLifecycle.registerService({
 });
 
 await processLifecycle.boot();
+
+if (Deno.env.get("BUILD_DRY_RUN") === "true") {
+  await processLifecycle.shutdown();
+}

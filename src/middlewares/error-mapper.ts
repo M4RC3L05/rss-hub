@@ -13,11 +13,16 @@ const log = makeLogger("error-mapper-middleware");
 
 const respond = (error: HTTPException, c: Context) => {
   const payload = {
-    error: { code: toSnakeCase(error.name), message: error.message },
+    error: {
+      code: toSnakeCase(error.name),
+      message: error.message.length > 0
+        ? error.message
+        : "Something went wrong",
+    },
   };
 
   if ("validationErrors" in error) {
-    (payload.error as Record<string, unknown>).errors = error.validationErrors;
+    Object.assign(payload.error, { validationErrors: error.validationErrors });
   }
 
   return c.json(payload, {

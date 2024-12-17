@@ -1,34 +1,12 @@
-import { createHash } from "node:crypto";
-import { sql } from "@m4rc3l05/sqlite-tag";
-import { Requester } from "@m4rc3l05/requester";
-import * as requesterComposers from "@m4rc3l05/requester/composers";
 import { resolve as feedResolver } from "@m4rc3l05/feed-normalizer";
-import * as _ from "lodash-es";
-import type { CustomDatabase } from "../database/mod.ts";
-import type { FeedsTable } from "../database/types/mod.ts";
+import type { CustomDatabase, FeedsTable } from "#src/database/mod.ts";
 import { formatError, makeLogger } from "#src/common/logger/mod.ts";
 import { DOMParser } from "@b-fuze/deno-dom/native";
 import { dirname, join, normalize } from "@std/path";
-import { xmlParser } from "#src/common/utils/xml-utils.ts";
-
-const xmlContentTypeHeaders = [
-  "application/xml",
-  "application/rss+xml",
-  "application/rdf+xml",
-  "application/atom+xml",
-  "text/xml",
-  "text/html",
-];
-
-const jsonContentTypeHeaders = [
-  "application/feed+json",
-  "application/json",
-];
-
-const validContentTypes = [
-  ...xmlContentTypeHeaders,
-  ...jsonContentTypeHeaders,
-];
+import { xmlUtils } from "#src/common/utils/mod.ts";
+import { deadline, retry } from "@std/async";
+import { encodeBase64 } from "@std/encoding";
+import { pick } from "@std/collections";
 
 const potencialFeedLinkFragments = [
   "/rss",
@@ -57,47 +35,54 @@ const normalizeLink = (normalizedURL: URL, link: string) => {
 };
 
 class FeedService {
-  #db: CustomDatabase;
-  #requester: Requester;
+  #db;
   #domParser;
 
   constructor(db: CustomDatabase) {
     this.#db = db;
-    this.#requester = new Requester().with(
-      requesterComposers.timeout({ ms: 5000 }),
-      requesterComposers.skip({ n: 1 }, requesterComposers.delay({ ms: 1000 })),
-      requesterComposers.retry({
-        maxRetries: 3,
-        shouldRetry: ({ error }) =>
-          !!error && !["AbortError"].includes(error.name),
-      }),
-    );
     this.#domParser = new DOMParser();
   }
 
-  async getFeedLinks(url: string | URL, options: { signal?: AbortSignal }) {
+  #fetch(
+    url: string,
+    options?: { signal?: AbortSignal },
+  ) {
+    return deadline(
+      retry(() =>
+        fetch(url, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3",
+          },
+          ...(options ?? {}),
+          signal: options?.signal
+            ? AbortSignal.any([options.signal, AbortSignal.timeout(10_000)])
+            : AbortSignal.timeout(10_000),
+        }), {
+        maxAttempts: 3,
+        minTimeout: 1000,
+        maxTimeout: 1000,
+        multiplier: 1,
+        jitter: 0,
+      }),
+      10_000,
+      { signal: options?.signal },
+    );
+  }
+
+  async getFeedLinks(url: string | URL, options?: { signal?: AbortSignal }) {
     const normalizedURL = new URL(url);
-    const pageResponse = await this.#requester.fetch(normalizedURL.toString(), {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3",
-      },
-      ...(options ?? {}),
-    });
+    const pageResponse = await this.#fetch(normalizedURL.toString(), options);
 
     if (!pageResponse.ok) {
       throw new Error("Could not fetch page", {
-        cause: {
-          cause: {
-            response: _.pick(pageResponse, [
-              "headers",
-              "status",
-              "statusText",
-              "type",
-              "url",
-            ]),
-          },
-        },
+        cause: pick(pageResponse, [
+          "headers",
+          "status",
+          "statusText",
+          "type",
+          "url",
+        ]),
       });
     }
 
@@ -118,11 +103,16 @@ class FeedService {
     if (feedLinks.length <= 0) {
       const siteMapResponse = await fetch(
         new URL("/sitemap.xml", normalizedURL.origin),
+        {
+          signal: options?.signal
+            ? AbortSignal.any([options.signal, AbortSignal.timeout(10_000)])
+            : AbortSignal.timeout(10_000),
+        },
       );
 
-      if (!pageResponse.ok) {
+      if (!siteMapResponse.ok) {
         log.warn("Unable to fetch sitemap, skipping", {
-          response: _.pick(pageResponse, [
+          response: pick(siteMapResponse, [
             "headers",
             "status",
             "statusText",
@@ -134,11 +124,20 @@ class FeedService {
         return feedLinks;
       }
 
-      const xmlDOM = xmlParser.parse(await siteMapResponse.text());
-      const links: { loc?: string }[] =
-        Array.isArray(xmlDOM?.sitemapindex?.sitemap)
+      const xmlDOM = xmlUtils.xmlParser.parse(await siteMapResponse.text());
+      let links: { loc?: string }[] = [];
+
+      if (xmlDOM?.sitemapindex?.sitemap) {
+        links = Array.isArray(xmlDOM?.sitemapindex?.sitemap)
           ? xmlDOM?.sitemapindex?.sitemap
-          : [];
+          : [xmlDOM?.sitemapindex?.sitemap];
+      }
+
+      if (xmlDOM?.urlset?.url) {
+        links = Array.isArray(xmlDOM?.urlset?.url)
+          ? xmlDOM?.urlset?.url
+          : [xmlDOM?.urlset?.url];
+      }
 
       feedLinks.push(
         ...links.filter((item) =>
@@ -154,18 +153,24 @@ class FeedService {
     return feedLinks;
   }
 
-  async syncFeed(feed: FeedsTable, options: { signal?: AbortSignal }) {
+  async syncFeed(feed: FeedsTable, options?: { signal?: AbortSignal }) {
     const extracted = await this.#extractRawFeed(feed.url, options);
 
-    if (options?.signal?.aborted) {
-      throw new Error("Aborted");
+    if (!extracted) {
+      log.info("No content extracted, ignoring", { feed });
+
+      return {
+        totalCount: 0,
+        successCount: 0,
+        faildCount: 0,
+        failedReasons: [],
+      };
     }
 
     const data = feedResolver(extracted);
 
     const status = await Promise.allSettled(
-      // deno-lint-ignore require-await
-      data.items.map(async (entry) => this.#syncFeedEntry(feed.id, entry)),
+      data.items.map((entry) => this.#syncFeedEntry(feed.id, entry)),
     );
 
     const totalCount = status.length;
@@ -190,72 +195,50 @@ class FeedService {
   }
 
   async verifyFeed(url: string, options?: { signal: AbortSignal }) {
-    const rawFeed = await this.#extractRawFeed(url, options ?? {});
-    const parsed = feedResolver(rawFeed);
+    const rawFeed = await this.#extractRawFeed(url, options);
+    const parsed = feedResolver(rawFeed!);
 
     return parsed;
   }
 
-  async #extractRawFeed(url: string, options: { signal?: AbortSignal }) {
-    try {
-      const response = await this.#requester.fetch(url, options);
-      if (!response.ok) {
-        throw new Error(`Request is not ok`, {
-          cause: {
-            response: _.pick(response, [
-              "headers",
-              "status",
-              "statusText",
-              "type",
-              "url",
-            ]),
-          },
-        });
-      }
+  async #extractRawFeed(url: string, options?: { signal?: AbortSignal }) {
+    const response = await this.#fetch(url, options);
 
-      if (response.status === 304) {
-        throw new Error("Feed did not change");
-      }
+    if (response.status === 304) {
+      return;
+    }
 
-      if (!response.headers.has("content-type")) {
-        throw new Error("No content type header in response");
-      }
-
-      const contentType = response.headers.get("content-type");
-
-      if (!contentType) {
-        throw new Error(`No content type provided for feed "${url}"`);
-      }
-
-      if (!validContentTypes.some((ct) => contentType.includes(ct))) {
-        throw new Error(`Not a valid content type header of "${contentType}"`, {
-          cause: {
-            response: _.pick(response, [
-              "headers",
-              "status",
-              "statusText",
-              "type",
-              "url",
-            ]),
-          },
-        });
-      }
-
-      return await response.text();
-    } catch (error) {
-      throw new Error(`Error fetching feed ${url}`, {
-        cause: error,
+    if (!response.ok) {
+      throw new Error(`Could not fetch feed contents from ${url}`, {
+        cause: pick(response, [
+          "headers",
+          "status",
+          "statusText",
+          "type",
+          "url",
+        ]),
       });
     }
+
+    return await response.text().catch((error) => {
+      throw new Error(`Unable to extract text content ${url}`, {
+        cause: error,
+      });
+    });
   }
 
-  #syncFeedEntry(
+  async #syncFeedEntry(
     feedId: string,
     item: ReturnType<typeof feedResolver>["items"][0],
   ) {
     const toInsert = {
       id: item.id ??
-        createHash("sha512").update(JSON.stringify(item)).digest("base64"),
+        encodeBase64(
+          await crypto.subtle.digest(
+            "SHA-512",
+            new TextEncoder().encode(JSON.stringify(item)),
+          ),
+        ),
       feedId,
       content: item.content ?? "",
       img: item.image ?? null,
@@ -270,47 +253,31 @@ class FeedService {
         new Date().toISOString(),
     };
 
-    this.#db.execute(
-      sql`
-        insert into feed_items ${
-        sql.insert(
-          _.mapKeys(toInsert, (__: unknown, k: string) => _.snakeCase(k)),
+    this.#db.sql`
+      insert into feed_items
+        (id, feed_id, content, img, title, enclosure, link, created_at, updated_at)
+      values
+        (
+          ${toInsert.id},
+          ${toInsert.feedId},
+          ${toInsert.content},
+          ${toInsert.img},
+          ${toInsert.title},
+          ${toInsert.enclosure},
+          ${toInsert.link},
+          ${toInsert.createdAt},
+          ${toInsert.updatedAt}
         )
-      }
-        on conflict (id, feed_id)
-        do update set
-          content = ${
-        sql.ternary(
-          !!item.content,
-          () => sql`${toInsert.content}`,
-          () => sql.id("content"),
-        )
-      },
-          img = ${
-        sql.ternary(
-          !!item.image,
-          () => sql`${toInsert.img}`,
-          () => sql.id("img"),
-        )
-      },
-          title = ${item.title ? sql`${toInsert.title}` : sql.id("title")},
-          enclosure = ${
-        sql.ternary(
-          item.enclosures.length > 0,
-          () => sql`${toInsert.enclosure}`,
-          () => sql.id("enclosure"),
-        )
-      },
-          link = ${
-        sql.ternary(
-          !!item.link,
-          () => sql`${toInsert.link}`,
-          () => sql.id("link"),
-        )
-      },
-          updated_at = ${toInsert.updatedAt}
-      `,
-    );
+      on conflict (id, feed_id)
+        do update
+          set
+            content = coalesce(${toInsert.content}, content),
+            img = coalesce(${toInsert.img}, img),
+            title = coalesce(${toInsert.title}, title),
+            enclosure = coalesce(${toInsert.enclosure}, enclosure),
+            link = coalesce(${toInsert.link}, link),
+            updated_at = coalesce(${toInsert.updatedAt}, updated_at)
+    `;
   }
 }
 

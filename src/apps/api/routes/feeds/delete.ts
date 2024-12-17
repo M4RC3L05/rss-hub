@@ -1,12 +1,9 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
 import vine from "@vinejs/vine";
-import { makeLogger } from "#src/common/logger/mod.ts";
+import { HTTPException } from "@hono/hono/http-exception";
 
 const requestParametersSchema = vine.object({ id: vine.string().uuid() });
 const requestParametersValidator = vine.compile(requestParametersSchema);
-
-const log = makeLogger("delete-feed-handler");
 
 export const del = (router: Hono) => {
   router.delete(
@@ -15,13 +12,14 @@ export const del = (router: Hono) => {
       const parameters = await requestParametersValidator.validate(
         c.req.param(),
       );
-      const changes = c.get("database").execute(sql`
+      const [feed] = c.get("database").sql<{ id: string }>`
         delete from feeds
         where id = ${parameters.id}
-      `);
+        returning id;
+      `;
 
-      if (changes === 0) {
-        log.warn("No feed was deleted", { feedId: parameters.id });
+      if (!feed) {
+        throw new HTTPException(404, { message: "Could not find feed" });
       }
 
       return c.body(null, 204);

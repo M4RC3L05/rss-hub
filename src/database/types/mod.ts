@@ -17,13 +17,13 @@ export type FeedsTable = {
 export type FeedItemsTable = {
   id: string;
   title: string;
-  enclosure?: string;
-  link?: string;
-  img?: string;
+  enclosure: string | null;
+  link: string | null;
+  img: string | null;
   content: string;
   feedId: string;
   createdAt: string;
   updatedAt: string;
-  readedAt?: string;
-  bookmarkedAt?: string;
+  readedAt: string | null;
+  bookmarkedAt: string | null;
 };

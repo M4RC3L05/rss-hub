@@ -1,9 +1,7 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import vine from "@vinejs/vine";
-import { mapKeys } from "@std/collections";
-import { toSnakeCase } from "@std/text";
+import type { FeedsTable } from "#src/database/mod.ts";
 
 const requestParametersSchema = vine.object({ id: vine.string().uuid() });
 const requestParametersValidator = vine.compile(requestParametersSchema);
@@ -23,11 +21,23 @@ export const update = (router: Hono) => {
         c.req.param(),
       );
       const data = await requestBodyValidator.validate(await c.req.json());
-      const feed = c.get("database").get(sql`
-        update feeds set ${sql.set(mapKeys(data, (key) => toSnakeCase(key)))}
+
+      const [feed] = c.get("database").sql<FeedsTable>`
+        update feeds
+          set
+            name = coalesce(${data.name ?? null}, name),
+            url = coalesce(
+              ${data.url ? new URL(data.url).toString() : null},
+              url
+            ),
+            category_id = coalesce(${data.categoryId ?? null}, category_id)
         where id = ${parameters.id}
-        returning *
-      `);
+        returning
+          id, name, url,
+          category_id as "categoryId",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+      `;
 
       if (!feed) {
         throw new HTTPException(404, { message: "Category not found" });

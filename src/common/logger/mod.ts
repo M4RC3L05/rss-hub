@@ -4,6 +4,7 @@ import {
   Logger,
   type LogRecord,
 } from "@std/log";
+import { memoize } from "@std/cache";
 
 const isPlainObject = (arg: unknown): arg is Record<string, unknown> =>
   arg !== null && arg !== undefined &&
@@ -57,7 +58,7 @@ const logFormatter = (
   return JSON.stringify(payload);
 };
 
-export const makeLogger = (namespace: string) => {
+export const makeLogger = memoize((namespace: string) => {
   const handlers: BaseHandler[] = [];
 
   if (Deno.env.get("ENV") !== "test") {
@@ -70,4 +71,4 @@ export const makeLogger = (namespace: string) => {
   }
 
   return new Logger(namespace, "INFO", { handlers: handlers });
-};
+}, { getKey: (namespace) => namespace });

@@ -1,7 +1,5 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
 import vine from "@vinejs/vine";
-import { makeLogger } from "#src/common/logger/mod.ts";
 
 const requestBodySchema = vine.union([
   vine.union.if(
@@ -13,50 +11,46 @@ const requestBodySchema = vine.union([
   ),
   vine.union.if(
     (data) => "feedId" in data,
-    vine.object({ feedId: vine.string() }),
+    vine.object({ feedId: vine.string().uuid() }),
   ),
-]);
-const requestBodyValidator = vine.compile(requestBodySchema);
+]).otherwise((_, field) => {
+  field.report(
+    "Either feedId or ids",
+    "feed_id_or_ids",
+    field,
+  );
+});
 
-const log = makeLogger("mark-as-read");
+const requestBodyValidator = vine.compile(requestBodySchema);
 
 export const markAsRead = (router: Hono) => {
   router.patch(
     "/read",
     async (c) => {
       const data = await requestBodyValidator.validate(await c.req.json());
-      const changes = c.get("database").execute(
-        sql`
-          update feed_items set
-            readed_at = ${new Date().toISOString()}
-          where
-            ${
-          sql.if(
-            "ids" in data,
-            () =>
-              sql`(${
-                sql.join(
-                  (data as { ids: { feedId: string; id: string }[] }).ids.map(
-                    ({ feedId, id }) =>
-                      sql`(id = ${id} and feed_id = ${feedId})`,
-                  ),
-                  sql` or `,
-                )
-              })`,
-          )
-        }
-            ${
-          sql.if(
-            "feedId" in data,
-            () => sql`feed_id = ${(data as { feedId: string }).feedId}`,
-          )
-        }
-            and readed_at is null
-        `,
-      );
 
-      if (changes <= 0) {
-        log.warn("Nothing was marked as readed");
+      if ("feedId" in data) {
+        c.get("database").sql<{ id: string }>`
+          update feed_items
+            set
+              readed_at = ${new Date().toISOString()}
+          where
+            feed_id = ${data.feedId} and readed_at is null
+          returning id
+        `;
+      }
+
+      if ("ids" in data) {
+        for (const { id, feedId } of data.ids) {
+          c.get("database").sql<{ id: string }>`
+            update feed_items
+              set
+                readed_at = ${new Date().toISOString()}
+            where
+              id = ${id} and feed_id = ${feedId} and readed_at is null
+            returning id
+          `[0];
+        }
       }
 
       return c.body(null, 204);

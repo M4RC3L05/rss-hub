@@ -1,11 +1,10 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import vine from "@vinejs/vine";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";
 
 const requestParametersSchema = vine.object({
-  feedId: vine.string(),
+  feedId: vine.string().uuid(),
   id: vine.string(),
 });
 const requestParametersValidator = vine.compile(requestParametersSchema);
@@ -18,12 +17,17 @@ export const get = (router: Hono) => {
         c.req.param(),
       );
 
-      const feedItem = c.get("database").get<FeedItemsTable>(
-        sql`
-          select * from feed_items
-          where id = ${decodeURIComponent(id)} and feed_id = ${feedId}
-        `,
-      );
+      const [feedItem] = c.get("database").sql<FeedItemsTable>`
+        select 
+          id, title, enclosure, link, img, content,
+          feed_id as "feedId",
+          readed_at as "readedAt",
+          bookmarked_at as "bookmarkedAt",
+          created_at as "createdAt",
+          updated_at as "updatedAt"  
+        from feed_items
+        where id = ${id} and feed_id = ${feedId}
+      `;
 
       if (!feedItem) {
         throw new HTTPException(404, {

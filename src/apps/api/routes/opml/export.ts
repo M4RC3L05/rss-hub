@@ -1,42 +1,53 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import { escape } from "@std/html";
 import type { Hono } from "@hono/hono";
+import { stream } from "@hono/hono/streaming";
 
 export const exportFeeds = (router: Hono) => {
   router.get("/export", (c) => {
-    let doc =
-      `<?xml version="1.0" encoding="UTF-8"?><opml version="2.0"><head><title>RSS HUB feeds</title><dateCreated>${
-        new Date().toUTCString()
-      }</dateCreated></head><body>`.trim();
-
     const categories = c
       .get("database")
-      .iter<{ id: string; name: string }>(sql`select * from categories`);
+      .prepare(`select * from categories order by name`)
+      .iter() as IterableIterator<
+        { id: string; name: string }
+      >;
 
-    for (const category of categories) {
-      const text = escape(category.name);
-      doc += `<outline text="${text}">`;
+    c.res.headers.set("content-type", "text/x-opml");
+    c.res.headers.set(
+      "content-disposition",
+      'attachment; filename="feeds.opml"',
+    );
 
-      const feeds = c
-        .get("database")
-        .iter<{ name: string; url: string }>(
-          sql`select * from feeds where category_id = ${category.id}`,
-        );
+    return stream(c, async (stream) => {
+      await stream.writeln(
+        `<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n<head>\n<title>RSS HUB feeds</title>\n<dateCreated>${
+          new Date().toUTCString()
+        }</dateCreated>\n</head>\n<body>`.trim(),
+      );
 
-      for (const feed of feeds) {
-        const text = escape(feed.name);
-        const xmlUrl = escape(feed.url);
-        doc += `<outline text="${text}" type="rss" xmlUrl="${xmlUrl}"/>`;
+      for (const category of categories) {
+        const text = escape(category.name);
+        await stream.writeln(`<outline text="${text}">`);
+
+        const feeds = c
+          .get("database")
+          .prepare(`select * from feeds where category_id = ? order by name`)
+          .iter(
+            category.id,
+          ) as IterableIterator<{ name: string; url: string }>;
+
+        for (const feed of feeds) {
+          const text = escape(feed.name);
+          const xmlUrl = escape(feed.url);
+
+          await stream.writeln(
+            `<outline text="${text}" type="rss" xmlUrl="${xmlUrl}"/>`,
+          );
+        }
+
+        await stream.writeln("</outline>");
       }
 
-      doc += "</outline>";
-    }
-
-    doc += "</body></opml>";
-
-    return c.body(doc.trim(), 200, {
-      "content-type": "text/x-opml",
-      "content-disposition": 'attachment; filename="feeds.opml"',
+      await stream.writeln("</body>\n</opml>");
     });
   });
 };

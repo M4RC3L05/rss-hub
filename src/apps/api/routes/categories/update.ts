@@ -1,4 +1,3 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import vine from "@vinejs/vine";
@@ -18,17 +17,23 @@ export const update = (router: Hono) => {
         c.req.param(),
       );
       const body = await requestBodyValidator.validate(await c.req.json());
-      const updated = c.get("database").get<CategoriesTable>(sql`
+      const [updated] = c.get("database").sql<{ id: string }>`
         update categories set name = ${body.name}
         where id = ${parameters.id}
-        returning *
-      `);
+        returning id
+      `;
 
       if (!updated) {
         throw new HTTPException(404, { message: "Category not found" });
       }
 
-      return c.json({ data: updated });
+      const [category] = c.get("database").sql<CategoriesTable>`
+        select id, name, created_at as "createdAt", updated_at as "updatedAt"
+        from categories
+        where id = ${updated.id}
+      `;
+
+      return c.json({ data: category });
     },
   );
 };

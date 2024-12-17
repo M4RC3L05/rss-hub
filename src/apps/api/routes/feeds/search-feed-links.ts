@@ -12,7 +12,6 @@ export const searchFeedLinks = (router: Hono) => {
 
     const feedLinks = await c.get("feedService").getFeedLinks(url, {
       signal: AbortSignal.any([
-        AbortSignal.timeout(10_000),
         c.get("shutdown"),
         c.req.raw.signal,
       ]),

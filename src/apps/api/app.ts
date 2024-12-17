@@ -33,7 +33,12 @@ export const makeApp = (deps: Partial<ContextVariableMap>) => {
     throw new HTTPException(404, { message: "Route not found" });
   });
 
-  app.onError(errorMapper({ defaultMapper: errorMappers.defaultErrorMapper }));
+  app.onError(
+    errorMapper({
+      defaultMapper: errorMappers.defaultErrorMapper,
+      mappers: [errorMappers.validationErrorMapper],
+    }),
+  );
 
   return app.route("/api", router());
 };

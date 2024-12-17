@@ -1,6 +1,4 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
-import { HTTPException } from "@hono/hono/http-exception";
 import vine from "@vinejs/vine";
 import { formatError, makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedsTable } from "#src/database/types/mod.ts";
@@ -20,20 +18,24 @@ export const create = (router: Hono) => {
     "/",
     async (c) => {
       const data = await requestBodyValidator.validate(await c.req.json());
-      const feed = c.get("database").get<FeedsTable>(sql`
-        insert into feeds (name, url, category_id)
-        values (${data.name}, ${data.url}, ${data.categoryId})
-        returning *
-      `);
 
-      if (!feed) {
-        throw new HTTPException(400, { message: "Could not create feed" });
-      }
+      const [feed] = c.get("database").sql<FeedsTable>`
+        insert into feeds (name, url, category_id)
+        values (
+          ${data.name},
+          ${new URL(data.url).toString()},
+          ${data.categoryId}
+        )
+        returning 
+          id, name, url,
+          category_id as "categoryId",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+      `;
 
       c.get("feedService")
         .syncFeed(feed, {
           signal: AbortSignal.any([
-            AbortSignal.timeout(10_000),
             c.get("shutdown"),
           ]),
         })

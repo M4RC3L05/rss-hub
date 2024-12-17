@@ -1,12 +1,9 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import type { Hono } from "@hono/hono";
 import vine from "@vinejs/vine";
-import { makeLogger } from "#src/common/logger/mod.ts";
+import { HTTPException } from "@hono/hono/http-exception";
 
 const requestParametersSchema = vine.object({ id: vine.string().uuid() });
 const requestParametersValidator = vine.compile(requestParametersSchema);
-
-const log = makeLogger("delete-category-handler");
 
 export const del = (router: Hono) => {
   router.delete(
@@ -16,14 +13,14 @@ export const del = (router: Hono) => {
         c.req.param(),
       );
 
-      const changes = c.get("database").execute(sql`
+      const [deleted] = c.get("database").sql`
         delete from categories
         where id = ${parameters.id}
-        returning *
-      `);
+        returning id
+      `;
 
-      if (changes === 0) {
-        log.warn("No category was deleted", { categoryId: parameters.id });
+      if (!deleted) {
+        throw new HTTPException(404, { message: "Category not found" });
       }
 
       return c.body(null, 204);

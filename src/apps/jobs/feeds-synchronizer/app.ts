@@ -1,7 +1,5 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import { formatError, makeLogger } from "#src/common/logger/mod.ts";
-import type { CustomDatabase } from "#src/database/mod.ts";
-import type { FeedsTable } from "#src/database/types/mod.ts";
+import type { CustomDatabase, FeedsTable } from "#src/database/mod.ts";
 import type { FeedService } from "#src/services/mod.ts";
 
 const log = makeLogger("feed-synchronizer-runner");
@@ -11,11 +9,17 @@ const runner = async ({
   feedService,
   db,
 }: { signal?: AbortSignal; db: CustomDatabase; feedService: FeedService }) => {
-  const feeds = db.all<FeedsTable>(sql`select * from feeds`);
+  const feeds = db.sql<FeedsTable>`select * from feeds`;
 
   log.info("Synching begin");
 
   for (const feed of feeds) {
+    if (signal?.aborted) {
+      log.info("Abort sync");
+
+      break;
+    }
+
     log.info(`Synching feed ${feed.url}`, { feed });
 
     try {

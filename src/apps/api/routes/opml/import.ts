@@ -1,11 +1,9 @@
-import { sql } from "@m4rc3l05/sqlite-tag";
 import { unescape } from "@std/html";
 import type { Hono } from "@hono/hono";
-import * as _ from "lodash-es";
 import { HTTPException } from "@hono/hono/http-exception";
 import { makeLogger } from "#src/common/logger/mod.ts";
-import { xmlParser } from "#src/common/utils/xml-utils.ts";
 import type { FeedsTable } from "#src/database/types/mod.ts";
+import { xmlUtils } from "#src/common/utils/mod.ts";
 
 const log = makeLogger("opml-import-handler");
 
@@ -23,62 +21,85 @@ export const importFeeds = (router: Hono) => {
       });
     }
 
-    const parsed = (await xmlParser.parse(await file.text())) as Record<
-      string,
-      unknown
-    >;
+    const fileContent = await file.text();
+    let parsed = {};
+
+    try {
+      parsed = (await xmlUtils.xmlParser.parse(fileContent)) as Record<
+        string,
+        unknown
+      >;
+    } catch (error) {
+      throw new HTTPException(422, {
+        message: "Malformed opml file",
+        cause: error,
+      });
+    }
+
     const feedsToSync: string[] = [];
 
     c.get("database").transaction(() => {
-      const categories = _.castArray(_.get(parsed, "opml.body.outline")).filter(
-        (value: string) => value !== null && value !== undefined,
-      );
+      // deno-lint-ignore no-explicit-any
+      const categories = (Array.isArray((parsed as any)?.opml?.body?.outline)
+        // deno-lint-ignore no-explicit-any
+        ? (parsed as any)?.opml?.body?.outline
+        // deno-lint-ignore no-explicit-any
+        : [(parsed as any)?.opml?.body?.outline])
+        .filter(
+          (value: string) => value !== null && value !== undefined,
+        );
 
       for (const category of categories) {
-        const categoryName = _.get(category as { "@_text": string }, "@_text");
-        let categoryStored = c
+        const categoryName = category["@_text"] as string | undefined;
+
+        if (!categoryName) continue;
+
+        let [categoryStored] = c
           .get("database")
-          .get(
-            sql`select * from categories where name = ${categoryName} limit 1`,
-          );
+          .sql<
+          { id: string }
+        >`select id from categories where name = ${categoryName} limit 1`;
 
         if (!categoryStored) {
           categoryStored = c
             .get("database")
-            .get(
-              sql`insert into categories (name) values (${categoryName}) returning *`,
-            );
+            .sql<
+            { id: string }
+          >`insert into categories (name) values (${categoryName}) returning id`[
+            0
+          ]!;
         }
 
-        const feeds = _.castArray(
-          _.get(category as { outline: unknown }, "outline"),
-        ).filter((value: string) => value !== null && value !== undefined);
+        const feeds = (Array.isArray(category.outline)
+          ? category.outline
+          : [category.outline]).filter((value: string) =>
+            value !== null && value !== undefined
+          );
 
         for (const feed of feeds) {
-          const feedName = unescape(
-            _.get(feed as { "@_text": string }, "@_text"),
-          );
-          const feedUrl = unescape(
-            _.get(feed as { "@_xmlUrl": string }, "@_xmlUrl") ??
-              _.get(feed as { "@_htmlUrl": string }, "@_htmlUrl"),
-          );
+          const feedName = feed["@_text"];
+          const feedUrl = feed["@_xmlUrl"] ?? feed["@_htmlUrl"];
 
-          const feedStored = c
+          if (!feedName || !feedUrl) {
+            continue;
+          }
+
+          const [feedStored] = c
             .get("database")
-            .get(sql`select * from feeds where url = ${feedUrl} limit 1`);
+            .sql`select * from feeds where url = ${unescape(feedUrl)} limit 1`;
 
           if (!feedStored) {
-            const feed = c.get("database").get<FeedsTable>(
-              sql`
+            const [feed] = c.get("database").sql<{ id: string }>`
                 insert into feeds
                   (name, url, category_id)
                 values
-                  (${feedName}, ${feedUrl}, ${
-                (categoryStored as { id: string }).id
-              })
-                returning *
-              `,
-            );
+                  (
+                    ${unescape(feedName)},
+                    ${unescape(feedUrl)},
+                    ${(categoryStored as { id: string }).id}
+                  )
+                returning id
+              `;
 
             if (feed) {
               feedsToSync.push(feed.id);
@@ -93,20 +114,31 @@ export const importFeeds = (router: Hono) => {
       (async () => {
         log.info("Begin full feed sync", { feedsToSync });
 
-        const feeds = c
-          .get("database")
-          .all<FeedsTable>(sql`select * from feeds where id in ${feedsToSync}`);
+        const feeds = feedsToSync.map((id) =>
+          c
+            .get("database")
+            .sql<FeedsTable>`
+            select
+              id, name, url,
+              category_id as "categoryId",
+              created_at as "createdAt",
+              updated_at as "updatedAt"
+            from feeds
+            where id = ${id}
+          `[0]
+        ).filter((item) => item !== undefined);
 
         await Promise.allSettled(
-          feeds.map(async (feed: FeedsTable) => ({
-            feed,
-            stats: await c.get("feedService").syncFeed(feed, {
-              signal: AbortSignal.any([
-                AbortSignal.timeout(10_000),
-                c.get("shutdown"),
-              ]),
-            }),
-          })),
+          feeds.map(async (feed: FeedsTable) => {
+            return {
+              feed,
+              stats: await c.get("feedService").syncFeed(feed, {
+                signal: AbortSignal.any([
+                  c.get("shutdown"),
+                ]),
+              }),
+            };
+          }),
         )
           .then((data) => {
             log.info("Full feed sync completed", {

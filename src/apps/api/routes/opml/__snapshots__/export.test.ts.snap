@@ -1,0 +1,36 @@
+export const snapshot = {};
+
+snapshot[`global > GET /api/opml/export > should handle nothing to export 1`] = `
+'<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+<head>
+<title>RSS HUB feeds</title>
+<dateCreated>Thu, 01 Jan 1970 00:00:00 GMT</dateCreated>
+</head>
+<body>
+</body>
+</opml>
+'
+`;
+
+snapshot[`global > GET /api/opml/export > should export to a opml file 1`] = `
+'<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+<head>
+<title>RSS HUB feeds</title>
+<dateCreated>Thu, 01 Jan 1970 00:00:00 GMT</dateCreated>
+</head>
+<body>
+<outline text="cat:bar">
+<outline text="feed:biz" type="rss" xmlUrl="feed:url:biz"/>
+</outline>
+<outline text="cat:biz">
+</outline>
+<outline text="cat:foo">
+<outline text="feed:bar" type="rss" xmlUrl="feed:url:bar"/>
+<outline text="feed:foo" type="rss" xmlUrl="feed:url:foo"/>
+</outline>
+</body>
+</opml>
+'
+`;

@@ -339,7 +339,7 @@ describe("FeedService", () => {
       assertEquals(error.cause, textError);
     });
 
-    it("should insert sync a feed", async () => {
+    it("should sync a feed", async () => {
       const feed = testFixtures.loadFeed(db, { url: "https://example.com" });
 
       using fetchStub = stub(
@@ -452,12 +452,13 @@ describe("FeedService", () => {
       );
     });
 
-    it("should insert sync a feed with previous items on db", async () => {
+    it("should sync a feed with previous items on db", async () => {
       const feed = testFixtures.loadFeed(db, { url: "https://example.com" });
       const feedItem = testFixtures.loadFeedItem(db, {
         feedId: feed.id,
         id: "https://www.example.com/blog/post3",
         enclosure: "foobar",
+        updatedAt: new Date(Date.now() - (1000 * 60)).toISOString(),
       });
 
       using fetchStub = stub(

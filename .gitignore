@@ -2,3 +2,4 @@ data/*
 !data/.gitkeep
 config/local.json
 node_modules
+**/public/css/*.min.css

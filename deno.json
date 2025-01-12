@@ -15,13 +15,13 @@
       "description": "Run feeds synchronizer job",
       "command": "deno run -A --cached-only src/apps/jobs/feeds-synchronizer/main.ts"
     },
-    "cmd:pino-pretty": {
+    "dev:pretty-logs": {
       "description": "Interact with pino-pretty",
-      "command": "deno run -A --no-lock npm:pino-pretty@13.0.0 -m message --levelKey level --timestampKey datetime -k \"data.error,data.err\" -c -C"
+      "command": "pino-pretty -m message --levelKey level --timestampKey datetime -k \"data.error,data.err\" -c -C"
     },
-    "cmd:dbmate": {
+    "dev:run-migrations": {
       "description": "Interact with dbmate",
-      "command": "deno run -A --no-lock npm:dbmate@2.23.0 -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema"
+      "command": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations --no-dump-schema up"
     },
     "pre:test": {
       "description": "Command to run before runing tests",
@@ -87,7 +87,9 @@
     "@std/text": "jsr:@std/text@1.0.10",
     "@vinejs/vine": "npm:@vinejs/vine@3.0.0",
     "config": "npm:config@3.3.12",
+    "dbmate": "npm:dbmate@2.24.2",
     "fast-xml-parser": "npm:fast-xml-parser@4.5.1",
+    "pino-pretty": "npm:pino-pretty@13.0.0",
     "simpledotcss": "npm:simpledotcss@2.3.3"
   }
 }

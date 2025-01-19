@@ -28,6 +28,10 @@
       "description": "Interact with dbmate",
       "command": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations -s ./src/database/schema.sql up"
     },
+    "cmd:dbmate": {
+      "description": "Run dbmate",
+      "command": "dbmate"
+    },
     "pre:test": {
       "description": "Command to run before runing tests",
       "command": "deno eval \"import '@db/sqlite';import '@b-fuze/deno-dom/native';\""

@@ -19,6 +19,8 @@ snapshot[`global > GET /api/feed-items/:id/:feedId/extract-content > should norm
   data: '<div id="readability-page-1" class="page">
               <p>foo</p>
               <a href="https://example.com/foo/bar" target="_blank">bar</a>
+              <a href="https://example.com/a/b/foo/bar" target="_blank">bar2</a>
+              <a href="https://example.com/a/foo/bar" target="_blank">bar3</a>
               <video src="https://example.com/foo/bar">
               <audio srcset="https://example.com/foo/bar">
               <a href="https://example.com/" target="_blank">bar</a>

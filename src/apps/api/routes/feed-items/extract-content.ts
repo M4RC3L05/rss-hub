@@ -84,24 +84,24 @@ export const extractContent = (router: Hono) => {
         const srcset = (eleWithExternalResources.getAttribute("srcset") ?? "")
           .trim();
 
-        if (href.startsWith("/")) {
+        if (href.startsWith("/") || href.startsWith(".")) {
           eleWithExternalResources.setAttribute(
             "href",
-            new URL(href, url.origin).toString(),
+            new URL(href, url).toString(),
           );
         }
 
-        if (src.startsWith("/")) {
+        if (src.startsWith("/") || src.startsWith(".")) {
           eleWithExternalResources.setAttribute(
             "src",
-            new URL(src, url.origin).toString(),
+            new URL(src, url).toString(),
           );
         }
 
-        if (srcset.startsWith("/")) {
+        if (srcset.startsWith("/") || srcset.startsWith(".")) {
           eleWithExternalResources.setAttribute(
             "srcset",
-            new URL(srcset, url.origin).toString(),
+            new URL(srcset, url).toString(),
           );
         }
       }

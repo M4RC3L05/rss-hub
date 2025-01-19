@@ -212,7 +212,7 @@ describe("GET /api/feed-items/:id/:feedId/extract-content", () => {
 
   it("should normalize page content links urls", async (t) => {
     const feedItem = testFixtures.loadFeedItem(db, {
-      link: "https://example.com",
+      link: "https://example.com/a/b/c.html",
     });
 
     using fetchStub = stub(
@@ -227,6 +227,8 @@ describe("GET /api/feed-items/:id/:feedId/extract-content", () => {
             <body>
               <p>foo</p>
               <a href="/foo/bar">bar</a>
+              <a href="./foo/bar">bar2</a>
+              <a href="../foo/bar">bar3</a>
               <video src="/foo/bar" />
               <audio srcset="/foo/bar" />
               <a href="https://example.com">bar</a>

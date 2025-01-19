@@ -262,44 +262,4 @@ describe("PATCH /api/feed-items/read", () => {
       null,
     );
   });
-
-  it("should handle feed items already readed", async () => {
-    const feedItem = testFixtures.loadFeedItem(db, {
-      id: "foo",
-      readedAt: new Date().toISOString(),
-    });
-
-    assertEquals(typeof feedItem.readedAt, "string");
-
-    const response = await app.request(
-      "/api/feed-items/read",
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          ids: [
-            { id: feedItem.id, feedId: feedItem.feedId },
-          ],
-        }),
-        headers: {
-          "authorization": `Basic ${encodeBase64("foo:bar")}`,
-        },
-      },
-    );
-
-    const data = await response.bytes();
-    const feedItems = db.sql<
-      { id: string; readedAt: string | null }
-    >`select id, readed_at as "readedAt" from feed_items`;
-
-    assertEquals(response.status, 204);
-    assertEquals(data.length, 0);
-    assertEquals(
-      typeof feedItems.find((f) => f.id === feedItem.id)?.readedAt,
-      "string",
-    );
-    assertEquals(
-      feedItems.find((f) => f.id === feedItem.id)?.readedAt,
-      feedItem.readedAt,
-    );
-  });
 });

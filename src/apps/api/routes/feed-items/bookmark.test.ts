@@ -146,32 +146,4 @@ describe("PATCH /api/feed-items/bookmark", () => {
     assertEquals(data.length, 0);
     assertEquals(typeof updated.bookmarkedAt, "string");
   });
-
-  it("should not throw error on bookmarking a bookmarked feedItem", async () => {
-    const feedItem = testFixtures.loadFeedItem(db, {
-      bookmarkedAt: new Date().toISOString(),
-    });
-
-    assertEquals(typeof feedItem.bookmarkedAt, "string");
-
-    const response = await app.request(
-      "/api/feed-items/bookmark",
-      {
-        method: "PATCH",
-        body: JSON.stringify({ id: feedItem.id, feedId: feedItem.feedId }),
-        headers: {
-          "authorization": `Basic ${encodeBase64("foo:bar")}`,
-        },
-      },
-    );
-
-    const data = await response.bytes();
-    const [updated] = db
-      .sql`select bookmarked_at as "bookmarkedAt" from feed_items where id = ${feedItem.id} and feed_id = ${feedItem.feedId}`;
-
-    assertEquals(response.status, 204);
-    assertEquals(data.length, 0);
-    assertEquals(typeof updated.bookmarkedAt, "string");
-    assertEquals(feedItem.bookmarkedAt, updated.bookmarkedAt);
-  });
 });

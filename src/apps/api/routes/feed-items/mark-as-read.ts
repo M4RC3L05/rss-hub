@@ -35,7 +35,7 @@ export const markAsRead = (router: Hono) => {
             set
               readed_at = ${new Date().toISOString()}
           where
-            feed_id = ${data.feedId} and readed_at is null
+            feed_id = ${data.feedId}
           returning id
         `;
       }
@@ -47,7 +47,7 @@ export const markAsRead = (router: Hono) => {
               set
                 readed_at = ${new Date().toISOString()}
             where
-              id = ${id} and feed_id = ${feedId} and readed_at is null
+              id = ${id} and feed_id = ${feedId}
             returning id
           `[0];
         }

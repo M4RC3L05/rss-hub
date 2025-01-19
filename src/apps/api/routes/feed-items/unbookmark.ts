@@ -19,7 +19,6 @@ export const unbookmark = (router: Hono) => {
         where
             id = ${data.id}
         and feed_id = ${data.feedId}
-        and bookmarked_at is not null
       `;
 
       return c.body(null, 204);

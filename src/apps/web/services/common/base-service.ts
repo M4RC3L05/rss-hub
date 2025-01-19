@@ -26,7 +26,13 @@ export abstract class BaseService {
             encodeBase64(`${this.#auth.username}:${this.#auth.password}`)
           }`,
         },
+        // deno-lint-ignore ban-ts-comment
+        // @ts-ignore
+        // see: https://github.com/denoland/deno/issues/27150
         signal: init?.signal
+          // deno-lint-ignore ban-ts-comment
+          // @ts-ignore
+          // see: https://github.com/denoland/deno/issues/27150
           ? AbortSignal.any([init.signal, AbortSignal.timeout(10_000)])
           : AbortSignal.timeout(10_000),
       }),

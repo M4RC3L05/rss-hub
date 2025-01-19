@@ -12,36 +12,34 @@ const requestQuerySchema = vine
   });
 const requestQueryValidator = vine.compile(requestQuerySchema);
 
+const generateSqlConditions = (
+  data: Awaited<ReturnType<typeof requestQueryValidator["validate"]>>,
+) => {
+  const condParts = [];
+  const bindArgs: Record<string, unknown> = {};
+
+  if (data.bookmarked) condParts.push("bookmarked_at is not null");
+  if (data.feedId) {
+    condParts.push("feed_id = :feedId");
+    bindArgs.feedId = data.feedId;
+  }
+  if (data.unread) condParts.push("readed_at is null");
+
+  return { cond: condParts.join(" and "), bindArgs };
+};
+
 export const search = (router: Hono) => {
   router.get(
     "/",
     async (c) => {
       const query = await requestQueryValidator.validate(c.req.query());
 
-      const data = c.get("database").sql<
-        FeedItemsTable & { rowid: number; totalItems: number }
-      >`
+      const { cond, bindArgs } = generateSqlConditions(query);
+      const data = c.get("database").prepare(`
         with items as (
           select rowid, *
           from feed_items
-          where
-            iif(
-              ${query.bookmarked ?? -1} = -1,
-              true,
-              bookmarked_at is not null      
-            )
-            and
-            iif(
-              ${query.feedId ?? -1} = -1,
-              true,
-              feed_id = ${query.feedId ?? -1}
-            )
-            and
-            iif(
-              ${query.unread ?? -1} = -1,
-              true,
-              readed_at is null
-            )
+          ${cond.length > 0 ? `where ${cond}` : ""}
         )
         select
           i.id as id,
@@ -58,11 +56,13 @@ export const search = (router: Hono) => {
           ti."totalItems" as "totalItems"
         from 
           items as i,
-          (select count(id) as "totalItems" from items) as ti
+          (select count(*) as "totalItems" from items) as ti
         order by i.created_at desc, i.rowid desc
-        limit ${query.limit}
-        offset ${query.page * query.limit}
-      `;
+        limit :limit
+        offset :offset
+      `).all<
+        FeedItemsTable & { rowid: number; totalItems: number }
+      >({ ...bindArgs, limit: query.limit, offset: query.page * query.limit });
 
       return c.json({
         data,

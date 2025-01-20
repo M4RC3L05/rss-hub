@@ -11,9 +11,10 @@ export const search = (router: Hono) => {
           c.name as name,
           c.created_at as "createdAt",
           c.updated_at as "updatedAt",
-          count(f.id) as "feedCount"
+          count(fi.id) as "feedsUnreadCount"
         from categories c
-        left join feeds f on c.id = f.category_id
+        left join feeds f on f.category_id = c.id
+        left join feed_items fi on fi.feed_id = f.id and fi.readed_at is null
         group by c.id
         order by name collate nocase asc
       `;

@@ -13,21 +13,21 @@ export const search = (router: Hono) => {
           f.category_id as "categoryId",
           f.created_at as "createdAt",
           f.updated_at as "updatedAt",
-          count(
-            case
-              when fi.id is not null and fi.readed_at is null
-                then 1 
-            end
-          ) as "unreadCount",
-          count(
-            case
-              when fi.bookmarked_at is not null
-                then 1 
-            end
-          ) as "bookmarkedCount"
+          coalesce(fi_bookmarked.bookmarked_count, 0) as "bookmarkedCount",
+          coalesce(fi_unreaded.unread_count, 0) as "unreadCount"
         from feeds f
-        left join feed_items fi on f.id = fi.feed_id
-        group by f.id
+        left join (
+          select fi.feed_id, count(*) as bookmarked_count
+          from feed_items fi
+          where fi.bookmarked_at is not null
+          group by fi.feed_id
+        ) fi_bookmarked on fi_bookmarked.feed_id = f.id
+        left join (
+          select fi.feed_id, count(*) as unread_count
+          from feed_items fi
+          where fi.readed_at is null
+          group by fi.feed_id
+        ) fi_unreaded on fi_unreaded.feed_id = f.id
         order by f.name collate nocase asc
       `;
 

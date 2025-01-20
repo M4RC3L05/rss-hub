@@ -26,6 +26,7 @@ beforeAll(async () => {
 beforeEach(() => {
   db.exec("delete from categories");
   db.exec("delete from feeds");
+  db.exec("delete from feed_items");
 });
 
 afterAll(() => {
@@ -49,10 +50,19 @@ describe("GET /api/categories", () => {
     assertEquals(data, { data: [] });
   });
 
-  it("should get all categories ordered by name with its feed count", async () => {
+  it("should get all categories ordered by name with its feed count and feed unreaded count", async () => {
     const category = testFixtures.loadCategory(db, { name: "foo" });
     const categoryTwo = testFixtures.loadCategory(db, { name: "bar" });
+    const categoryThree = testFixtures.loadCategory(db, { name: "biz" });
+    const feedOne = testFixtures.loadFeed(db, { categoryId: categoryTwo.id });
     testFixtures.loadFeed(db, { categoryId: categoryTwo.id });
+    testFixtures.loadFeed(db, { categoryId: categoryThree.id });
+
+    testFixtures.loadFeedItem(db, {
+      feedId: feedOne.id,
+      readedAt: new Date().toISOString(),
+    });
+    testFixtures.loadFeedItem(db, { feedId: feedOne.id, readedAt: null });
 
     const response = await app.request(
       "/api/categories",
@@ -67,7 +77,11 @@ describe("GET /api/categories", () => {
 
     assertEquals(response.status, 200);
     assertEquals(data, {
-      data: [{ ...categoryTwo, feedCount: 1 }, { ...category, feedCount: 0 }],
+      data: [
+        { ...categoryTwo, feedsUnreadCount: 1 },
+        { ...categoryThree, feedsUnreadCount: 0 },
+        { ...category, feedsUnreadCount: 0 },
+      ],
     });
   });
 });

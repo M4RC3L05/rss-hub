@@ -118,7 +118,7 @@ describe("POST /api/feeds", () => {
     });
   });
 
-  it.only("should create a new feed", async () => {
+  it("should create a new feed", async () => {
     const category = testFixtures.loadCategory(db);
     const feedService = {
       syncFeed: () =>

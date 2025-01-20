@@ -36,21 +36,26 @@ export const markAsRead = (router: Hono) => {
               readed_at = ${new Date().toISOString()}
           where
             feed_id = ${data.feedId}
+            and readed_at is null
           returning id
         `;
       }
 
       if ("ids" in data) {
-        for (const { id, feedId } of data.ids) {
-          c.get("database").sql<{ id: string }>`
-            update feed_items
-              set
-                readed_at = ${new Date().toISOString()}
-            where
-              id = ${id} and feed_id = ${feedId}
-            returning id
-          `[0];
-        }
+        const idsSql = data.ids.map(() => `(id = ? and feed_id = ?)`)
+          .join(" or ");
+
+        c.get("database").prepare(`
+          update feed_items
+            set
+              readed_at = ?
+          where ${idsSql}
+            and readed_at is null
+          returning id
+        `).run(
+          new Date().toISOString(),
+          ...data.ids.flatMap((x) => [x.id, x.feedId]),
+        );
       }
 
       return c.body(null, 204);

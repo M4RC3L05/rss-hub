@@ -19,6 +19,7 @@ export const bookmark = (router: Hono) => {
         where
             id = ${data.id}
         and feed_id = ${data.feedId}
+        and bookmarked_at is null
         returning id
       `;
 

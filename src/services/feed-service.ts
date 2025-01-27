@@ -2,7 +2,6 @@ import { resolve as feedResolver } from "@m4rc3l05/feed-normalizer";
 import type { CustomDatabase, FeedsTable } from "#src/database/mod.ts";
 import { formatError, makeLogger } from "#src/common/logger/mod.ts";
 import { DOMParser } from "@b-fuze/deno-dom/native";
-import { dirname, join, normalize } from "@std/path";
 import { xmlUtils } from "#src/common/utils/mod.ts";
 import { deadline, retry } from "@std/async";
 import { encodeBase64 } from "@std/encoding";
@@ -10,29 +9,19 @@ import { pick } from "@std/collections";
 
 const potencialFeedLinkFragments = [
   "/rss",
+  "/rss/",
   "/rss.xml",
   "/feed",
+  "/feed/",
   "/feed.xml",
   "/atom",
+  "/atom/",
   "/atom.xml",
   "/json",
+  "/json/",
 ];
 
 const log = makeLogger("feed-service");
-
-const normalizeLink = (normalizedURL: URL, link: string) => {
-  const domain = normalizedURL.origin;
-  const normalizedPath = normalize(normalizedURL.href.replace(domain, ""));
-  const normalizedLink = link.startsWith("http") ? link : normalize(link);
-
-  return normalizedLink.startsWith("http") ? normalizedLink : new URL(
-    normalizedLink.startsWith("/") ? normalizedLink : join(
-      dirname(normalizedPath),
-      normalizedLink,
-    ),
-    domain,
-  ).toString();
-};
 
 class FeedService {
   #db;
@@ -96,11 +85,22 @@ class FeedService {
       'link[type="application/rss+xml"], link[type="application/rss"], link[type="application/atom+xml"], link[type="application/atom"], link[type="application/feed+json"], link[type="application/json"]',
     ))
       .map((ele) => ele.getAttribute("href")?.trim())
-      .filter((link) => typeof link === "string")
-      .map((frag) => normalizeLink(normalizedURL, frag))
+      .filter((link) => typeof link === "string" && link.length > 0)
+      .map((frag) => URL.parse(frag as string, normalizedURL)?.toString())
       .filter((url) => typeof url === "string");
 
     if (feedLinks.length <= 0) {
+      feedLinks.push(
+        ...Array.from(parsedPageDom.body.querySelectorAll("a"))
+          .map((ele) => ele.getAttribute("href")?.trim())
+          .filter((link) => typeof link === "string" && link.length > 0)
+          .map((frag) => URL.parse(frag as string, normalizedURL)?.toString())
+          .filter((url) => typeof url === "string")
+          .filter((url) =>
+            potencialFeedLinkFragments.some((end) => url.endsWith(end))
+          ),
+      );
+
       const siteMapResponse = await fetch(
         new URL("/sitemap.xml", normalizedURL.origin),
         {
@@ -145,7 +145,8 @@ class FeedService {
           potencialFeedLinkFragments.some((frag) => item.loc!.includes(frag))
         )
           .filter((item) => typeof item.loc === "string")
-          .map((item) => normalizeLink(normalizedURL, item.loc!))
+          .map((item) => URL.parse(item.loc!, normalizedURL.origin))
+          .map((url) => url?.toString().trim())
           .filter((link) => typeof link === "string"),
       );
     }

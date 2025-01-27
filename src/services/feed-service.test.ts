@@ -149,6 +149,54 @@ describe("FeedService", () => {
       assertEquals(links, []);
     });
 
+    it("should extract feed links from link html body", async () => {
+      const feedService = new FeedService(db);
+
+      using fetchStub = stub(
+        globalThis,
+        "fetch",
+        (input) => {
+          if (input.toString().includes("sitemap.xml")) {
+            return Promise.resolve(
+              new Response("", { status: 200 }),
+            );
+          }
+
+          return Promise.resolve(
+            new Response(
+              `
+              <body>
+                <p>oioio</p>
+                <a href="https://example.com/foo">link</a>
+                <a href="https://example.com/foo/rss">link</a>
+                <a href="https://example.com/bar/rss/">link</a>
+                <a href="./feed/">link</a>
+                <a href="/bar/feed.xml">link</a>
+                <a href="json">link</a>
+                <a href="../feed.xml">link</a>
+              </body
+            `,
+              { status: 200 },
+            ),
+          );
+        },
+      );
+
+      const links = await feedService.getFeedLinks(
+        "https://example.com/foo/bar",
+      );
+
+      assertSpyCalls(fetchStub, 2);
+      assertEquals(links, [
+        "https://example.com/foo/rss",
+        "https://example.com/bar/rss/",
+        "https://example.com/foo/feed/",
+        "https://example.com/bar/feed.xml",
+        "https://example.com/foo/json",
+        "https://example.com/feed.xml",
+      ]);
+    });
+
     it("should extract feed links from sitemap urlset if no link tags", async () => {
       const feedService = new FeedService(db);
 
@@ -193,10 +241,10 @@ describe("FeedService", () => {
         "https://example.com/foo/bar/rss",
         "https://foo.com/foo/bar/rss.xml",
         "https://example.com/foo/bar/feed",
-        "https://example.com/foo/foo/bar/feed.xml",
+        "https://example.com/foo/bar/feed.xml",
         "https://example.com/atom",
-        "https://example.com/foo/baz/atom.xml",
-        "https://example.com/foo/buz/json",
+        "https://example.com/baz/atom.xml",
+        "https://example.com/buz/json",
       ]);
     });
 
@@ -245,10 +293,10 @@ describe("FeedService", () => {
         "https://example.com/foo/bar/rss",
         "https://foo.com/foo/bar/rss.xml",
         "https://example.com/foo/bar/feed",
-        "https://example.com/foo/foo/bar/feed.xml",
+        "https://example.com/foo/bar/feed.xml",
         "https://example.com/atom",
-        "https://example.com/foo/baz/atom.xml",
-        "https://example.com/foo/buz/json",
+        "https://example.com/baz/atom.xml",
+        "https://example.com/buz/json",
       ]);
     });
   });

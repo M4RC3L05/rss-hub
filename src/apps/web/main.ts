@@ -10,6 +10,11 @@ import {
   OpmlService,
 } from "#src/apps/web/services/api/mod.ts";
 
+// Add css dep to node_modules
+// deno-lint-ignore ban-ts-comment
+// @ts-ignore
+await import("simpledotcss").catch(() => {});
+
 const log = makeLogger("web");
 const { host, port } = config.get("apps.web");
 const servicesConfig = config.get("apps.web.services");

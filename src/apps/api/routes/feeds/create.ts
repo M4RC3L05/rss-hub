@@ -26,7 +26,7 @@ export const create = (router: Hono) => {
           ${new URL(data.url).toString()},
           ${data.categoryId}
         )
-        returning 
+        returning
           id, name, url,
           category_id as "categoryId",
           created_at as "createdAt",

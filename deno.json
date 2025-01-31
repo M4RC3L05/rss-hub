@@ -16,11 +16,11 @@
       "command": "deno run -A --cached-only src/apps/jobs/feeds-synchronizer/main.ts"
     },
     "dev:pretty-logs": {
-      "description": "Interact with pino-pretty",
+      "description": "Pretty logs with pino-pretty",
       "command": "pino-pretty -m message --levelKey level --timestampKey datetime -k \"data.error,data.err\" -c -C"
     },
     "dev:run-migrations": {
-      "description": "Interact with dbmate",
+      "description": "Run migrations",
       "command": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations -s ./src/database/schema.sql up"
     },
     "cmd:dbmate": {

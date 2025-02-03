@@ -7,7 +7,6 @@
     "jsr:@denosaurs/plug@1.0.3": "1.0.3",
     "jsr:@hono/hono@4.6.20": "4.6.20",
     "jsr:@m4rc3l05/feed-normalizer@0.1.8": "0.1.8",
-    "jsr:@m4rc3l05/process-lifecycle@1.0.0": "1.0.0",
     "jsr:@std/assert@0.217": "0.217.0",
     "jsr:@std/assert@0.221": "0.221.0",
     "jsr:@std/assert@1.0.10": "1.0.10",
@@ -95,9 +94,6 @@
         "npm:fast-xml-parser@4.3.6",
         "npm:radash"
       ]
-    },
-    "@m4rc3l05/process-lifecycle@1.0.0": {
-      "integrity": "652ffcc8d8c5594ae4cdbc58d244a59081e75ac302b4a06723c17fcf5cd268ed"
     },
     "@std/assert@0.213.1": {
       "integrity": "24c28178b30c8e0782c18e8e94ea72b16282207569cdd10ffb9d1d26f2edebfe"
@@ -434,7 +430,6 @@
       "jsr:@db/sqlite@0.12.0",
       "jsr:@hono/hono@4.6.20",
       "jsr:@m4rc3l05/feed-normalizer@0.1.8",
-      "jsr:@m4rc3l05/process-lifecycle@1.0.0",
       "jsr:@std/assert@1.0.11",
       "jsr:@std/async@1.0.10",
       "jsr:@std/cache@0.1.3",

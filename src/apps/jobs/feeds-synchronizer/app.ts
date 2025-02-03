@@ -9,6 +9,10 @@ const runner = async ({
   feedService,
   db,
 }: { signal?: AbortSignal; db: CustomDatabase; feedService: FeedService }) => {
+  if (signal?.aborted) {
+    return;
+  }
+
   const feeds = db.sql<FeedsTable>`select * from feeds`;
 
   log.info("Synching begin");

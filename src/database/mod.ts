@@ -1,7 +1,10 @@
 import { Database, type Statement } from "@db/sqlite";
 import config from "config";
+import { makeLogger } from "#src/common/logger/mod.ts";
 
 export * from "./types/mod.ts";
+
+const log = makeLogger("database");
 
 export class CustomDatabase extends Database {
   #cache = new Map<string, Statement>();
@@ -24,6 +27,17 @@ export class CustomDatabase extends Database {
     super.close();
 
     this.#cache.clear();
+  }
+
+  [Symbol.dispose]() {
+    log.info("Closing database");
+
+    this.exec("pragma analysis_limit = 400");
+    this.exec("pragma optimize");
+
+    this.close();
+
+    log.info("Database closed successfully");
   }
 }
 

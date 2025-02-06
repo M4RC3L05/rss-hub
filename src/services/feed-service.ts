@@ -1,6 +1,7 @@
 import { resolve as feedResolver } from "@m4rc3l05/feed-normalizer";
+import pineSerializer from "pino-std-serializers";
 import type { CustomDatabase, FeedsTable } from "#src/database/mod.ts";
-import { formatError, makeLogger } from "#src/common/logger/mod.ts";
+import { makeLogger } from "#src/common/logger/mod.ts";
 import { DOMParser } from "@b-fuze/deno-dom/native";
 import { xmlUtils } from "#src/common/utils/mod.ts";
 import { deadline, retry } from "@std/async";
@@ -190,7 +191,7 @@ class FeedService {
       successCount,
       faildCount,
       failedReasons: failedReasons.map((reason) =>
-        reason instanceof Error ? formatError(reason) : reason
+        reason instanceof Error ? pineSerializer.errWithCause(reason) : reason
       ),
     };
   }

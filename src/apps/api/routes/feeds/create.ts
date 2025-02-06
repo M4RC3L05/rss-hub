@@ -1,6 +1,7 @@
 import type { Hono } from "@hono/hono";
 import vine from "@vinejs/vine";
-import { formatError, makeLogger } from "#src/common/logger/mod.ts";
+import pineSerializer from "pino-std-serializers";
+import { makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedsTable } from "#src/database/types/mod.ts";
 
 const requestBodySchema = vine
@@ -42,7 +43,9 @@ export const create = (router: Hono) => {
         .then(({ faildCount, failedReasons, successCount, totalCount }) => {
           log.info(`Synching feed ${feed.url}`, {
             failedReasons: failedReasons.map((reason) =>
-              reason instanceof Error ? formatError(reason) : reason
+              reason instanceof Error
+                ? pineSerializer.errWithCause(reason)
+                : reason
             ),
             faildCount,
             successCount,

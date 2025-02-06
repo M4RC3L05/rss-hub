@@ -1,4 +1,5 @@
-import { formatError, makeLogger } from "#src/common/logger/mod.ts";
+import pineSerializer from "pino-std-serializers";
+import { makeLogger } from "#src/common/logger/mod.ts";
 import type { CustomDatabase, FeedsTable } from "#src/database/mod.ts";
 import type { FeedService } from "#src/services/mod.ts";
 
@@ -34,7 +35,9 @@ const runner = async ({
         `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,
         {
           failedReasons: failedReasons.map((reason: unknown) =>
-            reason instanceof Error ? formatError(reason) : reason
+            reason instanceof Error
+              ? pineSerializer.errWithCause(reason)
+              : reason
           ),
           faildCount,
           successCount,

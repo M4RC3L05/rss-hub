@@ -16,11 +16,11 @@
       "command": "deno run -A --cached-only src/apps/jobs/feeds-synchronizer/main.ts"
     },
     "dev:pretty-logs": {
-      "description": "Pretty logs with pino-pretty",
-      "command": "pino-pretty -m message --levelKey level --timestampKey datetime -k \"data.error,data.err\" -c -C"
+      "description": "Prettify logs",
+      "command": "pino-pretty -m message --levelKey level --timestampKey datetime -k \"data.error,data.reason\" -c -C"
     },
     "dev:run-migrations": {
-      "description": "Run migrations",
+      "description": "Run db migrations",
       "command": "dbmate -u 'sqlite:./data/app.db' -d ./src/database/migrations -s ./src/database/schema.sql up"
     },
     "cmd:dbmate": {
@@ -92,6 +92,7 @@
     "dbmate": "npm:dbmate@2.25.0",
     "fast-xml-parser": "npm:fast-xml-parser@4.5.1",
     "pino-pretty": "npm:pino-pretty@13.0.0",
+    "pino-std-serializers": "npm:pino-std-serializers@^7.0.0",
     "simpledotcss": "npm:simpledotcss@2.3.3"
   }
 }

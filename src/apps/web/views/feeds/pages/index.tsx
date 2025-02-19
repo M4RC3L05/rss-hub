@@ -116,13 +116,14 @@ export const FeedsIndexPage: FC<FeedsIndexPageProps> = (
                   method="dialog"
                   style="display: inline; margin-right: 8px"
                 >
-                  <button>No</button>
+                  <button type="submit">No</button>
                 </form>
               </dialog>
 
               <button
                 style="display: inline; margin-right: 8px"
                 onclick={`getElementById("dialog-${category.id}").show()`}
+                type="button"
               >
                 Delete ⨯?
               </button>

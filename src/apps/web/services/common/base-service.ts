@@ -13,7 +13,7 @@ export abstract class BaseService {
   request(
     { path, init, sendResponse }: {
       path: string;
-      init?: Parameters<typeof fetch>[1];
+      init?: RequestInit;
       sendResponse?: boolean;
     },
   ) {

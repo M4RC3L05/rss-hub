@@ -72,7 +72,7 @@ export const BookmarkedFeedItemsPage: FC<BookmarkedFeedItemsPageProps> = ({
                       method="dialog"
                       style="display: inline; margin-right: 8px"
                     >
-                      <button>⨯</button>
+                      <button type="submit">⨯</button>
                     </form>
 
                     <img src={feedItem.img} style="width: 100%; height: auto" />

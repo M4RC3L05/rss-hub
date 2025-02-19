@@ -22,7 +22,7 @@ export const FeedLinksPage: FC<FeedLinksPageProps> = ({ links, url }) => (
             {links.length <= 0 ? <p>No links found for "{url}"</p> : (
               <>
                 <h3>Links found for "{url}"</h3>
-                {links.map((link) => <p>{link}</p>)}
+                {links.map((link) => <p key={link}>{link}</p>)}
               </>
             )}
           </>

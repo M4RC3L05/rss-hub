@@ -44,7 +44,14 @@ export const FeedItemsIndexPage: FC<FeedItemsIndexPageProps> = ({
         <input type="hidden" name="feedId" value={feed.id} />
         <input type="hidden" name="state" value="read" />
         {feedItems.map(
-          (feedItem) => <input type="hidden" name="id[]" value={feedItem.id} />,
+          (feedItem) => (
+            <input
+              key={feedItem.id}
+              type="hidden"
+              name="id[]"
+              value={feedItem.id}
+            />
+          ),
         )}
         {feedItems.length <= 0
           ? <input type="hidden" name="id[]" value="" />
@@ -88,11 +95,12 @@ export const FeedItemsIndexPage: FC<FeedItemsIndexPageProps> = ({
         </form>
 
         <form method="dialog" style="display: inline; margin-right: 8px">
-          <button>No</button>
+          <button type="submit">No</button>
         </form>
       </dialog>
 
       <button
+        type="button"
         style="display: inline; margin-right: 8px"
         onclick={`getElementById("dialog-${feed.id}").show()`}
       >
@@ -165,7 +173,7 @@ export const FeedItemsIndexPage: FC<FeedItemsIndexPageProps> = ({
                       method="dialog"
                       style="display: inline; margin-right: 8px"
                     >
-                      <button>⨯</button>
+                      <button type="submit">⨯</button>
                     </form>
 
                     <img src={feedItem.img} style="width: 100%; height: auto" />

@@ -86,7 +86,7 @@ export const FeedItemsShowPage: FC<FeedItemsShowPageProps> = (
                       enclosure.url.endsWith(end)
                     )
                 ) {
-                  return <img src={enclosure.url} />;
+                  return <img key={enclosure.url} src={enclosure.url} />;
                 }
 
                 if (enclosure.type?.includes("video")) {

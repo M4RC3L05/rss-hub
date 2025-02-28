@@ -51,7 +51,7 @@ export const gracefulShutdown = () => {
   };
 
   globalThis.onunload = () => {
-    log.info(`Existing process with status "${Deno.exitCode}"`);
+    log.info(`Existing process with status "${exitCode}"`);
 
     // Under deno watch if not called it will hang.
     Deno.exit(exitCode);

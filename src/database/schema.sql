@@ -74,10 +74,10 @@ WHERE
 
 END;
 CREATE INDEX idx_feed_items_feed_id ON feed_items (feed_id);
-CREATE INDEX idx_feed_items_readed ON feed_items(readed_at)
+CREATE INDEX idx_feed_items_readed_feed_id ON feed_items(readed_at, feed_id)
 WHERE
   readed_at IS NULL;
-CREATE INDEX idx_feed_items_not_bookmarked ON feed_items(bookmarked_at)
+CREATE INDEX idx_feed_items_not_bookmarked_feed_id ON feed_items(feed_id, bookmarked_at)
 WHERE
   bookmarked_at IS NOT NULL;
 -- Dbmate schema migrations
@@ -91,4 +91,5 @@ INSERT INTO "schema_migrations" (version) VALUES
   ('20240108212136'),
   ('20240526105311'),
   ('20240609000229'),
-  ('20250119150455');
+  ('20250119150455'),
+  ('20250321214755');

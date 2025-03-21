@@ -54,7 +54,7 @@ export const search = (router: Hono) => {
           i.created_at as "createdAt",
           i.updated_at as "updatedAt",
           ti."totalItems" as "totalItems"
-        from 
+        from
           items as i,
           (select count(*) as "totalItems" from items) as ti
         order by i.created_at desc, i.rowid desc

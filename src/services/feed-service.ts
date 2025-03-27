@@ -2,11 +2,11 @@ import { resolve as feedResolver } from "@m4rc3l05/feed-normalizer";
 import pineSerializer from "pino-std-serializers";
 import type { CustomDatabase, FeedsTable } from "#src/database/mod.ts";
 import { makeLogger } from "#src/common/logger/mod.ts";
-import { DOMParser } from "@b-fuze/deno-dom/native";
 import { xmlUtils } from "#src/common/utils/mod.ts";
 import { deadline, retry } from "@std/async";
 import { encodeBase64 } from "@std/encoding";
 import { pick } from "@std/collections";
+import { JSDOM } from "jsdom";
 
 const potencialFeedLinkFragments = [
   "/rss",
@@ -26,11 +26,9 @@ const log = makeLogger("feed-service");
 
 class FeedService {
   #db;
-  #domParser;
 
   constructor(db: CustomDatabase) {
     this.#db = db;
-    this.#domParser = new DOMParser();
   }
 
   #fetch(
@@ -77,10 +75,7 @@ class FeedService {
     }
 
     const pageText = await pageResponse.text();
-    const parsedPageDom = this.#domParser.parseFromString(
-      pageText,
-      "text/html",
-    );
+    const parsedPageDom = new JSDOM(pageText).window.document;
 
     const feedLinks = Array.from(parsedPageDom.head.querySelectorAll(
       'link[type="application/rss+xml"], link[type="application/rss"], link[type="application/atom+xml"], link[type="application/atom"], link[type="application/feed+json"], link[type="application/json"]',

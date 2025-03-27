@@ -294,7 +294,7 @@ describe("GET /api/feed-items/:id/:feedId/extract-content", () => {
     assertEquals(data, { data: "" });
   });
 
-  it("should handle encoded uri compoennt feed item id", async () => {
+  it("should handle encoded uri component feed item id", async () => {
     const feedItem = testFixtures.loadFeedItem(db, {
       link: "https://example.com",
       id: "https://example.com",

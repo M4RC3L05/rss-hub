@@ -1,7 +1,8 @@
 import { Readability } from "@mozilla/readability";
+import { JSDOM } from "jsdom";
+import DOMPurify from "dompurify";
 import type { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
-import { DOMParser, type Element } from "@b-fuze/deno-dom/native";
 import vine from "@vinejs/vine";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";
 
@@ -60,7 +61,9 @@ export const extractContent = (router: Hono) => {
       const url = new URL(feedItem.link);
       const pageContent = await pageContentResponse.text();
 
-      const dom = new DOMParser().parseFromString(pageContent, "text/html");
+      const dom =
+        new JSDOM(DOMPurify(new JSDOM("").window).sanitize(pageContent)).window
+          .document;
 
       // deno-lint-ignore no-explicit-any
       for (const element of dom.querySelectorAll("a") as any as Element[]) {

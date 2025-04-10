@@ -13,9 +13,9 @@ RUN deno install --unstable-npm-lazy-caching --entrypoint src/apps/api/main.ts s
 RUN deno eval "import '@db/sqlite'"
 RUN deno eval "import '@b-fuze/deno-dom/native'"
 
-RUN BUILD_DRY_RUN=true DATABASE_PATH=":memory:" timeout 10s deno run -A --cached-only --unstable-npm-lazy-caching src/apps/api/main.ts || true
-RUN BUILD_DRY_RUN=true DATABASE_PATH=":memory:" timeout 10s deno run -A --cached-only --unstable-npm-lazy-caching src/apps/web/main.ts || true
-RUN BUILD_DRY_RUN=true DATABASE_PATH=":memory:" timeout 10s deno run -A --cached-only --unstable-npm-lazy-caching src/apps/jobs/feeds-synchronizer/main.ts || true
+RUN BUILD_DRY_RUN=true DATABASE_PATH=":memory:" timeout 30s deno run -A --cached-only --unstable-npm-lazy-caching src/apps/api/main.ts || true
+RUN BUILD_DRY_RUN=true DATABASE_PATH=":memory:" timeout 30s deno run -A --cached-only --unstable-npm-lazy-caching src/apps/web/main.ts || true
+RUN BUILD_DRY_RUN=true DATABASE_PATH=":memory:" timeout 30s deno run -A --cached-only --unstable-npm-lazy-caching src/apps/jobs/feeds-synchronizer/main.ts || true
 
 RUN mkdir /app/data
 

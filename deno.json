@@ -29,7 +29,7 @@
     },
     "pre:test": {
       "description": "Command to run before runing tests",
-      "command": "deno eval \"import '@db/sqlite';import '@b-fuze/deno-dom/native';\""
+      "command": "deno eval \"import '@db/sqlite';\""
     },
     "test": {
       "description": "Run tests",

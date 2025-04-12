@@ -2,8 +2,7 @@ export const snapshot = {};
 
 snapshot[`global > GET /api/feed-items/:id/:feedId/extract-content > should normalize page content links to open in new tab 1`] = `
 {
-  data: '<div id="readability-page-1" class="page">
-              <p>foo</p>
+  data: '<div id="readability-page-1" class="page"><p>foo</p>
               <a href="" target="_blank">bar</a>
               <a href="https://example.com/foo/bar" target="_blank">bar</a>
               <a href="https://example.com/" target="_blank">bar</a>
@@ -16,8 +15,7 @@ snapshot[`global > GET /api/feed-items/:id/:feedId/extract-content > should norm
 
 snapshot[`global > GET /api/feed-items/:id/:feedId/extract-content > should normalize page content links urls 1`] = `
 {
-  data: '<div id="readability-page-1" class="page">
-              <p>foo</p>
+  data: '<div id="readability-page-1" class="page"><p>foo</p>
               <a href="https://example.com/foo/bar" target="_blank">bar</a>
               <a href="https://example.com/a/b/foo/bar" target="_blank">bar2</a>
               <a href="https://example.com/a/foo/bar" target="_blank">bar3</a>

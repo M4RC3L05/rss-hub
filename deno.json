@@ -73,7 +73,6 @@
   "nodeModulesDir": "auto",
   "imports": {
     "#src/": "./src/",
-    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@0.1.49",
     "@db/sqlite": "jsr:@db/sqlite@0.12.0",
     "@hono/hono": "jsr:@hono/hono@4.7.5",
     "@m4rc3l05/feed-normalizer": "jsr:@m4rc3l05/feed-normalizer@0.1.8",
@@ -87,12 +86,15 @@
     "@std/log": "jsr:@std/log@0.224.14",
     "@std/testing": "jsr:@std/testing@1.0.9",
     "@std/text": "jsr:@std/text@1.0.11",
+    "@types/jsdom": "npm:@types/jsdom@^21.1.7",
     "@vinejs/vine": "npm:@vinejs/vine@3.0.1",
     "config": "npm:config@3.3.12",
     "dbmate": "npm:dbmate@2.26.0",
+    "dompurify": "npm:dompurify@^3.2.4",
     "fast-xml-parser": "npm:fast-xml-parser@5.0.9",
+    "jsdom": "npm:jsdom@^26.0.0",
     "pino-pretty": "npm:pino-pretty@13.0.0",
-    "pino-std-serializers": "npm:pino-std-serializers@^7.0.0",
+    "pino-std-serializers": "npm:pino-std-serializers@7.0.0",
     "simpledotcss": "npm:simpledotcss@2.3.4"
   }
 }

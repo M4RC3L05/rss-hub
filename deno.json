@@ -5,15 +5,15 @@
   "tasks": {
     "api": {
       "description": "Run api app",
-      "command": "deno run -A --cached-only --watch src/apps/api/main.ts"
+      "command": "deno run -A --cached-only src/apps/api/main.ts"
     },
     "web": {
       "description": "Run web app",
-      "command": "deno run -A --cached-only --watch src/apps/web/main.ts"
+      "command": "deno run -A --cached-only src/apps/web/main.ts"
     },
     "jobs:feeds-synchronizer": {
       "description": "Run feeds synchronizer job",
-      "command": "deno run -A --cached-only --watch src/apps/jobs/feeds-synchronizer/main.ts"
+      "command": "deno run -A --cached-only src/apps/jobs/feeds-synchronizer/main.ts"
     },
     "dev:pretty-logs": {
       "description": "Prettify logs",

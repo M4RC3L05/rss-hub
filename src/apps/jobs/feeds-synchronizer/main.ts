@@ -8,7 +8,8 @@ const log = makeLogger("feeds-synchronizer");
 
 const { done, signal: shutdownSignal } = gracefulShutdown();
 
-using database = makeDatabase();
+await using ads = new AsyncDisposableStack();
+const database = ads.use(makeDatabase());
 
 try {
   log.info("Running feeds-synchronizer");

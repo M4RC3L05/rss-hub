@@ -3,7 +3,7 @@ import config from "config";
 import { makeLogger } from "#src/common/logger/mod.ts";
 
 const log = makeLogger("server");
-const { host, port } = config.get("apps.api");
+const { host, port } = config.get<{ host: string; port: number }>("apps.api");
 
 class Server {
   #server: Deno.HttpServer;

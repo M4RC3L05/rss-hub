@@ -25,7 +25,9 @@ export const makeApp = (deps: Partial<ContextVariableMap>) => {
   app.use(
     "*",
     basicAuth({
-      ...config.get<{ name: string; pass: string }>("apps.api.basicAuth"),
+      ...config.get<{ username: string; password: string }>(
+        "apps.api.basicAuth",
+      ),
     }),
   );
 

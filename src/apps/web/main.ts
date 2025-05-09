@@ -14,7 +14,9 @@ import { makeServer } from "#src/apps/web/server.ts";
 // @ts-ignore
 await import("simpledotcss").catch(() => {});
 
-const servicesConfig = config.get("apps.web.services");
+const servicesConfig = config.get<
+  { api: { url: string; basicAuth: { username: string; password: string } } }
+>("apps.web.services");
 
 const { promise: shutdownPromise, signal: shutdownSignal } = gracefulShutdown();
 

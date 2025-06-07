@@ -1,4 +1,6 @@
 import type { FC } from "@hono/hono/jsx";
+import { JSDOM } from "jsdom";
+import DOMPurify from "dompurify";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";
 
 type FeedItemsShowPageProps = {
@@ -112,7 +114,13 @@ export const FeedItemsShowPage: FC<FeedItemsShowPageProps> = (
           </>
         )
         : undefined}
-      <div dangerouslySetInnerHTML={{ __html: feedItem.content }} />
+      <div
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify(new JSDOM("").window).sanitize(feedItem.content, {
+            USE_PROFILES: { html: true, svg: true },
+          }),
+        }}
+      />
     </main>
   </>
 );

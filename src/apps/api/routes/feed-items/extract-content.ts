@@ -61,9 +61,12 @@ export const extractContent = (router: Hono) => {
       const url = new URL(feedItem.link);
       const pageContent = await pageContentResponse.text();
 
-      const dom =
-        new JSDOM(DOMPurify(new JSDOM("").window).sanitize(pageContent)).window
-          .document;
+      const dom = new JSDOM(
+        DOMPurify(new JSDOM("").window).sanitize(pageContent, {
+          USE_PROFILES: { html: true, svg: true },
+        }),
+      ).window
+        .document;
 
       // deno-lint-ignore no-explicit-any
       for (const element of dom.querySelectorAll("a") as any as Element[]) {

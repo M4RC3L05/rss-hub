@@ -4,7 +4,7 @@
     "jsr:@db/sqlite@0.12.0": "0.12.0",
     "jsr:@denosaurs/plug@1": "1.0.6",
     "jsr:@hono/hono@4.7.11": "4.7.11",
-    "jsr:@m4rc3l05/feed-normalizer@0.2.0": "0.2.0",
+    "jsr:@m4rc3l05/feed-normalizer@0.2.1": "0.2.1",
     "jsr:@std/assert@0.217": "0.217.0",
     "jsr:@std/assert@0.221": "0.221.0",
     "jsr:@std/assert@1.0.13": "1.0.13",
@@ -73,8 +73,8 @@
     "@hono/hono@4.7.11": {
       "integrity": "52b9395e4f2448fbaf82a6bd7925d15e59f4055037e74d6c2f657f3618b11193"
     },
-    "@m4rc3l05/feed-normalizer@0.2.0": {
-      "integrity": "1fb50dbbec1346da7c10253181e91e6a0d5a4587c70131cf820200018c324bb1",
+    "@m4rc3l05/feed-normalizer@0.2.1": {
+      "integrity": "ae69a4d49b35b85fc3807b68495a9252398b60a48334a209d62fb02c211d85f6",
       "dependencies": [
         "jsr:@std/html",
         "npm:fast-xml-parser@5.2.4"
@@ -691,7 +691,7 @@
     "dependencies": [
       "jsr:@db/sqlite@0.12.0",
       "jsr:@hono/hono@4.7.11",
-      "jsr:@m4rc3l05/feed-normalizer@0.2.0",
+      "jsr:@m4rc3l05/feed-normalizer@0.2.1",
       "jsr:@std/assert@1.0.13",
       "jsr:@std/async@1.0.13",
       "jsr:@std/cache@0.2.0",

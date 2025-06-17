@@ -34,6 +34,10 @@ export const create = (router: Hono) => {
           updated_at as "updatedAt"
       `;
 
+      if (!feed) {
+        throw new Error("Unable to create feed");
+      }
+
       c.get("feedService")
         .syncFeed(feed, {
           signal: AbortSignal.any([

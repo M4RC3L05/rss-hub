@@ -162,8 +162,8 @@ describe("PATCH /api/feeds/:id", () => {
     assertEquals(data, {
       data: { ...feed, name: "foo!", categoryId: category2.id },
     });
-    assertEquals(updated.name, "foo!");
-    assertEquals(updated.categoryId, category2.id);
-    assertNotEquals(updated.updatedAt, feed.updatedAt);
+    assertEquals(updated?.name, "foo!");
+    assertEquals(updated?.categoryId, category2.id);
+    assertNotEquals(updated?.updatedAt, feed.updatedAt);
   });
 });

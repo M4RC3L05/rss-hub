@@ -133,10 +133,10 @@ describe("DELETE /api/categories/:id", () => {
     assertEquals(response.status, 204);
     assertEquals(data.length, 0);
     assertEquals(categories.length, 1);
-    assertEquals(categories[0].id, categoryTwo.id);
+    assertEquals(categories[0]?.id, categoryTwo.id);
     assertEquals(feeds.length, 1);
-    assertEquals(feeds[0].id, feedTwo.id);
+    assertEquals(feeds[0]?.id, feedTwo.id);
     assertEquals(feedItems.length, 1);
-    assertEquals(feedItems[0].id, feedItemTwo.id);
+    assertEquals(feedItems[0]?.id, feedItemTwo.id);
   });
 });

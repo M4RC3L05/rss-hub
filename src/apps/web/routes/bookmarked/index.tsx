@@ -11,8 +11,8 @@ export const index = (router: Hono) => {
         signal: c.req.raw.signal,
         filters: { bookmarked: true },
         pagination: {
-          limit: limit ? Number(limit) : undefined,
-          page: page ? Number(page) : undefined,
+          limit: limit ? Number(limit) : 10,
+          page: page ? Number(page) : 0,
         },
       },
     );

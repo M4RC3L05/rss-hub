@@ -146,7 +146,7 @@ describe("PATCH /api/feed-items/unbookmark", () => {
 
     assertEquals(response.status, 204);
     assertEquals(data.length, 0);
-    assertEquals(updated.bookmarkedAt, null);
+    assertEquals(updated?.bookmarkedAt, null);
   });
 
   it("should not throw error on unbookmarking an unbookmarked feedItem", async () => {
@@ -171,7 +171,7 @@ describe("PATCH /api/feed-items/unbookmark", () => {
 
     assertEquals(response.status, 204);
     assertEquals(data.length, 0);
-    assertEquals(updated.bookmarkedAt, null);
-    assertEquals(feedItem.bookmarkedAt, updated.bookmarkedAt);
+    assertEquals(updated?.bookmarkedAt, null);
+    assertEquals(feedItem.bookmarkedAt, updated?.bookmarkedAt);
   });
 });

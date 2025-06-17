@@ -12,15 +12,15 @@ export const index = (router: Hono) => {
         { data: feedItems, pagination: feedItemsPagination },
       ] = await Promise.all([
         c.get("services").api.feedsService.getFeedById({
-          id: feedId,
+          id: feedId!,
           signal: c.req.raw.signal,
         }),
         c.get("services").api.feedItemsService.getFeedItems({
-          feedId,
+          feedId: feedId!,
           filters: { bookmarked: !!bookmarked, unread: !!unread },
           pagination: {
-            limit: limit ? Number(limit) : undefined,
-            page: page ? Number(page) : undefined,
+            limit: limit ? Number(limit) : 10,
+            page: page ? Number(page) : 0,
           },
           signal: c.req.raw.signal,
         }),

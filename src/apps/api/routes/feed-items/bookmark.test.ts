@@ -144,7 +144,7 @@ describe("PATCH /api/feed-items/bookmark", () => {
 
     assertEquals(response.status, 204);
     assertEquals(data.length, 0);
-    assertEquals(typeof updated.bookmarkedAt, "string");
+    assertEquals(typeof updated?.bookmarkedAt, "string");
   });
 
   it("should handle feed items already readed", async () => {

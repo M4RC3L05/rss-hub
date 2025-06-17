@@ -29,7 +29,7 @@ const runner = async ({
 
     try {
       const { faildCount, failedReasons, successCount, totalCount } =
-        await feedService.syncFeed(feed, { signal });
+        await feedService.syncFeed(feed, signal ? { signal } : undefined);
 
       log.info(
         `Done processing ${feed.url}, ${totalCount} items, with ${successCount} succeeded and ${faildCount} failed`,

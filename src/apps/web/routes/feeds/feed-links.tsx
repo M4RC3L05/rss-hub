@@ -16,7 +16,7 @@ export const feedLinks = (router: Hono) => {
         links = data;
       }
 
-      return c.render(<FeedLinksPage url={url} links={links} />);
+      return c.render(<FeedLinksPage url={url ?? ""} links={links ?? []} />);
     },
   );
 };

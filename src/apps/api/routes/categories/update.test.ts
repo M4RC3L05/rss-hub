@@ -167,8 +167,8 @@ describe("PATCH /api/categories/:id", () => {
 
     assertEquals(response.status, 200);
     assertEquals(data, {
-      data: { ...category, name: "bar", updatedAt: updated.updatedAt },
+      data: { ...category, name: "bar", updatedAt: updated?.updatedAt },
     });
-    assertEquals(updated.name, "bar");
+    assertEquals(updated?.name, "bar");
   });
 });

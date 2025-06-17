@@ -54,7 +54,7 @@ class FeedService {
         jitter: 0,
       }),
       10_000,
-      { signal: options?.signal },
+      options?.signal ? { signal: options?.signal } : undefined,
     );
   }
 

@@ -20,7 +20,7 @@ try {
     feedService: new FeedService(database),
   });
 } catch (error) {
-  log.error(error, "Error running feeds-synchronizer task");
+  log.error("Error running feeds-synchronizer task", { error });
 } finally {
   log.info("feeds-synchronizer completed");
 }

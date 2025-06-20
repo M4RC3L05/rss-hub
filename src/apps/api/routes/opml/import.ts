@@ -4,6 +4,7 @@ import { HTTPException } from "@hono/hono/http-exception";
 import { makeLogger } from "#src/common/logger/mod.ts";
 import type { FeedsTable } from "#src/database/types/mod.ts";
 import { xmlUtils } from "#src/common/utils/mod.ts";
+import jsonMask from "json-mask";
 
 const log = makeLogger("opml-import-handler");
 
@@ -22,13 +23,44 @@ export const importFeeds = (router: Hono) => {
     }
 
     const fileContent = await file.text();
-    let parsed = {};
+    let parsed: {
+      opml?: {
+        body?: {
+          outline?: {
+            "@_text"?: string;
+            outline?: {
+              "@_text"?: string;
+              "@_xmlUrl"?: string;
+              "@_htmlUrl"?: string;
+            } | {
+              "@_text"?: string;
+              "@_xmlUrl"?: string;
+              "@_htmlUrl"?: string;
+            }[];
+          } | {
+            "@_text"?: string;
+            outline?: {
+              "@_text"?: string;
+              "@_xmlUrl"?: string;
+              "@_htmlUrl"?: string;
+            } | {
+              "@_text"?: string;
+              "@_xmlUrl"?: string;
+              "@_htmlUrl"?: string;
+            }[];
+          }[];
+        };
+      };
+    } | null;
 
     try {
-      parsed = (await xmlUtils.xmlParser.parse(fileContent)) as Record<
-        string,
-        unknown
-      >;
+      parsed = await xmlUtils.xmlParser.parse(fileContent);
+      parsed = jsonMask(
+        parsed,
+        "opml(body(outline(@_text,outline(@_text,@_xmlUrl,@_htmlUrl))))",
+      );
+
+      if (!parsed) throw new Error("No parsed data");
     } catch (error) {
       throw new HTTPException(422, {
         message: "Malformed opml file",
@@ -37,22 +69,19 @@ export const importFeeds = (router: Hono) => {
     }
 
     const feedsToSync: string[] = [];
+    const categories = (
+      Array.isArray(parsed?.opml?.body?.outline)
+        ? parsed.opml.body.outline
+        : [parsed?.opml?.body?.outline]
+    ).filter((item) => item !== null && item !== undefined);
 
     c.get("database").transaction(() => {
-      // deno-lint-ignore no-explicit-any
-      const categories = (Array.isArray((parsed as any)?.opml?.body?.outline)
-        // deno-lint-ignore no-explicit-any
-        ? (parsed as any)?.opml?.body?.outline
-        // deno-lint-ignore no-explicit-any
-        : [(parsed as any)?.opml?.body?.outline])
-        .filter(
-          (value: string) => value !== null && value !== undefined,
-        );
-
       for (const category of categories) {
-        const categoryName = category["@_text"] as string | undefined;
+        const categoryName = category["@_text"];
 
-        if (!categoryName) continue;
+        if (!categoryName) {
+          continue;
+        }
 
         let [categoryStored] = c
           .get("database")
@@ -70,11 +99,11 @@ export const importFeeds = (router: Hono) => {
           ]!;
         }
 
-        const feeds = (Array.isArray(category.outline)
-          ? category.outline
-          : [category.outline]).filter((value: string) =>
-            value !== null && value !== undefined
-          );
+        const feeds = (
+          Array.isArray(category.outline)
+            ? category.outline
+            : [category.outline]
+        ).filter((item) => item !== null && item !== undefined);
 
         for (const feed of feeds) {
           const feedName = feed["@_text"];
@@ -133,9 +162,7 @@ export const importFeeds = (router: Hono) => {
             return {
               feed,
               stats: await c.get("feedService").syncFeed(feed, {
-                signal: AbortSignal.any([
-                  c.get("shutdown"),
-                ]),
+                signal: c.get("shutdown"),
               }),
             };
           }),

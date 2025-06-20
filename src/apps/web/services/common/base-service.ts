@@ -19,20 +19,13 @@ export abstract class BaseService {
   ) {
     return fetch(
       `${this.#baseUrl}${path}`,
-      // deno-lint-ignore no-explicit-any
-      deepMerge((init ?? {}) as any, {
+      deepMerge((init as Record<string, unknown>) ?? {}, {
         headers: {
           "authorization": `Basic ${
             encodeBase64(`${this.#auth.username}:${this.#auth.password}`)
           }`,
         },
-        // deno-lint-ignore ban-ts-comment
-        // @ts-ignore
-        // see: https://github.com/denoland/deno/issues/27150
         signal: init?.signal
-          // deno-lint-ignore ban-ts-comment
-          // @ts-ignore
-          // see: https://github.com/denoland/deno/issues/27150
           ? AbortSignal.any([init.signal, AbortSignal.timeout(10_000)])
           : AbortSignal.timeout(10_000),
       }),

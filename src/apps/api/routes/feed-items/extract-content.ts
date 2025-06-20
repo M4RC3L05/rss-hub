@@ -68,9 +68,8 @@ export const extractContent = (router: Hono) => {
       ).window
         .document;
 
-      // deno-lint-ignore no-explicit-any
-      for (const element of dom.querySelectorAll("a") as any as Element[]) {
-        const href = ((element as Element).getAttribute("href") ?? "").trim();
+      for (const element of dom.querySelectorAll("a")) {
+        const href = (element.getAttribute("href") ?? "").trim();
 
         if (!href.startsWith("#")) {
           (element as Element).setAttribute("target", "_blank");
@@ -80,8 +79,7 @@ export const extractContent = (router: Hono) => {
       for (
         const eleWithExternalResources of dom.querySelectorAll(
           "[src], [href], [srcset]",
-          // deno-lint-ignore no-explicit-any
-        ) as any as Element[]
+        )
       ) {
         const href = (eleWithExternalResources.getAttribute("href") ?? "")
           .trim();

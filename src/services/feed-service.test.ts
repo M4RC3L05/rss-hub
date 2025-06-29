@@ -26,6 +26,7 @@ import {
 } from "@std/testing/mock";
 import FeedService from "#src/services/feed-service.ts";
 import { makeLogger } from "#src/common/logger/mod.ts";
+import { FakeTime } from "@std/testing/time";
 
 const log = makeLogger("feed-service");
 let db: CustomDatabase;
@@ -495,6 +496,80 @@ describe("FeedService", () => {
             readedAt: null,
             title: "Blog Post 3",
             updatedAt: "2023-10-01T12:00:00.000Z",
+          },
+        ],
+      );
+    });
+
+    it("should sync a feed and respect feed items order when no timestamp", async () => {
+      using _ = new FakeTime(0);
+      const feed = testFixtures.loadFeed(db, { url: "https://example.com" });
+
+      using fetchStub = stub(
+        globalThis,
+        "fetch",
+        () =>
+          Promise.resolve(Response.json({
+            title: "foo",
+            items: [{
+              id: "https://www.example.com/blog/post1",
+              title: "Blog Post 1",
+              url: "https://www.example.com/blog/post1",
+              content_text:
+                "This is the first blog post. It covers various topics.",
+              image: "https://www.example.com/blog/post1/image.jpg",
+              attachments: [
+                {
+                  url: "https://www.example.com/blog/post1/attachment.pdf",
+                  title: "Attachment PDF",
+                  mime_type: "application/pdf",
+                  size: 123456,
+                },
+              ],
+            }, {
+              title: "Blog Post 2",
+              url: "https://www.example.com/blog/post2",
+              content_html:
+                "<p>This is the first blog post. It covers various topics.</p>",
+              attachments: [],
+            }, {
+              id: "https://www.example.com/blog/post3",
+              title: "Blog Post 3",
+              url: "https://www.example.com/blog/post3",
+              summary: "A brief summary of the first blog post.",
+              image: "https://www.example.com/blog/post1/image.jpg",
+            }],
+          })),
+      );
+
+      const result = await new FeedService(db).syncFeed(feed);
+
+      assertSpyCalls(fetchStub, 1);
+      assertEquals(result, {
+        totalCount: 3,
+        successCount: 3,
+        faildCount: 0,
+        failedReasons: [],
+      });
+
+      assertEquals(
+        db.sql`
+          select rowid,title
+          from feed_items
+          order by rowid asc
+        `,
+        [
+          {
+            title: "Blog Post 3",
+            rowid: 1,
+          },
+          {
+            title: "Blog Post 2",
+            rowid: 2,
+          },
+          {
+            title: "Blog Post 1",
+            rowid: 3,
           },
         ],
       );

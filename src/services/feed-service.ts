@@ -165,21 +165,21 @@ class FeedService {
     }
 
     const data = feedResolver(extracted);
+    const status: (true | Error)[] = [];
 
-    const status = await Promise.allSettled(
-      data.items.map((entry) => this.#syncFeedEntry(feed.id, entry)),
-    );
+    for (let i = data.items.length - 1; i >= 0; i -= 1) {
+      try {
+        await this.#syncFeedEntry(feed.id, data.items[i]!);
+        status.push(true);
+      } catch (error) {
+        status.push(error as Error);
+      }
+    }
 
     const totalCount = status.length;
-    const successCount = status.filter(
-      ({ status }) => status === "fulfilled",
-    ).length;
-    const faildCount = status.filter(
-      ({ status }) => status === "rejected",
-    ).length;
-    const failedReasons = status
-      .filter(({ status }) => status === "rejected")
-      .map((data) => (data as PromiseRejectedResult).reason as unknown);
+    const successCount = status.filter((item) => item === true).length;
+    const faildCount = status.filter((item) => item !== true).length;
+    const failedReasons = status.filter((item) => item !== true);
 
     return {
       totalCount,

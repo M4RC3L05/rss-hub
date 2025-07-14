@@ -16,7 +16,7 @@ export const FeedLinksPage: FC<FeedLinksPageProps> = ({ links, url }) => (
     </header>
 
     <main>
-      {Array.isArray(links)
+      {Array.isArray(links) && url
         ? (
           <>
             {links.length <= 0 ? <p>No links found for "{url}"</p> : (

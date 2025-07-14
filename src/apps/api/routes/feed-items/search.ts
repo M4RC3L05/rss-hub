@@ -1,6 +1,7 @@
 import type { Hono } from "@hono/hono";
 import vine from "@vinejs/vine";
 import type { FeedItemsTable } from "#src/database/types/mod.ts";
+import type { RestBindParameters } from "@db/sqlite";
 
 const requestQuerySchema = vine
   .object({
@@ -35,34 +36,36 @@ export const search = (router: Hono) => {
       const query = await requestQueryValidator.validate(c.req.query());
 
       const { cond, bindArgs } = generateSqlConditions(query);
-      const data = c.get("database").prepare(`
-        with items as (
-          select rowid, *
-          from feed_items
-          ${cond.length > 0 ? `where ${cond}` : ""}
-        )
+      const baseSelect = `
         select
-          i.id as id,
-          i.title as title,
-          i.enclosure as enclosure,
-          i.link as link,
-          i.img as img,
-          i.content as content,
-          i.feed_id as "feedId",
-          i.readed_at as "readedAt",
-          i.bookmarked_at as "bookmarkedAt",
-          i.created_at as "createdAt",
-          i.updated_at as "updatedAt",
-          ti."totalItems" as "totalItems"
-        from
-          items as i,
-          (select count(*) as "totalItems" from items) as ti
-        order by i.created_at desc, i.rowid desc
+          id as id,
+          title as title,
+          enclosure as enclosure,
+          link as link,
+          img as img,
+          content as content,
+          feed_id as "feedId",
+          readed_at as "readedAt",
+          bookmarked_at as "bookmarkedAt",
+          created_at as "createdAt",
+          updated_at as "updatedAt"
+        from feed_items
+        ${cond.length > 0 ? `where ${cond}` : ""}
+        order by created_at desc, rowid desc
+      `;
+      const data = c.get("database").prepare(`
+        ${baseSelect}
         limit :limit
         offset :offset
       `).all<
-        FeedItemsTable & { rowid: number; totalItems: number }
+        FeedItemsTable & { rowid: number }
       >({ ...bindArgs, limit: query.limit, offset: query.page * query.limit });
+
+      const { totalItems } = c.get("database").prepare(
+        `select count(*) as "totalItems" from (${baseSelect})`,
+      ).get<FeedItemsTable & { rowid: number; totalItems: number }>({
+        ...bindArgs,
+      } as unknown as RestBindParameters)!;
 
       return c.json({
         data,
@@ -70,9 +73,9 @@ export const search = (router: Hono) => {
           previous: Math.max(query.page - 1, 0),
           next: Math.min(
             query.page + 1,
-            Math.floor((data[0]?.totalItems ?? 0) / query.limit),
+            Math.floor((totalItems ?? 0) / query.limit),
           ),
-          total: data[0]?.totalItems ?? 0,
+          total: totalItems ?? 0,
           limit: query.limit,
         },
       });

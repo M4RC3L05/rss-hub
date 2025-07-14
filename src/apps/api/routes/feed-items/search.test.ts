@@ -113,16 +113,8 @@ describe("GET /api/feed-items", () => {
 
     assertEquals(response.status, 200);
     assertEquals(data, {
-      data: [
-        { ...feedItem2, totalItems: 2 },
-        { ...feedItem, totalItems: 2 },
-      ],
-      pagination: {
-        limit: 10,
-        next: 0,
-        previous: 0,
-        total: 2,
-      },
+      data: [feedItem2, feedItem],
+      pagination: { limit: 10, next: 0, previous: 0, total: 2 },
     });
   });
 
@@ -145,16 +137,8 @@ describe("GET /api/feed-items", () => {
 
     assertEquals(response.status, 200);
     assertEquals(data, {
-      data: [
-        { ...feedItem2, totalItems: 2 },
-        { ...feedItem, totalItems: 2 },
-      ],
-      pagination: {
-        limit: 10,
-        next: 0,
-        previous: 0,
-        total: 2,
-      },
+      data: [feedItem2, feedItem],
+      pagination: { limit: 10, next: 0, previous: 0, total: 2 },
     });
   });
 
@@ -176,16 +160,8 @@ describe("GET /api/feed-items", () => {
 
     assertEquals(response.status, 200);
     assertEquals(data, {
-      data: [
-        { ...feedItem2, totalItems: 2 },
-        { ...feedItem, totalItems: 2 },
-      ],
-      pagination: {
-        limit: 10,
-        next: 0,
-        previous: 0,
-        total: 2,
-      },
+      data: [feedItem2, feedItem],
+      pagination: { limit: 10, next: 0, previous: 0, total: 2 },
     });
   });
 
@@ -208,16 +184,8 @@ describe("GET /api/feed-items", () => {
 
       assertEquals(response.status, 200);
       assertEquals(data, {
-        data: [
-          { ...feedItem3, totalItems: 3 },
-          { ...feedItem2, totalItems: 3 },
-        ],
-        pagination: {
-          limit: 2,
-          next: 1,
-          previous: 0,
-          total: 3,
-        },
+        data: [feedItem3, feedItem2],
+        pagination: { limit: 2, next: 1, previous: 0, total: 3 },
       });
     }
 
@@ -235,15 +203,8 @@ describe("GET /api/feed-items", () => {
 
       assertEquals(response.status, 200);
       assertEquals(data, {
-        data: [
-          { ...feedItem, totalItems: 3 },
-        ],
-        pagination: {
-          limit: 2,
-          next: 1,
-          previous: 0,
-          total: 3,
-        },
+        data: [feedItem],
+        pagination: { limit: 2, next: 1, previous: 0, total: 3 },
       });
     }
   });
